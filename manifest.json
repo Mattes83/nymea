@@ -1,6 +1,6 @@
 {
-  "domain": "detailed_hello_world_push",
-  "name": "Detailed Hello World Push",
+  "domain": "nymea",
+  "name": "nymea",
   "codeowners": ["@Mattes83"],
   "config_flow": true,
   "dependencies": [],

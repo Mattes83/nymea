@@ -1,4 +1,4 @@
-"""Config flow for Hello World integration."""
+"""Config flow for nymea integration."""
 from __future__ import annotations
 
 import logging
@@ -8,6 +8,10 @@ import voluptuous as vol
 
 from homeassistant import config_entries, exceptions
 from homeassistant.core import HomeAssistant
+from homeassistant.config_entries import (
+    ConfigFlowResult,
+    OptionsFlow,
+)
 
 from .const import DOMAIN  # pylint:disable=unused-import
 from .hub import Hub
@@ -25,7 +29,8 @@ _LOGGER = logging.getLogger(__name__)
 # quite work as documented and always gave me the "Lokalise key references" string
 # (in square brackets), rather than the actual translated value. I did not attempt to
 # figure this out or look further into it.
-DATA_SCHEMA = vol.Schema({("host"): str})
+#DATA_SCHEMA = vol.Schema({("host"): str})
+DATA_SCHEMA = vol.Schema({     vol.Required(        "host",        default="192.168.2.12"): str,})
 
 
 async def validate_input(hass: HomeAssistant, data: dict) -> dict[str, Any]:
@@ -69,7 +74,7 @@ async def validate_input(hass: HomeAssistant, data: dict) -> dict[str, Any]:
 
 
 class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
-    """Handle a config flow for Hello World."""
+    """Handle a config flow for nymea."""
 
     VERSION = 1
     # Pick one of the available connection classes in homeassistant/config_entries.py
@@ -78,7 +83,7 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
     # changes.
     CONNECTION_CLASS = config_entries.CONN_CLASS_LOCAL_PUSH
 
-    async def async_step_user(self, user_input=None):
+    async def async_step_user(self, user_input: dict[str, Any] | None = None) -> ConfigFlowResult:
         """Handle the initial step."""
         # This goes through the steps to take the user through the setup process.
         # Using this it is possible to update the UI and prompt for additional

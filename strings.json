@@ -2,10 +2,13 @@
   "config": {
     "step": {
       "user": {
+        "title": "Connect to nymea",
+        "description": "Please enter the host name or IP address of a nymea device (preferably one connected via wire to the network).",
         "data": {
-          "host": "[%key:common::config_flow::data::host%]",
-          "username": "[%key:common::config_flow::data::username%]",
-          "password": "[%key:common::config_flow::data::password%]"
+          "host": "[%key:common::config_flow::data::host%]"
+        },
+        "data_description": {
+          "host": "The hostname or IP address of your nymea device."
         }
       }
     },
