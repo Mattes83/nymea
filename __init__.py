@@ -1,4 +1,4 @@
-"""The Detailed Hello World Push integration."""
+"""The nymea integration."""
 from __future__ import annotations
 
 from homeassistant.config_entries import ConfigEntry
@@ -13,7 +13,7 @@ PLATFORMS: list[str] = ["cover", "sensor"]
 
 
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
-    """Set up Hello World from a config entry."""
+    """Set up nymea from a config entry."""
     # Store an instance of the "connecting" class that does the work of speaking
     # with your actual devices.
     hass.data.setdefault(DOMAIN, {})[entry.entry_id] = hub.Hub(hass, entry.data["host"])

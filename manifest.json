@@ -4,7 +4,7 @@
   "codeowners": ["@Mattes83"],
   "config_flow": true,
   "dependencies": [],
-  "documentation": "test",
+  "documentation": "https://community.home-assistant.io/t/translations-not-working-and-failing-hassfest/595023",
   "homekit": {},
   "iot_class": "local_push",
   "requirements": [],
