@@ -1,7 +1,7 @@
 {
   "domain": "detailed_hello_world_push",
   "name": "Detailed Hello World Push",
-  "codeowners": ["@sillyfrog"],
+  "codeowners": ["@Mattes83"],
   "config_flow": true,
   "dependencies": [],
   "documentation": "https://www.home-assistant.io/integrations/detailed_hello_world_push",
