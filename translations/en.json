@@ -1,24 +1,26 @@
 {
     "config": {
         "abort": {
-            "already_configured": "[%key:common::config_flow::abort::already_configured_device%]"
+            "already_configured": "Device is already configured"
         },
         "error": {
-            "cannot_connect": "[%key:common::config_flow::error::cannot_connect%]",
-            "invalid_auth": "[%key:common::config_flow::error::invalid_auth%]",
-            "unknown": "[%key:common::config_flow::error::unknown%]"
+            "cannot_connect": "Failed to connect",
+            "invalid_auth": "Invalid authentication",
+            "unknown": "Unexpected error"
         },
         "step": {
             "user": {
-                "title": "Connect to nymea",
-                "description": "Please enter the host name or IP address of a nymea device (preferably one connected via wire to the network).",
                 "data": {
-                    "host": "[%key:common::config_flow::data::host%]"
+                    "host": "host",
+                    "port": "port"
                 },
                 "data_description": {
-                    "host": "The hostname or IP address of your nymea device."
-                }
+                    "host": "The hostname or IP address of your nymea device.",
+                    "port": "The port of your nymea device."
+                },
+                "description": "Please enter the host name or IP address of a nymea device.",
+                "title": "Connect to nymea"
             }
         }
-   }
+    }
 }
