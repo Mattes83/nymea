@@ -1,18 +1,7 @@
 """Platform for sensor integration."""
 
-# This file shows the setup for the sensors associated with the cover.
-# They are setup in the same way with the call to the async_setup_entry function
-# via HA from the module __init__. Each sensor has a device_class, this tells HA how
-# to display it in the UI (for know types). The unit_of_measurement property tells HA
-# what the unit is, so it can display the correct range. For predefined types (such as
-# battery), the unit_of_measurement should match what's expected.
-import random
-
 from homeassistant.components.sensor import SensorDeviceClass
-from homeassistant.const import (
-    ATTR_VOLTAGE,
-    PERCENTAGE,
-)
+from homeassistant.const import ATTR_VOLTAGE, PERCENTAGE
 from homeassistant.helpers.entity import Entity
 
 from .const import DOMAIN
@@ -22,13 +11,13 @@ from .const import DOMAIN
 # Note how both entities for each roller sensor (battry and illuminance) are added at
 # the same time to the same list. This way only a single async_add_devices call is
 # required.
-async def async_setup_entry(hass, config_entry, async_add_entities):
+async def async_setup_entry(hass, config_entry, async_add_entities) -> None:
     """Add sensors for passed config_entry in HA."""
     hub = hass.data[DOMAIN][config_entry.entry_id]
 
     new_devices = []
     for roller in hub.rollers:
-        new_devices.append(IlluminanceSensor(roller))
+        new_devices.append(StateSensor(roller))
     if new_devices:
         async_add_entities(new_devices)
 
@@ -45,10 +34,6 @@ class SensorBase(Entity):
         """Initialize the sensor."""
         self._roller = roller
 
-    # To link this entity to the cover device, this property must return an
-    # identifiers value matching that used in the cover, but no other information such
-    # as name. If name is returned, this entity will then also become a device in the
-    # HA UI.
     @property
     def device_info(self):
         """Return information to link this entity with the correct device."""
@@ -68,19 +53,18 @@ class SensorBase(Entity):
         self._roller.remove_callback(self.async_write_ha_state)
 
 
-class IlluminanceSensor(SensorBase):
+class StateSensor(SensorBase):
     """Representation of a Sensor."""
 
-    device_class = SensorDeviceClass.ILLUMINANCE
-    _attr_unit_of_measurement = "lx"
+    device_class = SensorDeviceClass.ENUM
 
     def __init__(self, roller) -> None:
         """Initialize the sensor."""
         super().__init__(roller)
-        self._attr_unique_id = f"{self._roller.roller_id}_illuminance"
-        self._attr_name = f"{self._roller.name} Illuminance"
+        self._attr_unique_id = f"{self._roller.roller_id}_state"
+        self._attr_name = f"{self._roller.name} State"
 
     @property
     def state(self):
         """Return the state of the sensor."""
-        return self._roller.illuminance
+        return self._roller.state

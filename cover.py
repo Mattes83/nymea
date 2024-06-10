@@ -20,6 +20,10 @@ from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
 from .const import DOMAIN
 
+from datetime import timedelta
+
+SCAN_INTERVAL = timedelta(seconds=5)
+
 
 # This function is called as part of the __init__.async_setup_entry (via the
 # hass.config_entries.async_forward_entry_setup call)
@@ -160,22 +164,11 @@ class NymeaCover(CoverEntity):
 
         This is the only method that should fetch new data for Home Assistant.
         """
-
         params = {}
         params["thingId"] = self._roller.thingid
+        params["stateTypeId"] = self.stateTypeIdState
 
-        things = self._roller.hub.send_command("Integrations.GetThings", params)[
+        value = self._roller.hub.send_command("Integrations.GetStateValue", params)[
             "params"
-        ]["things"]
-        for thing in things:
-            if thing["thingClassId"] == "ca6baab8-3708-4478-8ca2-7d4d6d542937":
-                state = next(
-                    (
-                        obj
-                        for obj in thing["states"]
-                        if obj["stateTypeId"] == self.stateTypeIdState
-                    ),
-                    None,
-                )["value"]
-
-                self._roller.state = State[state]
+        ]["value"]
+        self._roller.state = State[value]
