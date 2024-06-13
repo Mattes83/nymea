@@ -1,4 +1,5 @@
 """Config flow for nymea integration."""
+
 from __future__ import annotations
 
 import logging
@@ -11,7 +12,7 @@ from homeassistant import config_entries, exceptions
 from homeassistant.core import HomeAssistant
 
 from .const import DOMAIN  # pylint:disable=unused-import
-from .hub import Hub
+from .maveo_box import MaveoBox
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -33,7 +34,7 @@ async def validate_input(hass: HomeAssistant, data: dict) -> dict[str, Any]:
     if not re.match(pattern, data["host"]):
         raise InvalidHost
 
-    hub = Hub(hass, data["host"], data["port"])
+    hub = MaveoBox(hass, data["host"], data["port"])
     success = await hub.test_connection()
     if not success:
         # If there is an error, raise an exception to notify HA that there was a

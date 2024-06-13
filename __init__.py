@@ -5,7 +5,7 @@ from __future__ import annotations
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
 
-from . import hub
+from . import maveo_box
 from .const import DOMAIN
 
 PLATFORMS: list[str] = ["cover", "sensor"]
@@ -13,13 +13,11 @@ PLATFORMS: list[str] = ["cover", "sensor"]
 
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     """Set up nymea from a config entry."""
-    nymea_hub = hub.Hub(hass, entry.data["host"], entry.data["port"])
+    nymea_hub = maveo_box.MaveoBox(hass, entry.data["host"], entry.data["port"])
     hass.data.setdefault(DOMAIN, {})[entry.entry_id] = nymea_hub
     await nymea_hub.init_connection()
     await nymea_hub.get_devices()
 
-    # This creates each HA object for each platform your device requires.
-    # It's done by calling the `async_setup_entry` function in each platform module.
     await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
     return True
 

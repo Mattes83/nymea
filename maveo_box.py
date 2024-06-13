@@ -2,18 +2,12 @@
 
 from __future__ import annotations
 
-# In a real implementation, this would be in an external library that's on PyPI.
-# The PyPI package needs to be included in the `requirements` section of manifest.json
-# See https://developers.home-assistant.io/docs/creating_integration_manifest
-# for more information.
-import asyncio
-import random
+from enum import Enum
+import getpass
 import json
 import socket
 import ssl
-import getpass
 
-from enum import Enum
 from homeassistant.core import HomeAssistant
 
 State = Enum(
@@ -21,13 +15,13 @@ State = Enum(
 )
 
 
-class Hub:
-    """nymea hub."""
+class MaveoBox:
+    """Maveo Box."""
 
-    manufacturer = "nymea"
+    manufacturer = "maveo"
 
     def __init__(self, hass: HomeAssistant, host: str, port: int) -> None:
-        """Init nymea hub."""
+        """Init maveo box."""
         self._host = host
         self._port = port
         self._hass = hass
@@ -39,7 +33,7 @@ class Hub:
         self._initialSetupRequired = False
         self._commandId = 0
         self._sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self.rollers = []
+        self.maveoSticks = []
         self.online = True
 
     @property
@@ -48,6 +42,7 @@ class Hub:
         return self._id
 
     async def test_connection(self) -> bool:
+        """Tests initial connectivity during setup."""
         with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
             sock.settimeout(5)
             try:
@@ -57,6 +52,7 @@ class Hub:
                 return False
 
     async def get_devices(self):
+        """Adds devices."""
         params = {}
         params["thingClassId"] = "ca6baab8-3708-4478-8ca2-7d4d6d542937"
         stateTypes = self.send_command("Integrations.GetStateTypes", params)["params"][
@@ -97,8 +93,8 @@ class Hub:
                     ),
                     None,
                 )["value"]
-                self.rollers.append(
-                    Roller(
+                self.maveoSticks.append(
+                    MaveoStick(
                         thing["id"],
                         thing["name"],
                         manufacturer,
@@ -346,26 +342,25 @@ class Hub:
         input('\nDEBUG STOP: Press "enter" to continue...\n')
 
 
-class Roller:
-    """Dummy roller (device for HA) for Hello World example."""
+class MaveoStick:
+    """Represents a Maveo Stick attached to the garage door drive and connected to the maveo box."""
 
     def __init__(
         self,
-        rollerid: str,
+        stickId: str,
         name: str,
         manufacturer: str,
         version: str,
         thingid: str,
-        hub: Hub,
+        maveoBox: MaveoBox,
     ) -> None:
         """Init roller."""
-        self._id = rollerid
+        self._id = stickId
         self.thingid = thingid
         self.thingclassid = "ca6baab8-3708-4478-8ca2-7d4d6d542937"
-        self.hub = hub
+        self.maveoBox = maveoBox
         self.name = name
         self._callbacks = set()
-        self._loop = asyncio.get_event_loop()
         self.state = State.closed
 
         # Some static information about this device
@@ -373,37 +368,19 @@ class Roller:
         self.model = manufacturer
 
     @property
-    def roller_id(self) -> str:
-        """Return ID for roller."""
+    def stick_id(self) -> str:
+        """Return ID for maveo stick."""
         return self._id
 
-    async def delayed_update(self) -> None:
-        """Publish updates, with a random delay to emulate interaction with device."""
-        await asyncio.sleep(random.randint(1, 10))
-        await self.publish_updates()
-
     def register_callback(self, callback: Callable[[], None]) -> None:
-        """Register callback, called when Roller changes state."""
+        """Register callback, called when MaveoStick changes state."""
         self._callbacks.add(callback)
 
     def remove_callback(self, callback: Callable[[], None]) -> None:
         """Remove previously registered callback."""
         self._callbacks.discard(callback)
 
-    # In a real implementation, this library would call it's call backs when it was
-    # notified of any state changeds for the relevant device.
     async def publish_updates(self) -> None:
         """Schedule call all registered callbacks."""
-        self._current_position = self._target_position
         for callback in self._callbacks:
             callback()
-
-    @property
-    def online(self) -> float:
-        """Roller is online."""
-        return random.random() > 0.1
-
-    @property
-    def illuminance(self) -> int:
-        """Return a sample illuminance in lux."""
-        return random.randint(0, 500)
