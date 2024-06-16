@@ -6,6 +6,7 @@ from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
 
 from . import maveo_box
+from .maveo_stick import MaveoStick
 from .const import DOMAIN
 
 PLATFORMS: list[str] = ["cover", "sensor"]
@@ -16,7 +17,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     nymea_hub = maveo_box.MaveoBox(hass, entry.data["host"], entry.data["port"])
     hass.data.setdefault(DOMAIN, {})[entry.entry_id] = nymea_hub
     await nymea_hub.init_connection()
-    await nymea_hub.get_devices()
+    await MaveoStick.add(nymea_hub)
 
     await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
     return True

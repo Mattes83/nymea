@@ -12,7 +12,7 @@ from homeassistant.components.cover import (
     CoverEntity,
     CoverEntityFeature,
 )
-from .maveo_box import State
+from .maveo_stick import State, MaveoStick
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.device_registry import DeviceInfo
@@ -64,7 +64,7 @@ class GarageDoor(CoverEntity):
         # entity screens, and used to build the Entity ID that's used is automations etc.
         self._attr_name = self._maveoStick.name
         params = {}
-        params["thingClassId"] = self._maveoStick.thingclassid
+        params["thingClassId"] = MaveoStick.thingclassid
         stateTypes = self._maveoStick.maveoBox.send_command(
             "Integrations.GetStateTypes", params
         )["params"]["stateTypes"]
@@ -104,7 +104,7 @@ class GarageDoor(CoverEntity):
     @property
     def is_closed(self) -> bool:
         """Return if the cover is closed."""
-        return self._maveoStick.state == State.closed
+        return self._maveoStick.state == State.closed or State.intermediate
 
     @property
     def is_closing(self) -> bool:
@@ -118,7 +118,7 @@ class GarageDoor(CoverEntity):
 
     async def async_open_cover(self, **kwargs: Any) -> None:
         params = {}
-        params["thingClassId"] = self._maveoStick.thingclassid
+        params["thingClassId"] = MaveoStick.thingclassid
         response = self._maveoStick.maveoBox.send_command(
             "Integrations.GetActionTypes", params
         )["params"]["actionTypes"]
@@ -138,7 +138,7 @@ class GarageDoor(CoverEntity):
 
     async def async_close_cover(self, **kwargs: Any) -> None:
         params = {}
-        params["thingClassId"] = self._maveoStick.thingclassid
+        params["thingClassId"] = MaveoStick.thingclassid
         response = self._maveoStick.maveoBox.send_command(
             "Integrations.GetActionTypes", params
         )["params"]["actionTypes"]
@@ -162,7 +162,7 @@ class GarageDoor(CoverEntity):
         This is the only method that should fetch new data for Home Assistant.
         """
         params = {}
-        params["thingId"] = self._maveoStick.thingid
+        params["thingId"] = self._maveoStick.stick_id
         params["stateTypeId"] = self.stateTypeIdState
 
         value = self._maveoStick.maveoBox.send_command(

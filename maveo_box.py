@@ -2,17 +2,12 @@
 
 from __future__ import annotations
 
-from enum import Enum
 import getpass
 import json
 import socket
 import ssl
 
 from homeassistant.core import HomeAssistant
-
-State = Enum(
-    "State", ["unknown", "open", "closed", "opening", "closing", "intermediate"]
-)
 
 
 class MaveoBox:
@@ -50,59 +45,6 @@ class MaveoBox:
                 return True
             except (socket.timeout, socket.error):
                 return False
-
-    async def get_devices(self):
-        """Adds devices."""
-        params = {}
-        params["thingClassId"] = "ca6baab8-3708-4478-8ca2-7d4d6d542937"
-        stateTypes = self.send_command("Integrations.GetStateTypes", params)["params"][
-            "stateTypes"
-        ]
-
-        statetype_manufacturer = next(
-            (
-                obj
-                for obj in stateTypes
-                if obj["displayName"] == "Garage manufacturer name"
-            ),
-            None,
-        )
-
-        statetype_version = next(
-            (obj for obj in stateTypes if obj["displayName"] == "maveo-stick version"),
-            None,
-        )
-
-        things = self.send_command("Integrations.GetThings")["params"]["things"]
-        for thing in things:
-            if thing["thingClassId"] == "ca6baab8-3708-4478-8ca2-7d4d6d542937":
-                manufacturer = next(
-                    (
-                        obj
-                        for obj in thing["states"]
-                        if obj["stateTypeId"] == statetype_manufacturer["id"]
-                    ),
-                    None,
-                )["value"]
-
-                version = next(
-                    (
-                        obj
-                        for obj in thing["states"]
-                        if obj["stateTypeId"] == statetype_version["id"]
-                    ),
-                    None,
-                )["value"]
-                self.maveoSticks.append(
-                    MaveoStick(
-                        thing["id"],
-                        thing["name"],
-                        manufacturer,
-                        version,
-                        thing["id"],
-                        self,
-                    )
-                )
 
     async def init_connection(self) -> bool:
         try:
@@ -340,47 +282,3 @@ class MaveoBox:
 
     def debug_stop(self):
         input('\nDEBUG STOP: Press "enter" to continue...\n')
-
-
-class MaveoStick:
-    """Represents a Maveo Stick attached to the garage door drive and connected to the maveo box."""
-
-    def __init__(
-        self,
-        stickId: str,
-        name: str,
-        manufacturer: str,
-        version: str,
-        thingid: str,
-        maveoBox: MaveoBox,
-    ) -> None:
-        """Init roller."""
-        self._id = stickId
-        self.thingid = thingid
-        self.thingclassid = "ca6baab8-3708-4478-8ca2-7d4d6d542937"
-        self.maveoBox = maveoBox
-        self.name = name
-        self._callbacks = set()
-        self.state = State.closed
-
-        # Some static information about this device
-        self.firmware_version = version
-        self.model = manufacturer
-
-    @property
-    def stick_id(self) -> str:
-        """Return ID for maveo stick."""
-        return self._id
-
-    def register_callback(self, callback: Callable[[], None]) -> None:
-        """Register callback, called when MaveoStick changes state."""
-        self._callbacks.add(callback)
-
-    def remove_callback(self, callback: Callable[[], None]) -> None:
-        """Remove previously registered callback."""
-        self._callbacks.discard(callback)
-
-    async def publish_updates(self) -> None:
-        """Schedule call all registered callbacks."""
-        for callback in self._callbacks:
-            callback()
