@@ -12,6 +12,10 @@
           "host": "The hostname or IP address of your nymea device.",
           "port": "The port of your nymea device."
         }
+      },
+      "link": {
+        "title": "Link Hub",
+        "description": "After confirming this dialog press the yellow button on the backside of the maveo box to create a token for use with Home Assistant."
       }
     },
     "error": {

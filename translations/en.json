@@ -9,6 +9,10 @@
             "unknown": "Unexpected error"
         },
         "step": {
+            "link": {
+                "description": "After confirming this dialog press the yellow button on the backside of the maveo box to create a token for use with Home Assistant.",
+                "title": "Link Hub"
+            },
             "user": {
                 "data": {
                     "host": "host",

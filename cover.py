@@ -57,7 +57,7 @@ class GarageDoor(CoverEntity):
         # which is done here by appending "_cover". For more information, see:
         # https://developers.home-assistant.io/docs/entity_registry_index/#unique-id-requirements
         # Note: This is NOT used to generate the user visible Entity ID used in automations.
-        self._attr_unique_id = f"{self._maveoStick.stick_id}_cover"
+        self._attr_unique_id = f"{self._maveoStick.id}_cover"
 
         # This is the name for this *entity*, the "name" attribute from "device_info"
         # is used as the device name for device screens in the UI. This name is used on
@@ -94,17 +94,17 @@ class GarageDoor(CoverEntity):
     def device_info(self) -> DeviceInfo:
         """Information about this entity/device."""
         return {
-            "identifiers": {(DOMAIN, self._maveoStick.stick_id)},
-            "name": self.name,
+            "identifiers": {(DOMAIN, self._maveoStick.id)},
+            "name": "maveo Stick",
+            "model": "maveo Stick",
             "sw_version": self._maveoStick.firmware_version,
-            "model": self._maveoStick.model,
-            "manufacturer": self._maveoStick.maveoBox.manufacturer,
+            "manufacturer": "Marantec",
         }
 
     @property
     def is_closed(self) -> bool:
         """Return if the cover is closed."""
-        return self._maveoStick.state == State.closed or State.intermediate
+        return self._maveoStick.state == State.closed
 
     @property
     def is_closing(self) -> bool:
@@ -129,7 +129,7 @@ class GarageDoor(CoverEntity):
 
         params = {}
         params["actionTypeId"] = actionType_open["id"]
-        params["thingId"] = self._maveoStick.stick_id
+        params["thingId"] = self._maveoStick.id
         response = self._maveoStick.maveoBox.send_command(
             "Integrations.ExecuteAction", params
         )
@@ -149,7 +149,7 @@ class GarageDoor(CoverEntity):
 
         params = {}
         params["actionTypeId"] = actionType_open["id"]
-        params["thingId"] = self._maveoStick.stick_id
+        params["thingId"] = self._maveoStick.id
         response = self._maveoStick.maveoBox.send_command(
             "Integrations.ExecuteAction", params
         )
@@ -162,7 +162,7 @@ class GarageDoor(CoverEntity):
         This is the only method that should fetch new data for Home Assistant.
         """
         params = {}
-        params["thingId"] = self._maveoStick.stick_id
+        params["thingId"] = self._maveoStick.id
         params["stateTypeId"] = self.stateTypeIdState
 
         value = self._maveoStick.maveoBox.send_command(

@@ -7,6 +7,8 @@ from homeassistant.core import HomeAssistant
 
 from . import maveo_box
 from .maveo_stick import MaveoStick
+from .maveo_sensor import MaveoSensor
+from .aqara_sensor import AqaraSensor
 from .const import DOMAIN
 
 PLATFORMS: list[str] = ["cover", "sensor"]
@@ -14,10 +16,14 @@ PLATFORMS: list[str] = ["cover", "sensor"]
 
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     """Set up nymea from a config entry."""
-    nymea_hub = maveo_box.MaveoBox(hass, entry.data["host"], entry.data["port"])
+    nymea_hub = maveo_box.MaveoBox(
+        hass, entry.data["host"], entry.data["port"], entry.data["token"]
+    )
     hass.data.setdefault(DOMAIN, {})[entry.entry_id] = nymea_hub
     await nymea_hub.init_connection()
     await MaveoStick.add(nymea_hub)
+    await MaveoSensor.add(nymea_hub)
+    await AqaraSensor.add(nymea_hub)
 
     await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
     return True
@@ -33,7 +39,3 @@ async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         hass.data[DOMAIN].pop(entry.entry_id)
 
     return unload_ok
-
-
-# list_thingClasses: ca6baab8-3708-4478-8ca2-7d4d6d542937
-# Garage, id: 580f520f-5a6c-4f4d-a7d7-45a40ab582c2, thingClassId: ca6baab8-3708-4478-8ca2-7d4d6d542937
