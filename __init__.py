@@ -1,25 +1,30 @@
 """The nymea integration."""
+
 from __future__ import annotations
 
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
 
-from . import hub
+from . import maveo_box
+from .maveo_stick import MaveoStick
+from .maveo_sensor import MaveoSensor
+from .aqara_sensor import AqaraSensor
 from .const import DOMAIN
 
-# List of platforms to support. There should be a matching .py file for each,
-# eg <cover.py> and <sensor.py>
 PLATFORMS: list[str] = ["cover", "sensor"]
 
 
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     """Set up nymea from a config entry."""
-    # Store an instance of the "connecting" class that does the work of speaking
-    # with your actual devices.
-    hass.data.setdefault(DOMAIN, {})[entry.entry_id] = hub.Hub(hass, entry.data["host"])
+    nymea_hub = maveo_box.MaveoBox(
+        hass, entry.data["host"], entry.data["port"], entry.data["token"]
+    )
+    hass.data.setdefault(DOMAIN, {})[entry.entry_id] = nymea_hub
+    await nymea_hub.init_connection()
+    await MaveoStick.add(nymea_hub)
+    await MaveoSensor.add(nymea_hub)
+    await AqaraSensor.add(nymea_hub)
 
-    # This creates each HA object for each platform your device requires.
-    # It's done by calling the `async_setup_entry` function in each platform module.
     await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
     return True
 
