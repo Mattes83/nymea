@@ -1,4 +1,16 @@
-# TODOs
+# Introduction
+This is a custom integration for nymea/maveo.
+It currently supports the following devices:
+- maveo stick: open/close the garage and get its state
+- maveo sensor: humidity and temperature sensor
+- aqara weather sensor: humidity, temperature, pressure
 
-- property "availability" on device
--
+
+# Disclaimer
+I have never written a custom component for home assistant and I have had no contact to python before. The code quality is accordingly, sorry for that.
+It is more or less a proof of concept which needs to be improved massively.
+
+# Resources
+The code for the home assistant integration is based on https://github.com/home-assistant/example-custom-config/tree/master/custom_components/detailed_hello_world_push.
+
+The code to interact with nymea is taken from https://github.com/nymea/nymea-cli
