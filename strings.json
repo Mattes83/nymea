@@ -3,13 +3,19 @@
     "step": {
       "user": {
         "title": "Connect to nymea",
-        "description": "Please enter the host name or IP address of a nymea device (preferably one connected via wire to the network).",
+        "description": "Please enter the host name or IP address of a nymea device.",
         "data": {
-          "host": "[%key:common::config_flow::data::host%]"
+          "host": "host",
+          "port": "port"
         },
         "data_description": {
-          "host": "The hostname or IP address of your nymea device."
+          "host": "The hostname or IP address of your nymea device.",
+          "port": "The port of your nymea device."
         }
+      },
+      "link": {
+        "title": "Link Hub",
+        "description": "After confirming this dialog press the yellow button on the backside of the maveo box to create a token for use with Home Assistant."
       }
     },
     "error": {

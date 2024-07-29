@@ -1,132 +1,296 @@
 """Platform for sensor integration."""
-# This file shows the setup for the sensors associated with the cover.
-# They are setup in the same way with the call to the async_setup_entry function
-# via HA from the module __init__. Each sensor has a device_class, this tells HA how
-# to display it in the UI (for know types). The unit_of_measurement property tells HA
-# what the unit is, so it can display the correct range. For predefined types (such as
-# battery), the unit_of_measurement should match what's expected.
-import random
 
-from homeassistant.const import (
-    ATTR_VOLTAGE,
-    DEVICE_CLASS_BATTERY,
-    DEVICE_CLASS_ILLUMINANCE,
-    PERCENTAGE,
+from homeassistant.components.sensor import (
+    RestoreSensor,
+    SensorDeviceClass,
+    SensorEntity,
+    SensorEntityDescription,
+    SensorStateClass,
 )
+from homeassistant.const import ATTR_VOLTAGE, PERCENTAGE
+from homeassistant.helpers.device_registry import DeviceInfo
 from homeassistant.helpers.entity import Entity
+from homeassistant.const import (
+    EntityCategory,
+    UnitOfTemperature,
+    UnitOfPressure,
+)
 
 from .const import DOMAIN
 
 
-# See cover.py for more details.
-# Note how both entities for each roller sensor (battry and illuminance) are added at
-# the same time to the same list. This way only a single async_add_devices call is
-# required.
-async def async_setup_entry(hass, config_entry, async_add_entities):
+async def async_setup_entry(hass, config_entry, async_add_entities) -> None:
     """Add sensors for passed config_entry in HA."""
-    hub = hass.data[DOMAIN][config_entry.entry_id]
+    maveoBox = hass.data[DOMAIN][config_entry.entry_id]
 
     new_devices = []
-    for roller in hub.rollers:
-        new_devices.append(BatterySensor(roller))
-        new_devices.append(IlluminanceSensor(roller))
+    for stick in maveoBox.maveoSticks:
+        new_devices.append(StateSensor(stick))
+
+    for sensor in maveoBox.maveoSensors:
+        new_devices.append(MaveoHumiditySensor(sensor))
+        new_devices.append(MaveoTemperatureSensor(sensor))
+
+    for sensor in maveoBox.aqaraSensors:
+        new_devices.append(AqaraHumiditySensor(sensor))
+        new_devices.append(AqaraTemperatureSensor(sensor))
+        new_devices.append(AqaraPressureSensor(sensor))
+
     if new_devices:
         async_add_entities(new_devices)
 
 
-# This base class shows the common properties and methods for a sensor as used in this
-# example. See each sensor for further details about properties and methods that
-# have been overridden.
 class SensorBase(Entity):
-    """Base representation of a Hello World Sensor."""
+    """Base representation of a Sensor."""
 
-    should_poll = False
+    should_poll = True
 
-    def __init__(self, roller):
+    def __init__(self, stick) -> None:
         """Initialize the sensor."""
-        self._roller = roller
+        self._maveoStick = stick
 
-    # To link this entity to the cover device, this property must return an
-    # identifiers value matching that used in the cover, but no other information such
-    # as name. If name is returned, this entity will then also become a device in the
-    # HA UI.
     @property
     def device_info(self):
         """Return information to link this entity with the correct device."""
-        return {"identifiers": {(DOMAIN, self._roller.roller_id)}}
+        return {"identifiers": {(DOMAIN, self._maveoStick.id)}}
 
-    # This property is important to let HA know if this entity is online or not.
-    # If an entity is offline (return False), the UI will refelect this.
-    @property
-    def available(self) -> bool:
-        """Return True if roller and hub is available."""
-        return self._roller.online and self._roller.hub.online
-
-    async def async_added_to_hass(self):
+    async def async_added_to_hass(self) -> None:
         """Run when this Entity has been added to HA."""
-        # Sensors should also register callbacks to HA when their state changes
-        self._roller.register_callback(self.async_write_ha_state)
+        self._maveoStick.register_callback(self.async_write_ha_state)
 
-    async def async_will_remove_from_hass(self):
+    async def async_will_remove_from_hass(self) -> None:
         """Entity being removed from hass."""
-        # The opposite of async_added_to_hass. Remove any registered call backs here.
-        self._roller.remove_callback(self.async_write_ha_state)
+        self._maveoStick.remove_callback(self.async_write_ha_state)
 
 
-class BatterySensor(SensorBase):
+class StateSensor(SensorBase):
     """Representation of a Sensor."""
 
-    # The class of this device. Note the value should come from the homeassistant.const
-    # module. More information on the available devices classes can be seen here:
-    # https://developers.home-assistant.io/docs/core/entity/sensor
-    device_class = DEVICE_CLASS_BATTERY
+    device_class = SensorDeviceClass.ENUM
 
-    # The unit of measurement for this entity. As it's a DEVICE_CLASS_BATTERY, this
-    # should be PERCENTAGE. A number of units are supported by HA, for some
-    # examples, see:
-    # https://developers.home-assistant.io/docs/core/entity/sensor#available-device-classes
-    _attr_unit_of_measurement = PERCENTAGE
-
-    def __init__(self, roller):
+    def __init__(self, stick) -> None:
         """Initialize the sensor."""
-        super().__init__(roller)
-
-        # As per the sensor, this must be a unique value within this domain. This is done
-        # by using the device ID, and appending "_battery"
-        self._attr_unique_id = f"{self._roller.roller_id}_battery"
-
-        # The name of the entity
-        self._attr_name = f"{self._roller.name} Battery"
-
-        self._state = random.randint(0, 100)
-
-    # The value of this sensor. As this is a DEVICE_CLASS_BATTERY, this value must be
-    # the battery level as a percentage (between 0 and 100)
-    @property
-    def state(self):
-        """Return the state of the sensor."""
-        return self._roller.battery_level
-
-
-# This is another sensor, but more simple compared to the battery above. See the
-# comments above for how each field works.
-class IlluminanceSensor(SensorBase):
-    """Representation of a Sensor."""
-
-    device_class = DEVICE_CLASS_ILLUMINANCE
-    _attr_unit_of_measurement = "lx"
-
-    def __init__(self, roller):
-        """Initialize the sensor."""
-        super().__init__(roller)
-        # As per the sensor, this must be a unique value within this domain. This is done
-        # by using the device ID, and appending "_battery"
-        self._attr_unique_id = f"{self._roller.roller_id}_illuminance"
-
-        # The name of the entity
-        self._attr_name = f"{self._roller.name} Illuminance"
+        super().__init__(stick)
+        self._attr_unique_id = f"{self._maveoStick.id}_state"
+        self._attr_name = f"{self._maveoStick.name} State"
+        self.entity_registry_visible_default = False
 
     @property
     def state(self):
         """Return the state of the sensor."""
-        return self._roller.illuminance
+        return self._maveoStick.state
+
+
+class MaveoHumiditySensor(SensorEntity):
+    """Representation of a Sensor."""
+
+    device_class = SensorDeviceClass.HUMIDITY
+
+    def __init__(self, sensor) -> None:
+        """Initialize the sensor."""
+        self._maveoSensor = sensor
+        self._attr_unique_id = f"{self._maveoSensor.id}_humidity"
+        self._attr_name = "Humidity"
+        self._thingclassid = "db7bd8f7-3d12-4ed4-a7c7-fa022bd3701c"
+        self._stateTypeIdHumidity = "48612bb6-f209-44f8-ad21-eb4a4c5b9889"
+        self.native_unit_of_measurement = PERCENTAGE
+        self.update()
+
+    @property
+    def state(self) -> float:
+        """Return the state of the sensor."""
+        return self.humidity
+
+    @property
+    def device_info(self) -> DeviceInfo:
+        """Information about this entity/device."""
+        return {
+            "identifiers": {(DOMAIN, self._maveoSensor.id)},
+            "name": "maveo Sensor H+T",
+            "model": "maveo Sensor H+T",
+            "sw_version": self._maveoSensor.firmware_version,
+            "manufacturer": "Marantec",
+        }
+
+    def update(self) -> None:
+        """Fetch new state data. This is the only method that should fetch new data for Home Assistant."""
+
+        params = {}
+        params["thingId"] = self._maveoSensor.id
+        params["stateTypeId"] = self._stateTypeIdHumidity
+        value = self._maveoSensor.maveoBox.send_command(
+            "Integrations.GetStateValue", params
+        )["params"]["value"]
+        self.humidity = value
+
+
+class MaveoTemperatureSensor(SensorEntity):
+    """Representation of a Sensor."""
+
+    device_class = SensorDeviceClass.TEMPERATURE
+
+    def __init__(self, sensor) -> None:
+        """Initialize the sensor."""
+        self._maveoSensor = sensor
+        self._attr_unique_id = f"{self._maveoSensor.id}_temperature"
+        self._attr_name = "Temperature"
+        self._thingclassid = "db7bd8f7-3d12-4ed4-a7c7-fa022bd3701c"
+        self._stateTypeIdTemperature = "16bfc529-7822-40d8-a6c6-953aa9ceae27"
+        self.native_unit_of_measurement = UnitOfTemperature.CELSIUS
+        self.update()
+
+    @property
+    def state(self) -> float:
+        """Return the state of the sensor."""
+        return self.temperature
+
+    @property
+    def device_info(self) -> DeviceInfo:
+        """Information about this entity/device."""
+        return {
+            "identifiers": {(DOMAIN, self._maveoSensor.id)},
+            "name": "maveo Sensor H+T",
+            "model": "maveo Sensor H+T",
+            "sw_version": self._maveoSensor.firmware_version,
+            "manufacturer": "Marantec",
+        }
+
+    def update(self) -> None:
+        """Fetch new state data. This is the only method that should fetch new data for Home Assistant."""
+
+        params = {}
+        params["thingId"] = self._maveoSensor.id
+        params["stateTypeId"] = self._stateTypeIdTemperature
+        value = self._maveoSensor.maveoBox.send_command(
+            "Integrations.GetStateValue", params
+        )["params"]["value"]
+        self.temperature = value
+
+
+class AqaraHumiditySensor(SensorEntity):
+    """Representation of a Sensor."""
+
+    device_class = SensorDeviceClass.HUMIDITY
+
+    def __init__(self, sensor) -> None:
+        """Initialize the sensor."""
+        self._aqaraSensor = sensor
+        self._attr_unique_id = f"{self._aqaraSensor.id}_humidity"
+        self._attr_name = "Humidity"
+        self._thingclassid = "0b582616-0b05-4ac9-8b59-51b66079b571"
+        self._stateTypeIdHumidity = "27a1e85a-f654-48d8-905d-05b3e2bc499e"
+        self.native_unit_of_measurement = PERCENTAGE
+        self.update()
+
+    @property
+    def state(self) -> float:
+        """Return the state of the sensor."""
+        return self.humidity
+
+    @property
+    def device_info(self) -> DeviceInfo:
+        """Information about this entity/device."""
+        return {
+            "identifiers": {(DOMAIN, self._aqaraSensor.id)},
+            "name": "Aqara Sensor H+T",
+            "model": "WSDCGQ11LM",
+            "sw_version": self._aqaraSensor.firmware_version,
+            "manufacturer": "Lumi",
+        }
+
+    def update(self) -> None:
+        """Fetch new state data. This is the only method that should fetch new data for Home Assistant."""
+
+        params = {}
+        params["thingId"] = self._aqaraSensor.id
+        params["stateTypeId"] = self._stateTypeIdHumidity
+        value = self._aqaraSensor.maveoBox.send_command(
+            "Integrations.GetStateValue", params
+        )["params"]["value"]
+        self.humidity = value
+
+
+class AqaraTemperatureSensor(SensorEntity):
+    """Representation of a Sensor."""
+
+    device_class = SensorDeviceClass.TEMPERATURE
+
+    def __init__(self, sensor) -> None:
+        """Initialize the sensor."""
+        self._aqaraSensor = sensor
+        self._attr_unique_id = f"{self._aqaraSensor.id}_temperature"
+        self._attr_name = "Temperature"
+        self._thingclassid = "0b582616-0b05-4ac9-8b59-51b66079b571"
+        self._stateTypeIdTemperature = "b1641cec-3bf6-4654-b9c0-b81acb3b4481"
+        self.native_unit_of_measurement = UnitOfTemperature.CELSIUS
+        self.update()
+
+    @property
+    def state(self) -> float:
+        """Return the state of the sensor."""
+        return self.temperature
+
+    @property
+    def device_info(self) -> DeviceInfo:
+        """Information about this entity/device."""
+        return {
+            "identifiers": {(DOMAIN, self._aqaraSensor.id)},
+            "name": "Aqara Sensor H+T",
+            "model": "WSDCGQ11LM",
+            "sw_version": self._aqaraSensor.firmware_version,
+            "manufacturer": "Lumi",
+        }
+
+    def update(self) -> None:
+        """Fetch new state data. This is the only method that should fetch new data for Home Assistant."""
+
+        params = {}
+        params["thingId"] = self._aqaraSensor.id
+        params["stateTypeId"] = self._stateTypeIdTemperature
+        value = self._aqaraSensor.maveoBox.send_command(
+            "Integrations.GetStateValue", params
+        )["params"]["value"]
+        self.temperature = value
+
+
+class AqaraPressureSensor(SensorEntity):
+    """Representation of a Sensor."""
+
+    device_class = SensorDeviceClass.PRESSURE
+
+    def __init__(self, sensor) -> None:
+        """Initialize the sensor."""
+        self._aqaraSensor = sensor
+        self._attr_unique_id = f"{self._aqaraSensor.id}_pressure"
+        self._attr_name = "Pressure"
+        self._thingclassid = "0b582616-0b05-4ac9-8b59-51b66079b571"
+        self._stateTypeIdPressure = "7c3861f3-a9db-407e-9459-90a511d7f797"
+        self.native_unit_of_measurement = UnitOfPressure.HPA
+        self.update()
+
+    @property
+    def state(self) -> float:
+        """Return the state of the sensor."""
+        return self.pressure
+
+    @property
+    def device_info(self) -> DeviceInfo:
+        """Information about this entity/device."""
+        return {
+            "identifiers": {(DOMAIN, self._aqaraSensor.id)},
+            "name": "Aqara Sensor H+T",
+            "model": "WSDCGQ11LM",
+            "sw_version": self._aqaraSensor.firmware_version,
+            "manufacturer": "Lumi",
+        }
+
+    def update(self) -> None:
+        """Fetch new state data. This is the only method that should fetch new data for Home Assistant."""
+
+        params = {}
+        params["thingId"] = self._aqaraSensor.id
+        params["stateTypeId"] = self._stateTypeIdPressure
+        value = self._aqaraSensor.maveoBox.send_command(
+            "Integrations.GetStateValue", params
+        )["params"]["value"]
+        self.pressure = value
