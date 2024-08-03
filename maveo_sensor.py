@@ -1,6 +1,7 @@
-from __future__ import annotations
+"""SUpport for Maveo sensor."""
 
-from enum import Enum
+from __future__ import annotations
+from typing import Callable
 
 from .maveo_box import MaveoBox
 

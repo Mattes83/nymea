@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import getpass
 import json
 import logging
 import socket
@@ -48,62 +47,60 @@ class MaveoBox:
         with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
             sock.settimeout(5)
             try:
-                sock.connect((self._host, self._port))
-                return True
-            except (socket.timeout, socket.error):
+                sock.connect(self._host, self._port)
+                return True  # noqa: TRY300
+            except (TimeoutError, OSError):
                 return False
 
     async def init_connection(self) -> str | None:
+        """Inits the connection to the maveo box and returns a token used for authentication."""
+        self._sock.connect((self._host, self._port))
+
+        # Perform initial handshake
         try:
+            # first try without ssl
+            handshake_message = self.send_command("JSONRPC.Hello", {})
+        except:
+            # on case of error try with ssl
+            context = ssl.create_default_context()
+            # as we are working with self signed certificates disable some cert checks
+            context.check_hostname = False
+            context.verify_mode = ssl.CERT_NONE
+            self._sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             self._sock.connect((self._host, self._port))
+            self._sock = context.wrap_socket(self._sock)
+            handshake_message = self.send_command("JSONRPC.Hello", {})
 
-            # Perform initial handshake
-            try:
-                handshake_message = self.send_command("JSONRPC.Hello", {})
-            except:
-                context = ssl.create_default_context()
-                context.check_hostname = False
-                context.verify_mode = ssl.CERT_NONE
-                try:
-                    self._sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-                    self._sock.connect((self._host, self._port))
-                    self._sock = context.wrap_socket(self._sock)
-                    handshake_message = self.send_command("JSONRPC.Hello", {})
-                except:
-                    self.logger.error("SSL handshake failed.")
+        handshake_data = handshake_message["params"]
 
-            handshake_data = handshake_message["params"]
+        self._initialSetupRequired = handshake_data["initialSetupRequired"]
+        self._authenticationRequired = handshake_data["authenticationRequired"]
+        self._pushButtonAuthAvailable = handshake_data["pushButtonAuthAvailable"]
 
-            self._initialSetupRequired = handshake_data["initialSetupRequired"]
-            self._authenticationRequired = handshake_data["authenticationRequired"]
-            self._pushButtonAuthAvailable = handshake_data["pushButtonAuthAvailable"]
-
-            # If we don't need any authentication, we are done
-            if not self._authenticationRequired:
-                return None
-
-            if self._initialSetupRequired and not self._pushButtonAuthAvailable:
-                self.logger.error(
-                    "We are expecting a configured maveo box, so there should be a user"
-                )
-                return None
-
-            # Authenticate if no token
-            if self._authenticationRequired and self._token == None:
-                if self._pushButtonAuthAvailable:
-                    self.pushbuttonAuthentication()
-                else:
-                    self.logger.error(
-                        "We do not handle nymea installations without push-button"
-                    )
-
-            return self._token
-        except OSError:
-            self.logger.exception("ERROR: %s -> could not connect to nymea.")
+        # If we don't need any authentication, we are done
+        if not self._authenticationRequired:
+            self.logger.warning(
+                "Maveo box is configured to allow unauthenticated requests. Skipping authentication"
+            )
             return None
 
-    def pushbuttonAuthentication(self) -> str | None:
-        if self._token != None:
+        if self._initialSetupRequired:
+            raise NotImplementedError(
+                "An uninitialized maveo box is currently not supported"
+            )
+
+        if not self._pushButtonAuthAvailable:
+            raise NotImplementedError(
+                "A maveo box without push button is currently not supported"
+            )
+
+        # Authenticate if no token
+        if self._authenticationRequired and self._token is None:
+            self._token = self._pushbuttonAuthentication()
+        return self._token
+
+    def _pushbuttonAuthentication(self) -> str | None:
+        if self._token is not None:
             return self._token
 
         self.logger.info("Using push button authentication method...")
@@ -154,9 +151,7 @@ class MaveoBox:
                 self.logger.info("Notification received:")
                 if response["params"]["success"] is True:
                     self.logger.info("Authenticated successfully!")
-                    self.logger.info("Token: %s", response["params"]["token"])
-                    self._token = response["params"]["token"]
-                    return self._token
+                    return response["params"]["token"]
 
     def send_command(self, method, params=None):
         with mutex:
@@ -169,10 +164,7 @@ class MaveoBox:
                 command_obj["params"] = params
 
             command = json.dumps(command_obj) + "\n"
-            try:
-                self._sock.send(command.encode("utf-8"))
-            except Exception as exc:
-                return None
+            self._sock.send(command.encode("utf-8"))
 
             # wait for the response with id = commandId
             responseId = -1
@@ -191,11 +183,6 @@ class MaveoBox:
                 responseId = response["id"]
             self._commandId = self._commandId + 1
 
-            # If this call was unautorized, authenticate
-            if response["status"] == "unauthorized":
-                self.logger.error("Unautorized json call")
-
-            # if this call was not successfull
             if response["status"] != "success":
                 self.logger.error("JSON error happened: %s", response["error"])
                 return None

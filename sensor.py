@@ -1,25 +1,102 @@
 """Platform for sensor integration."""
 
+from homeassistant.components.nymea.aqara_weather_sensor import AqaraSensor
 from homeassistant.components.sensor import (
-    RestoreSensor,
     SensorDeviceClass,
     SensorEntity,
     SensorEntityDescription,
     SensorStateClass,
 )
-from homeassistant.const import ATTR_VOLTAGE, PERCENTAGE
+from dataclasses import dataclass
+from homeassistant.config_entries import ConfigEntry
+from homeassistant.const import PERCENTAGE, UnitOfPressure, UnitOfTemperature
+from homeassistant.core import HomeAssistant
 from homeassistant.helpers.device_registry import DeviceInfo
 from homeassistant.helpers.entity import Entity
+from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.const import (
+    ATTR_MANUFACTURER,
+    ATTR_MODEL,
+    ATTR_SW_VERSION,
+    PERCENTAGE,
+    STATE_UNKNOWN,
     EntityCategory,
+    UnitOfApparentPower,
+    UnitOfElectricCurrent,
+    UnitOfElectricPotential,
+    UnitOfFrequency,
+    UnitOfPower,
     UnitOfTemperature,
-    UnitOfPressure,
+    UnitOfTime,
 )
 
 from .const import DOMAIN
+from typing import Callable, Final, cast
 
 
-async def async_setup_entry(hass, config_entry, async_add_entities) -> None:
+# https://docs.python.org/3/library/dataclasses.html
+@dataclass(frozen=True, kw_only=True)
+class NymeaEntityDescription(SensorEntityDescription):
+    """Describes Nymea sensor entity."""
+
+    value: Callable[[dict], float | int | None]
+    thingclass_id: str
+
+
+SENSOR_TYPES: list[NymeaEntityDescription] = [
+    NymeaEntityDescription(
+        thingclass_id="0b582616-0b05-4ac9-8b59-51b66079b571",
+        key="b1641cec-3bf6-4654-b9c0-b81acb3b4481",
+        name="Temperature",
+        device_class=SensorDeviceClass.TEMPERATURE,
+        native_unit_of_measurement=UnitOfTemperature.CELSIUS,
+        state_class=SensorStateClass.MEASUREMENT,
+        value=lambda data: data.get("temperature"),
+    ),
+    NymeaEntityDescription(
+        thingclass_id="0b582616-0b05-4ac9-8b59-51b66079b571",
+        key="27a1e85a-f654-48d8-905d-05b3e2bc499e",
+        name="Humidity",
+        device_class=SensorDeviceClass.HUMIDITY,
+        native_unit_of_measurement=PERCENTAGE,
+        state_class=SensorStateClass.MEASUREMENT,
+        value=lambda data: data.get("humidity"),
+    ),
+    NymeaEntityDescription(
+        thingclass_id="0b582616-0b05-4ac9-8b59-51b66079b571",
+        key="7c3861f3-a9db-407e-9459-90a511d7f797",
+        name="Pressure",
+        device_class=SensorDeviceClass.ATMOSPHERIC_PRESSURE,
+        native_unit_of_measurement=UnitOfPressure.HPA,
+        state_class=SensorStateClass.MEASUREMENT,
+        value=lambda data: data.get("pressure"),
+    ),
+    NymeaEntityDescription(
+        thingclass_id="0b582616-0b05-4ac9-8b59-51b66079b571",
+        key="684f642e-08ed-4912-b7a9-597baef400c0",
+        name="Signal strength",
+        device_class=SensorDeviceClass.SIGNAL_STRENGTH,
+        native_unit_of_measurement=PERCENTAGE,
+        state_class=SensorStateClass.MEASUREMENT,
+        value=lambda data: data.get("signalStrength"),
+    ),
+    NymeaEntityDescription(
+        thingclass_id="0b582616-0b05-4ac9-8b59-51b66079b571",
+        key="706eb697-4265-440d-a79a-11df3f6db335",
+        name="Battery level",
+        device_class=SensorDeviceClass.SIGNAL_STRENGTH,
+        native_unit_of_measurement=PERCENTAGE,
+        state_class=SensorStateClass.MEASUREMENT,
+        value=lambda data: data.get("batteryLevel"),
+    ),
+]
+
+
+async def async_setup_entry(
+    hass: HomeAssistant,
+    config_entry: ConfigEntry,
+    async_add_entities: AddEntitiesCallback,
+) -> None:
     """Add sensors for passed config_entry in HA."""
     maveoBox = hass.data[DOMAIN][config_entry.entry_id]
 
@@ -32,9 +109,8 @@ async def async_setup_entry(hass, config_entry, async_add_entities) -> None:
         new_devices.append(MaveoTemperatureSensor(sensor))
 
     for sensor in maveoBox.aqaraSensors:
-        new_devices.append(AqaraHumiditySensor(sensor))
-        new_devices.append(AqaraTemperatureSensor(sensor))
-        new_devices.append(AqaraPressureSensor(sensor))
+        for desc in SENSOR_TYPES:
+            new_devices.append(AqaraHTSensor(sensor, desc))
 
     if new_devices:
         async_add_entities(new_devices)
@@ -167,68 +243,25 @@ class MaveoTemperatureSensor(SensorEntity):
         self.temperature = value
 
 
-class AqaraHumiditySensor(SensorEntity):
-    """Representation of a Sensor."""
-
-    device_class = SensorDeviceClass.HUMIDITY
-
-    def __init__(self, sensor) -> None:
-        """Initialize the sensor."""
-        self._aqaraSensor = sensor
-        self._attr_unique_id = f"{self._aqaraSensor.id}_humidity"
-        self._attr_name = "Humidity"
-        self._thingclassid = "0b582616-0b05-4ac9-8b59-51b66079b571"
-        self._stateTypeIdHumidity = "27a1e85a-f654-48d8-905d-05b3e2bc499e"
-        self.native_unit_of_measurement = PERCENTAGE
-        self.update()
-
-    @property
-    def state(self) -> float:
-        """Return the state of the sensor."""
-        return self.humidity
-
-    @property
-    def device_info(self) -> DeviceInfo:
-        """Information about this entity/device."""
-        return {
-            "identifiers": {(DOMAIN, self._aqaraSensor.id)},
-            "name": "Aqara Sensor H+T",
-            "model": "WSDCGQ11LM",
-            "sw_version": self._aqaraSensor.firmware_version,
-            "manufacturer": "Lumi",
-        }
-
-    def update(self) -> None:
-        """Fetch new state data. This is the only method that should fetch new data for Home Assistant."""
-
-        params = {}
-        params["thingId"] = self._aqaraSensor.id
-        params["stateTypeId"] = self._stateTypeIdHumidity
-        value = self._aqaraSensor.maveoBox.send_command(
-            "Integrations.GetStateValue", params
-        )["params"]["value"]
-        self.humidity = value
-
-
-class AqaraTemperatureSensor(SensorEntity):
+class AqaraHTSensor(SensorEntity):
     """Representation of a Sensor."""
 
     device_class = SensorDeviceClass.TEMPERATURE
 
-    def __init__(self, sensor) -> None:
+    def __init__(self, sensor: AqaraSensor, desc: NymeaEntityDescription) -> None:
         """Initialize the sensor."""
         self._aqaraSensor = sensor
-        self._attr_unique_id = f"{self._aqaraSensor.id}_temperature"
-        self._attr_name = "Temperature"
-        self._thingclassid = "0b582616-0b05-4ac9-8b59-51b66079b571"
-        self._stateTypeIdTemperature = "b1641cec-3bf6-4654-b9c0-b81acb3b4481"
-        self.native_unit_of_measurement = UnitOfTemperature.CELSIUS
+        self._attr_unique_id = f"{self._aqaraSensor.id}_{desc.key}"
+        self._attr_name = desc.name
+        self._thingclassid = desc.thingclass_id
+        self._stateTypeId = desc.key
+        self.native_unit_of_measurement = desc.native_unit_of_measurement
         self.update()
 
     @property
     def state(self) -> float:
         """Return the state of the sensor."""
-        return self.temperature
+        return self.value
 
     @property
     def device_info(self) -> DeviceInfo:
@@ -239,6 +272,7 @@ class AqaraTemperatureSensor(SensorEntity):
             "model": "WSDCGQ11LM",
             "sw_version": self._aqaraSensor.firmware_version,
             "manufacturer": "Lumi",
+            # "via_device": (DOMAIN, self._aqaraSensor.maveoBox.hub_id), bridge has to be added as device first
         }
 
     def update(self) -> None:
@@ -246,51 +280,8 @@ class AqaraTemperatureSensor(SensorEntity):
 
         params = {}
         params["thingId"] = self._aqaraSensor.id
-        params["stateTypeId"] = self._stateTypeIdTemperature
+        params["stateTypeId"] = self._stateTypeId
         value = self._aqaraSensor.maveoBox.send_command(
             "Integrations.GetStateValue", params
         )["params"]["value"]
-        self.temperature = value
-
-
-class AqaraPressureSensor(SensorEntity):
-    """Representation of a Sensor."""
-
-    device_class = SensorDeviceClass.PRESSURE
-
-    def __init__(self, sensor) -> None:
-        """Initialize the sensor."""
-        self._aqaraSensor = sensor
-        self._attr_unique_id = f"{self._aqaraSensor.id}_pressure"
-        self._attr_name = "Pressure"
-        self._thingclassid = "0b582616-0b05-4ac9-8b59-51b66079b571"
-        self._stateTypeIdPressure = "7c3861f3-a9db-407e-9459-90a511d7f797"
-        self.native_unit_of_measurement = UnitOfPressure.HPA
-        self.update()
-
-    @property
-    def state(self) -> float:
-        """Return the state of the sensor."""
-        return self.pressure
-
-    @property
-    def device_info(self) -> DeviceInfo:
-        """Information about this entity/device."""
-        return {
-            "identifiers": {(DOMAIN, self._aqaraSensor.id)},
-            "name": "Aqara Sensor H+T",
-            "model": "WSDCGQ11LM",
-            "sw_version": self._aqaraSensor.firmware_version,
-            "manufacturer": "Lumi",
-        }
-
-    def update(self) -> None:
-        """Fetch new state data. This is the only method that should fetch new data for Home Assistant."""
-
-        params = {}
-        params["thingId"] = self._aqaraSensor.id
-        params["stateTypeId"] = self._stateTypeIdPressure
-        value = self._aqaraSensor.maveoBox.send_command(
-            "Integrations.GetStateValue", params
-        )["params"]["value"]
-        self.pressure = value
+        self.value = value

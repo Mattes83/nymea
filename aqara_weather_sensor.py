@@ -1,6 +1,6 @@
-from __future__ import annotations
+"""Support for Aqara weather sensor."""
 
-from enum import Enum
+from __future__ import annotations
 
 from .maveo_box import MaveoBox
 

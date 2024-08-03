@@ -1,3 +1,5 @@
+"""Support for Maveo stick."""
+
 from __future__ import annotations
 
 from enum import Enum
@@ -81,9 +83,3 @@ class MaveoStick:
                         maveoBox,
                     )
                 )
-
-
-#'0b582616-0b05-4ac9-8b59-51b66079b571'
-# temp 'b1641cec-3bf6-4654-b9c0-b81acb3b4481'
-# humidity: '27a1e85a-f654-48d8-905d-05b3e2bc499e'
-# luftdruck: '7c3861f3-a9db-407e-9459-90a511d7f797'
