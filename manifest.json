@@ -7,6 +7,7 @@
   "documentation": "https://community.home-assistant.io/t/translations-not-working-and-failing-hassfest/595023",
   "homekit": {},
   "iot_class": "local_polling",
+  "integration_type": "hub",
   "requirements": [],
   "ssdp": [],
   "version": "0.1.0",

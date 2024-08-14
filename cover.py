@@ -5,20 +5,18 @@ from __future__ import annotations
 from datetime import timedelta
 from typing import Any
 
-# These constants are relevant to the type of entity we are using.
-# See below for how they are used.
 from homeassistant.components.cover import (
     CoverDeviceClass,
     CoverEntity,
     CoverEntityFeature,
 )
-from .maveo_stick import State, MaveoStick
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.device_registry import DeviceInfo
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
 from .const import DOMAIN
+from .maveo_stick import MaveoStick, State
 
 SCAN_INTERVAL = timedelta(seconds=5)
 
@@ -51,12 +49,6 @@ class GarageDoor(CoverEntity):
         """Initialize the garage door."""
         # Usual setup is done here. Callbacks are added in async_added_to_hass.
         self._maveoStick = maveoStick
-
-        # A unique_id for this entity with in this domain. This means for example if you
-        # have a sensor on this cover, you must ensure the value returned is unique,
-        # which is done here by appending "_cover". For more information, see:
-        # https://developers.home-assistant.io/docs/entity_registry_index/#unique-id-requirements
-        # Note: This is NOT used to generate the user visible Entity ID used in automations.
         self._attr_unique_id = f"{self._maveoStick.id}_cover"
 
         # This is the name for this *entity*, the "name" attribute from "device_info"
@@ -135,6 +127,7 @@ class GarageDoor(CoverEntity):
         )
 
         self._maveoStick.state = State.opening
+        await self._maveoStick.publish_updates()
 
     async def async_close_cover(self, **kwargs: Any) -> None:
         params = {}
@@ -155,6 +148,7 @@ class GarageDoor(CoverEntity):
         )
 
         self._maveoStick.state = State.closing
+        await self._maveoStick.publish_updates()
 
     def update(self) -> None:
         """Fetch new state data.
