@@ -1,47 +1,28 @@
-"""A nymea 'hub' that connects several devices."""
+"""Nymea allows to connect to a nymea hub."""
 
 from __future__ import annotations
 
 import json
-import logging
 import socket
 import ssl
 from threading import Lock
 
-from homeassistant.core import HomeAssistant
-# from .nymea import Nymea
-
 mutex = Lock()
 
 
-class MaveoBox:
-    """Maveo Box."""
+class Nymea:
+    """Nymea."""
 
-    def __init__(
-        self, hass: HomeAssistant, host: str, port: int, token: str | None = None
-    ) -> None:
-        """Init maveo box."""
-        # self.nymea = Nymea(host, port, token)
+    def __init__(self, host: str, port: int, token: str | None = None) -> None:
+        """Init nymea."""
         self._host = host
         self._port = port
-        self._hass = hass
-        self._name = host
-        self._id = host.lower()
         self._token = token
         self._pushButtonAuthAvailable = False
         self._authenticationRequired = True
         self._initialSetupRequired = False
         self._commandId = 0
         self._sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self.maveoSticks = []
-        self.things = []
-        self.online = True
-        self.logger = logging.getLogger(__name__)
-
-    @property
-    def hub_id(self) -> str:
-        """ID for nymea hub."""
-        return self._id
 
     async def test_connection(self) -> bool:
         """Tests initial connectivity during setup."""
@@ -80,9 +61,6 @@ class MaveoBox:
 
         # If we don't need any authentication, we are done
         if not self._authenticationRequired:
-            self.logger.warning(
-                "Maveo box is configured to allow unauthenticated requests. Skipping authentication"
-            )
             return None
 
         if self._initialSetupRequired:
@@ -103,8 +81,6 @@ class MaveoBox:
     def _pushbuttonAuthentication(self) -> str | None:
         if self._token is not None:
             return self._token
-
-        self.logger.info("Using push button authentication method...")
 
         params = {"deviceName": "home assistant"}
         command_obj = {
@@ -130,11 +106,6 @@ class MaveoBox:
             response_id = response["id"]
 
         self._commandId = self._commandId + 1
-
-        # check response
-        self.logger.info(
-            "Initialized push button authentication. Please press the pushbutton on the device."
-        )
 
         # wait for push button notification
         while True:
@@ -190,3 +161,35 @@ class MaveoBox:
 
             # Call went fine, return the response
             return response
+
+    def get_things(self, thingClassId: str) -> list[Thing]:
+        params = {}
+        params["thingClassId"] = thingClassId
+        stateTypes = self.send_command("Integrations.GetStateTypes", params)["params"][
+            "stateTypes"
+        ]
+
+        stateTypesById: dict[str, any] = {}
+        for t in stateTypes:
+            stateTypesById[t["id"]] = t
+
+        things = []
+        ts = self.send_command("Integrations.GetThings")["params"]["things"]
+        for t in ts:
+            if t["thingClassId"] == thingClassId:
+                states = {}
+                for s in t["states"]:
+                    states[stateTypesById[s["stateTypeId"]]].name = s["value"]
+                things.append(Thing(t["id"], t["name"], t["thingClassId"], states))
+        return things
+
+
+class Thing:
+    def __init__(
+        self, id: str, name: str, thingClassId: str, states: dict[str, any]
+    ) -> None:
+        """Init thing."""
+        self.id = id
+        self.name = name
+        self.thingClassId: thingClassId
+        self.states = states

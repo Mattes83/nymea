@@ -52,6 +52,7 @@ class MaveoStick:
 
     @staticmethod
     async def add(maveoBox: MaveoBox):
+        # things = maveoBox.nymea.get_things(MaveoStick.thingclassid)
         """Add all maveo sticks connected to the maveo box."""
         params = {}
         params["thingClassId"] = MaveoStick.thingclassid

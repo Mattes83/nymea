@@ -7,12 +7,11 @@ from homeassistant.core import HomeAssistant
 from homeassistant.exceptions import ConfigEntryNotReady
 
 from . import maveo_box
-from .aqara_weather_sensor import AqaraSensor
 from .const import DOMAIN
-from .maveo_sensor import MaveoSensor
+from .thing import Thing
 from .maveo_stick import MaveoStick
 
-PLATFORMS: list[str] = ["cover", "sensor"]
+PLATFORMS: list[str] = ["cover", "sensor", "binary_sensor"]
 
 
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
@@ -23,13 +22,13 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     hass.data.setdefault(DOMAIN, {})[entry.entry_id] = nymea_hub
     try:
         await nymea_hub.init_connection()
+        # await nymea_hub.nymea.init_connection()
     except Exception as ex:
         raise ConfigEntryNotReady(
             f"Error while connecting to {entry.data["host"]}"
         ) from ex
     await MaveoStick.add(nymea_hub)
-    await MaveoSensor.add(nymea_hub)
-    await AqaraSensor.add(nymea_hub)
+    await Thing.add(nymea_hub)
 
     await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
     return True
