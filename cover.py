@@ -66,6 +66,7 @@ class GarageDoor(CoverEntity):
             None,
         )
         self.stateTypeIdState = statetype_state["id"]
+        self._available = True
 
     async def async_added_to_hass(self) -> None:
         """Run when this Entity has been added to HA."""
@@ -107,6 +108,11 @@ class GarageDoor(CoverEntity):
     def is_opening(self) -> bool:
         """Return if the cover is opening or not."""
         return self._maveoStick.state == State.opening
+
+    @property
+    def available(self) -> bool:
+        """Return the state of the sensor."""
+        return self._available
 
     async def async_open_cover(self, **kwargs: Any) -> None:
         params = {}
@@ -158,8 +164,12 @@ class GarageDoor(CoverEntity):
         params = {}
         params["thingId"] = self._maveoStick.id
         params["stateTypeId"] = self.stateTypeIdState
-
-        value = self._maveoStick.maveoBox.send_command(
-            "Integrations.GetStateValue", params
-        )["params"]["value"]
-        self._maveoStick.state = State[value]
+        try:
+            value = self._maveoStick.maveoBox.send_command(
+                "Integrations.GetStateValue", params
+            )["params"]["value"]
+            self._maveoStick.state = State[value]
+            self._available = True
+        except:
+            self._available = False
+            self._maveoStick.maveoBox.init_connection()

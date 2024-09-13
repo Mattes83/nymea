@@ -137,12 +137,18 @@ class ThingSensor(SensorEntity):
         self.device_class = desc.device_class
         self._stateTypeId = desc.key
         self.native_unit_of_measurement = desc.native_unit_of_measurement
+        self._available = True
         self.update()
 
     @property
     def state(self) -> float:
         """Return the state of the sensor."""
         return self.value
+
+    @property
+    def available(self) -> bool:
+        """Return the state of the sensor."""
+        return self._available
 
     @property
     def device_info(self) -> DeviceInfo:
@@ -159,7 +165,13 @@ class ThingSensor(SensorEntity):
         params = {}
         params["thingId"] = self._thing.id
         params["stateTypeId"] = self._stateTypeId
-        value = self._thing.maveoBox.send_command("Integrations.GetStateValue", params)[
-            "params"
-        ]["value"]
+        try:
+            value = self._thing.maveoBox.send_command(
+                "Integrations.GetStateValue", params
+            )["params"]["value"]
+            self._available = True
+        except:
+            self._available = False
+            self._maveoStick.maveoBox.init_connection()
+
         self.value = value

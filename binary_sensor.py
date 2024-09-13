@@ -111,12 +111,18 @@ class BinaryThingSensor(BinarySensorEntity):
         self._attr_name = desc.name
         self.device_class = desc.device_class
         self._stateTypeId = desc.key
+        self._available = True
         self.update()
 
     @property
     def state(self) -> float:
         """Return the state of the sensor."""
         return self.value
+
+    @property
+    def available(self) -> float:
+        """Return the state of the sensor."""
+        return self._available
 
     @property
     def device_info(self) -> DeviceInfo:
@@ -133,7 +139,12 @@ class BinaryThingSensor(BinarySensorEntity):
         params = {}
         params["thingId"] = self._thing.id
         params["stateTypeId"] = self._stateTypeId
-        value = self._thing.maveoBox.send_command("Integrations.GetStateValue", params)[
-            "params"
-        ]["value"]
-        self.value = value
+        try:
+            value = self._thing.maveoBox.send_command(
+                "Integrations.GetStateValue", params
+            )["params"]["value"]
+            self.value = value
+            self._available = True
+        except:
+            self._available = False
+            self._maveoStick.maveoBox.init_connection()
