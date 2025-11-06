@@ -29,9 +29,8 @@ async def async_setup_entry(
     async_add_entities: AddEntitiesCallback,
 ) -> None:
     """Add cover for passed config_entry in HA."""
-    # The maveoBox is loaded from the associated hass.data entry that was created in the
-    # __init__.async_setup_entry function
-    maveoBox = hass.data[DOMAIN][config_entry.entry_id]
+    # The maveoBox is loaded from the config entry's runtime_data
+    maveoBox = config_entry.runtime_data
 
     # Add all entities to HA
     async_add_entities(GarageDoor(stick) for stick in maveoBox.maveoSticks)
@@ -41,8 +40,10 @@ class GarageDoor(CoverEntity):
     """Representation of a GarageDoor."""
 
     device_class = CoverDeviceClass.GARAGE
+    has_entity_name = True
 
-    should_poll = True
+    # Polling disabled - using push notifications
+    should_poll = False
     supported_features = CoverEntityFeature.OPEN | CoverEntityFeature.CLOSE
 
     def __init__(self, maveoStick) -> None:
@@ -70,13 +71,26 @@ class GarageDoor(CoverEntity):
 
     async def async_added_to_hass(self) -> None:
         """Run when this Entity has been added to HA."""
-        # Importantly for a push integration, the module that will be getting updates
-        # needs to notify HA of changes. The dummy device has a registercallback
-        # method, so to this we add the 'self.async_write_ha_state' method, to be
-        # called where ever there are changes.
-        # The call back registration is done once this entity is registered with HA
-        # (rather than in the __init__)
+        # Fetch initial state before notifications start
+        await self.async_update()
+        
+        # Register callback for push notifications
         self._maveoStick.register_callback(self.async_write_ha_state)
+
+    async def async_update(self) -> None:
+        """Fetch initial state (called once before notification listener starts)."""
+        params = {}
+        params["thingId"] = self._maveoStick.id
+        params["stateTypeId"] = self.stateTypeIdState
+        try:
+            value = self._maveoStick.maveoBox.send_command(
+                "Integrations.GetStateValue", params
+            )["params"]["value"]
+            self._maveoStick.state = State[value]
+            self._available = True
+        except Exception as ex:
+            self._available = False
+            self._maveoStick.maveoBox.logger.error(f"Error fetching initial state: {ex}")
 
     async def async_will_remove_from_hass(self) -> None:
         """Entity being removed from hass."""
@@ -97,7 +111,7 @@ class GarageDoor(CoverEntity):
     @property
     def is_closed(self) -> bool:
         """Return if the cover is closed."""
-        return self._maveoStick.state == State.closed
+        return self._maveoStick.state == State.closed or self._maveoStick.state == State.intermediate 
 
     @property
     def is_closing(self) -> bool:
@@ -155,21 +169,3 @@ class GarageDoor(CoverEntity):
 
         self._maveoStick.state = State.closing
         await self._maveoStick.publish_updates()
-
-    def update(self) -> None:
-        """Fetch new state data.
-
-        This is the only method that should fetch new data for Home Assistant.
-        """
-        params = {}
-        params["thingId"] = self._maveoStick.id
-        params["stateTypeId"] = self.stateTypeIdState
-        try:
-            value = self._maveoStick.maveoBox.send_command(
-                "Integrations.GetStateValue", params
-            )["params"]["value"]
-            self._maveoStick.state = State[value]
-            self._available = True
-        except:
-            self._available = False
-            self._maveoStick.maveoBox.init_connection()

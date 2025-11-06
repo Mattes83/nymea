@@ -1,0 +1,43 @@
+[tool.ruff]
+target-version = "py312"
+line-length = 88
+
+# Exclude common directories
+exclude = [
+    ".git",
+    ".github",
+    ".pytest_cache",
+    "__pycache__",
+    "*.pyc",
+]
+
+[tool.ruff.lint]
+select = [
+    "E",   # pycodestyle errors
+    "W",   # pycodestyle warnings
+    "F",   # pyflakes
+    "I",   # isort
+    "C",   # flake8-comprehensions
+    "B",   # flake8-bugbear
+    "UP",  # pyupgrade
+]
+
+ignore = [
+    "E501",  # line too long (handled by formatter)
+    "B008",  # do not perform function calls in argument defaults
+    "C901",  # too complex
+    "W191",  # indentation contains tabs
+]
+
+[tool.ruff.lint.per-file-ignores]
+"__init__.py" = ["F401"]  # Unused imports in __init__ files
+"tests/*.py" = ["F401", "F811"]  # Allow redefined fixtures
+
+[tool.ruff.lint.isort]
+known-first-party = ["custom_components.nymea"]
+force-sort-within-sections = true
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
+line-ending = "auto"

@@ -88,7 +88,7 @@ async def async_setup_entry(
     async_add_entities: AddEntitiesCallback,
 ) -> None:
     """Add sensors for passed config_entry in HA."""
-    maveoBox = hass.data[DOMAIN][config_entry.entry_id]
+    maveoBox = config_entry.runtime_data
 
     new_devices = [
         BinaryThingSensor(thing, desc)
@@ -103,6 +103,11 @@ async def async_setup_entry(
 
 class BinaryThingSensor(BinarySensorEntity):
     """Representation of a Sensor."""
+    
+    has_entity_name = True
+    
+    # Disable polling - using push notifications
+    should_poll = False
 
     def __init__(self, thing: Thing, desc: NymeaEntityDescription) -> None:
         """Initialize the sensor."""
@@ -112,11 +117,44 @@ class BinaryThingSensor(BinarySensorEntity):
         self.device_class = desc.device_class
         self._stateTypeId = desc.key
         self._available = True
-        self.update()
+        self.value = None
+
+    async def async_added_to_hass(self) -> None:
+        """Run when this Entity has been added to HA."""
+        # Fetch initial state before notifications start
+        await self.async_update()
+        
+        # Register callback for push notifications
+        self._thing.register_callback(self.async_write_ha_state)
+
+    async def async_will_remove_from_hass(self) -> None:
+        """Entity being removed from hass."""
+        self._thing.remove_callback(self.async_write_ha_state)
+
+    async def async_update(self) -> None:
+        """Fetch initial state (called once before notification listener starts)."""
+        params = {}
+        params["thingId"] = self._thing.id
+        params["stateTypeId"] = self._stateTypeId
+        try:
+            value = self._thing.maveoBox.send_command(
+                "Integrations.GetStateValue", params
+            )["params"]["value"]
+            self.value = value
+            # Also cache it in the Thing for future notifications
+            self._thing._state_cache[self._stateTypeId] = value
+            self._available = True
+        except Exception as ex:
+            self._available = False
+            self._thing.maveoBox.logger.error(f"Error fetching initial binary sensor state: {ex}")
 
     @property
     def state(self) -> float:
         """Return the state of the sensor."""
+        # Try to get the latest value from Thing's cache (updated by notifications)
+        cached_value = self._thing.get_state_value(self._stateTypeId)
+        if cached_value is not None:
+            self.value = cached_value
         return self.value
 
     @property
@@ -132,19 +170,3 @@ class BinaryThingSensor(BinarySensorEntity):
             "name": self._thing.name,
             "manufacturer": self._thing.manufacturer,
         }
-
-    def update(self) -> None:
-        """Fetch new state data. This is the only method that should fetch new data for Home Assistant."""
-
-        params = {}
-        params["thingId"] = self._thing.id
-        params["stateTypeId"] = self._stateTypeId
-        try:
-            value = self._thing.maveoBox.send_command(
-                "Integrations.GetStateValue", params
-            )["params"]["value"]
-            self.value = value
-            self._available = True
-        except:
-            self._available = False
-            self._maveoStick.maveoBox.init_connection()
