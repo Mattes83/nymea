@@ -1,7 +1,11 @@
-"""Platform for sensor integration."""
+"""Support for nymea sensor entities."""
 
+from __future__ import annotations
+
+import logging
 from collections.abc import Callable
 from dataclasses import dataclass
+from typing import Any
 
 from homeassistant.components.sensor import (
     SensorDeviceClass,
@@ -19,13 +23,15 @@ from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from .const import DOMAIN
 from .thing import Thing
 
+_LOGGER = logging.getLogger(__name__)
+
 
 # https://docs.python.org/3/library/dataclasses.html
 @dataclass(frozen=True, kw_only=True)
 class NymeaEntityDescription(SensorEntityDescription):
     """Describes Nymea sensor entity."""
 
-    value: Callable[[dict], float | int | None]
+    value: Callable[[dict[str, Any]], float | int | None]
     thingclass_id: str
 
 
@@ -113,7 +119,7 @@ async def async_setup_entry(
     async_add_entities: AddEntitiesCallback,
 ) -> None:
     """Add sensors for passed config_entry in HA."""
-    maveoBox = hass.data[DOMAIN][config_entry.entry_id]
+    maveoBox = config_entry.runtime_data
 
     new_devices = [
         ThingSensor(thing, desc)
@@ -128,21 +134,60 @@ async def async_setup_entry(
 
 class ThingSensor(SensorEntity):
     """Representation of a Sensor."""
+    
+    has_entity_name = True
+    
+    # Disable polling - using push notifications
+    should_poll = False
 
     def __init__(self, thing: Thing, desc: NymeaEntityDescription) -> None:
         """Initialize the sensor."""
-        self._thing = thing
-        self._attr_unique_id = f"{self._thing.id}_{desc.key}"
-        self._attr_name = desc.name
-        self.device_class = desc.device_class
-        self._stateTypeId = desc.key
-        self.native_unit_of_measurement = desc.native_unit_of_measurement
-        self._available = True
-        self.update()
+        self._thing: Thing = thing
+        self._attr_unique_id: str = f"{self._thing.id}_{desc.key}"
+        self._attr_name: str = desc.name
+        self.device_class: SensorDeviceClass | None = desc.device_class
+        self._stateTypeId: str = desc.key
+        self.native_unit_of_measurement: str | None = desc.native_unit_of_measurement
+        self._available: bool = True
+        self.value: float | int | str | None = None
+
+    async def async_added_to_hass(self) -> None:
+        """Run when this Entity has been added to HA."""
+        # Fetch initial state before notifications start
+        await self.async_update()
+        
+        # Register callback for push notifications
+        self._thing.register_callback(self.async_write_ha_state)
+
+    async def async_will_remove_from_hass(self) -> None:
+        """Entity being removed from hass."""
+        self._thing.remove_callback(self.async_write_ha_state)
+
+    async def async_update(self) -> None:
+        """Fetch initial state (called once before notification listener starts)."""
+        params: dict[str, str] = {}
+        params["thingId"] = self._thing.id
+        params["stateTypeId"] = self._stateTypeId
+        try:
+            value: float | int | str = self._thing.maveoBox.send_command(
+                "Integrations.GetStateValue", params
+            )["params"]["value"]  # type: ignore[index]
+            self.value = value
+            # Also cache it in the Thing for future notifications.
+            self._thing._state_cache[self._stateTypeId] = value
+            self._available = True
+        except Exception as ex:
+            self._available = False
+            # This is logging, so use % formatting.
+            _LOGGER.error("Error fetching initial sensor state for %s: %s", self._thing.id, ex)
 
     @property
-    def state(self) -> float:
+    def state(self) -> float | int | str | None:
         """Return the state of the sensor."""
+        # Try to get the latest value from Thing's cache (updated by notifications).
+        cached_value: Any = self._thing.get_state_value(self._stateTypeId)
+        if cached_value is not None:
+            self.value = cached_value
         return self.value
 
     @property
@@ -158,20 +203,3 @@ class ThingSensor(SensorEntity):
             "name": self._thing.name,
             "manufacturer": self._thing.manufacturer,
         }
-
-    def update(self) -> None:
-        """Fetch new state data. This is the only method that should fetch new data for Home Assistant."""
-
-        params = {}
-        params["thingId"] = self._thing.id
-        params["stateTypeId"] = self._stateTypeId
-        try:
-            value = self._thing.maveoBox.send_command(
-                "Integrations.GetStateValue", params
-            )["params"]["value"]
-            self._available = True
-        except:
-            self._available = False
-            self._maveoStick.maveoBox.init_connection()
-
-        self.value = value

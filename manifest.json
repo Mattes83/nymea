@@ -4,12 +4,14 @@
   "codeowners": ["@Mattes83"],
   "config_flow": true,
   "dependencies": [],
-  "documentation": "https://community.home-assistant.io/t/translations-not-working-and-failing-hassfest/595023",
+  "documentation": "https://github.com/Mattes83/nymea",
   "homekit": {},
-  "iot_class": "local_polling",
+  "iot_class": "local_push",
   "integration_type": "hub",
-  "requirements": [],
+  "requirements": ["websockets>=15.0"],
   "ssdp": [],
-  "version": "0.1.0",
-  "zeroconf": []
+  "version": "0.2.0",
+  "zeroconf": [
+    "_jsonrpc._tcp.local."
+  ]
 }

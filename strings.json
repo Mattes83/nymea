@@ -6,16 +6,22 @@
         "description": "Please enter the host name or IP address of a nymea device.",
         "data": {
           "host": "host",
-          "port": "port"
+          "port": "port",
+          "websocket_port": "websocket_port"
         },
         "data_description": {
           "host": "The hostname or IP address of your nymea device.",
-          "port": "The port of your nymea device."
+          "port": "The JSON-RPC TCP port for commands and pairing (default: 2222).",
+          "websocket_port": "The WebSocket port for notifications (default: 4444)."
         }
       },
       "link": {
         "title": "Link Hub",
-        "description": "After confirming this dialog press the yellow button on the backside of the maveo box to create a token for use with Home Assistant."
+        "description": "Press and confirm this dialog, then press the **yellow button** on the back of your Maveo Box **within 30 seconds** to complete the pairing."
+      },
+      "zeroconf_confirm": {
+        "title": "Discovered nymea device",
+        "description": "Do you want to add the nymea device at {host} to Home Assistant?"
       }
     },
     "error": {
@@ -24,7 +30,8 @@
       "unknown": "[%key:common::config_flow::error::unknown%]"
     },
     "abort": {
-      "already_configured": "[%key:common::config_flow::abort::already_configured_device%]"
+      "already_configured": "[%key:common::config_flow::abort::already_configured_device%]",
+      "cannot_connect": "[%key:common::config_flow::abort::already_configured_device%]"
     }
   }
 }
