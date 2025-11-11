@@ -6,13 +6,12 @@ import logging
 import re
 from typing import Any
 
-import voluptuous as vol
-
 from homeassistant import config_entries, exceptions
 from homeassistant.components import zeroconf
 from homeassistant.config_entries import ConfigFlowResult
 from homeassistant.const import CONF_HOST, CONF_PORT, CONF_TOKEN
 from homeassistant.core import HomeAssistant
+import voluptuous as vol
 
 from .const import CONF_WEBSOCKET_PORT, DOMAIN  # pylint:disable=unused-import
 from .maveo_box import MaveoBox
@@ -74,38 +73,38 @@ class NymeaConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             ConfigFlowResult with next step or abort reason.
         """
         _LOGGER.debug("Zeroconf discovery: %s", discovery_info)
-        
+
         # We only want to handle JSON-RPC TCP discoveries, not WebSocket.
         # WebSocket is used for notifications, but pairing requires JSON-RPC.
         if "_ws._tcp" in discovery_info.type:
             _LOGGER.debug("Ignoring WebSocket discovery, we need JSON-RPC TCP")
             return self.async_abort(reason="not_supported")
-        
+
         host = discovery_info.host
         port = discovery_info.port or 2223  # Use JSON-RPC port by default.
         websocket_port = 4444  # WebSocket port for notifications.
-        
+
         # Check if already configured.
         await self.async_set_unique_id(discovery_info.hostname.replace(".local.", ""))
         self._abort_if_unique_id_configured(updates={CONF_HOST: host})
-        
+
         # Store discovery info for later use.
         self.discovery_info = discovery_info
-        
+
         # Validate connection.
         try:
             await validate_input(self.hass, {CONF_HOST: host, CONF_PORT: port})
         except (CannotConnect, InvalidHost):
             return self.async_abort(reason="cannot_connect")
-        
+
         # Store the discovered data.
         self.data = {CONF_HOST: host, CONF_PORT: port, CONF_WEBSOCKET_PORT: websocket_port}
         _LOGGER.info("Discovered nymea device at %s:%s", host, port)
-        
+
         # Show confirmation form with discovered host.
         self.context["title_placeholders"] = {"name": f"nymea ({host})"}
         return await self.async_step_zeroconf_confirm()
-    
+
     async def async_step_zeroconf_confirm(
         self, user_input: dict[str, Any] | None = None
     ) -> ConfigFlowResult:
@@ -116,7 +115,7 @@ class NymeaConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                 step_id="zeroconf_confirm",
                 description_placeholders={"host": self.data.get(CONF_HOST, "unknown")},
             )
-        
+
         # User confirmed, proceed to link step
         _LOGGER.debug("User confirmed discovery, proceeding to link")
         return await self.async_step_link()
@@ -162,14 +161,14 @@ class NymeaConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
 
         # User confirmed (submitted form, even if empty dict), proceed with pairing
         _LOGGER.info("Starting pairing process for %s:%s", self.data.get(CONF_HOST), self.data.get(CONF_PORT))
-        
+
         if not self.data or CONF_HOST not in self.data:
             _LOGGER.error("Configuration data missing in link step: %s", self.data)
             return self.async_abort(reason="unknown")
-        
+
         box: MaveoBox = MaveoBox(
-            self.hass, 
-            self.data[CONF_HOST], 
+            self.hass,
+            self.data[CONF_HOST],
             self.data[CONF_PORT],
             websocket_port=self.data.get(CONF_WEBSOCKET_PORT, 4444)
         )

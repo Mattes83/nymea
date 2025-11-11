@@ -2,9 +2,9 @@
 
 from __future__ import annotations
 
-import logging
 from collections.abc import Callable
 from dataclasses import dataclass
+import logging
 from typing import Any
 
 from homeassistant.components.binary_sensor import (
@@ -15,7 +15,6 @@ from homeassistant.components.binary_sensor import (
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.device_registry import DeviceInfo
-from homeassistant.helpers.entity import Entity
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
 from .const import DOMAIN
@@ -109,9 +108,9 @@ async def async_setup_entry(
 
 class BinaryThingSensor(BinarySensorEntity):
     """Representation of a Sensor."""
-    
+
     has_entity_name = True
-    
+
     # Disable polling - using push notifications
     should_poll = False
 
@@ -129,7 +128,7 @@ class BinaryThingSensor(BinarySensorEntity):
         """Run when this Entity has been added to HA."""
         # Fetch initial state before notifications start
         await self.async_update()
-        
+
         # Register callback for push notifications
         self._thing.register_callback(self.async_write_ha_state)
 

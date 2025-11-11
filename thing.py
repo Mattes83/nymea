@@ -7,7 +7,7 @@ from typing import TYPE_CHECKING, Any
 
 if TYPE_CHECKING:
     from collections.abc import Callable
-    
+
     from .maveo_box import MaveoBox
 
 _LOGGER = logging.getLogger(__name__)
@@ -31,10 +31,10 @@ class Thing:
         self.manufacturer: str = manufacturer
         self.maveoBox: MaveoBox = maveoBox
         self._callbacks: set[Callable[[], None]] = set()
-        
+
         # Cache for state values - maps stateTypeId to value.
         self._state_cache: dict[str, Any] = {}
-        
+
         # Register for state change notifications.
         self._register_for_notifications()
 
@@ -42,8 +42,7 @@ class Thing:
         """Register to receive state change notifications for this thing."""
         # Register handler for Integrations.StateChanged notifications.
         self.maveoBox.register_notification_handler(
-            "Integrations.StateChanged", 
-            self._handle_state_changed
+            "Integrations.StateChanged", self._handle_state_changed
         )
 
     def _handle_state_changed(self, params: dict[str, Any]) -> None:
@@ -52,33 +51,27 @@ class Thing:
         thing_id = params.get("thingId")
         if thing_id != self._id:
             return
-        
+
         # Extract and cache the state value.
         state_type_id = params.get("stateTypeId")
         value = params.get("value")
-        
+
         if state_type_id and value is not None:
             self._state_cache[state_type_id] = value
             # This is logging, so use % formatting.
             _LOGGER.debug(
-                "Thing %s state updated: %s = %s",
-                self.name,
-                state_type_id,
-                value
+                "Thing %s state updated: %s = %s", self.name, state_type_id, value
             )
-            
+
         # Trigger all registered callbacks to update Home Assistant.
         try:
             self.maveoBox._hass.loop.call_soon_threadsafe(
-                self.maveoBox._hass.async_create_task,
-                self.publish_updates()
+                self.maveoBox._hass.async_create_task, self.publish_updates()
             )
         except Exception as ex:
             # This is logging, so use % formatting.
-            _LOGGER.error(
-                "Error handling state change notification for thing: %s", ex
-            )
-    
+            _LOGGER.error("Error handling state change notification for thing: %s", ex)
+
     def get_state_value(self, state_type_id: str) -> Any:
         """Get cached state value for a specific stateTypeId."""
         return self._state_cache.get(state_type_id)
@@ -99,45 +92,7 @@ class Thing:
     def unregister_notifications(self) -> None:
         """Unregister from state change notifications."""
         self.maveoBox.unregister_notification_handler(
-            "Integrations.StateChanged",
-            self._handle_state_changed
-        )
-
-    @property
-    def id(self) -> str:
-        """Return ID for thing."""
-        return self._id
-
-    @staticmethod
-    async def add(maveoBox: MaveoBox) -> None:
-        """Add all things connected to the maveo box."""
-        params: dict[str, str] = {}
-        things: list[dict[str, Any]] = maveoBox.send_command("Integrations.GetConfiguredThings", params)[  # type: ignore[index]
-            "params"
-        ]["things"]
-    
-    def get_state_value(self, state_type_id: str):
-        """Get cached state value for a specific stateTypeId."""
-        return self._state_cache.get(state_type_id)
-
-    def register_callback(self, callback: Callable[[], None]) -> None:
-        """Register callback, called when Thing changes state."""
-        self._callbacks.add(callback)
-
-    def remove_callback(self, callback: Callable[[], None]) -> None:
-        """Remove previously registered callback."""
-        self._callbacks.discard(callback)
-
-    async def publish_updates(self) -> None:
-        """Schedule call all registered callbacks."""
-        for callback in self._callbacks:
-            callback()
-
-    def unregister_notifications(self):
-        """Unregister from state change notifications."""
-        self.maveoBox.unregister_notification_handler(
-            "Integrations.StateChanged",
-            self._handle_state_changed
+            "Integrations.StateChanged", self._handle_state_changed
         )
 
     @property

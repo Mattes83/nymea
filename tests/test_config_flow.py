@@ -2,13 +2,12 @@
 
 from unittest.mock import AsyncMock, patch
 
-import pytest
-
 from homeassistant import config_entries
 from homeassistant.components import zeroconf
 from homeassistant.const import CONF_HOST, CONF_PORT, CONF_TOKEN
 from homeassistant.core import HomeAssistant
 from homeassistant.data_entry_flow import FlowResultType
+import pytest
 
 from custom_components.nymea.config_flow import (
     CannotConnect,
@@ -58,7 +57,7 @@ async def test_form_user_cannot_connect(hass: HomeAssistant) -> None:
     ) as mock_box:
         mock_instance = mock_box.return_value
         mock_instance.test_connection = AsyncMock(return_value=False)
-        
+
         result2 = await hass.config_entries.flow.async_configure(
             result["flow_id"],
             {
@@ -83,7 +82,7 @@ async def test_form_user_invalid_host(hass: HomeAssistant) -> None:
     ) as mock_box:
         mock_instance = mock_box.return_value
         mock_instance.test_connection = AsyncMock(return_value=True)
-        
+
         result2 = await hass.config_entries.flow.async_configure(
             result["flow_id"],
             {
@@ -117,7 +116,7 @@ async def test_form_link_step(hass: HomeAssistant, mock_maveo_box) -> None:
                 CONF_WEBSOCKET_PORT: 4444,
             },
         )
-        
+
         # Should be at link step
         assert result2["type"] == FlowResultType.FORM
         assert result2["step_id"] == "link"
@@ -187,7 +186,7 @@ async def test_zeroconf_confirm_step(hass: HomeAssistant, mock_maveo_box) -> Non
             context={"source": config_entries.SOURCE_ZEROCONF},
             data=discovery_info,
         )
-        
+
         # Confirm discovery
         result2 = await hass.config_entries.flow.async_configure(
             result["flow_id"],
@@ -238,7 +237,7 @@ async def test_zeroconf_cannot_connect(hass: HomeAssistant) -> None:
     ) as mock_box:
         mock_instance = mock_box.return_value
         mock_instance.test_connection = AsyncMock(return_value=False)
-        
+
         result = await hass.config_entries.flow.async_init(
             DOMAIN,
             context={"source": config_entries.SOURCE_ZEROCONF},

@@ -2,8 +2,8 @@
 
 from __future__ import annotations
 
-import logging
 from datetime import timedelta
+import logging
 from typing import TYPE_CHECKING, Any
 
 from homeassistant.components.cover import (
@@ -86,7 +86,7 @@ class GarageDoor(CoverEntity):
         """Run when this Entity has been added to HA."""
         # Fetch initial state before notifications start
         await self.async_update()
-        
+
         # Register callback for push notifications
         self._maveoStick.register_callback(self.async_write_ha_state)
 
@@ -104,7 +104,9 @@ class GarageDoor(CoverEntity):
         except Exception as ex:
             self._available = False
             # This is logging, so use % formatting.
-            _LOGGER.error("Error fetching initial state for %s: %s", self._maveoStick.id, ex)
+            _LOGGER.error(
+                "Error fetching initial state for %s: %s", self._maveoStick.id, ex
+            )
 
     async def async_will_remove_from_hass(self) -> None:
         """Entity being removed from hass."""
@@ -125,7 +127,10 @@ class GarageDoor(CoverEntity):
     @property
     def is_closed(self) -> bool:
         """Return if the cover is closed."""
-        return self._maveoStick.state == State.closed or self._maveoStick.state == State.intermediate 
+        return (
+            self._maveoStick.state == State.closed
+            or self._maveoStick.state == State.intermediate
+        )
 
     @property
     def is_closing(self) -> bool:
@@ -157,9 +162,7 @@ class GarageDoor(CoverEntity):
         params = {}
         params["actionTypeId"] = actionType_open["id"]  # type: ignore[index]
         params["thingId"] = self._maveoStick.id
-        response_exec: dict[str, Any] | None = self._maveoStick.maveoBox.send_command(
-            "Integrations.ExecuteAction", params
-        )
+        self._maveoStick.maveoBox.send_command("Integrations.ExecuteAction", params)
 
         self._maveoStick.state = State.opening
         await self._maveoStick.publish_updates()
@@ -179,9 +182,7 @@ class GarageDoor(CoverEntity):
         params = {}
         params["actionTypeId"] = actionType_open["id"]  # type: ignore[index]
         params["thingId"] = self._maveoStick.id
-        response_exec: dict[str, Any] | None = self._maveoStick.maveoBox.send_command(
-            "Integrations.ExecuteAction", params
-        )
+        self._maveoStick.maveoBox.send_command("Integrations.ExecuteAction", params)
 
         self._maveoStick.state = State.closing
         await self._maveoStick.publish_updates()

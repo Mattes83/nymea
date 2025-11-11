@@ -3,17 +3,16 @@
 from __future__ import annotations
 
 import asyncio
+from collections.abc import Callable
 import json
 import logging
 import socket
 import ssl
-from collections.abc import Callable
 from threading import Lock
 from typing import Any
 
-import websockets
-
 from homeassistant.core import HomeAssistant
+import websockets
 
 # from .nymea import Nymea
 
@@ -26,17 +25,19 @@ class MaveoBox:
     """Maveo Box."""
 
     def __init__(
-        self, 
-        hass: HomeAssistant, 
-        host: str, 
-        port: int, 
-        token: str | None = None, 
-        websocket_port: int = 4444
+        self,
+        hass: HomeAssistant,
+        host: str,
+        port: int,
+        token: str | None = None,
+        websocket_port: int = 4444,
     ) -> None:
         """Init maveo box."""
         self._host: str = host
         self._port: int = port  # JSON-RPC port (typically 2222)
-        self._ws_port: int = websocket_port  # WebSocket port for notifications (typically 4444)
+        self._ws_port: int = (
+            websocket_port  # WebSocket port for notifications (typically 4444)
+        )
         self._hass: HomeAssistant = hass
         self._name: str = host
         self._id: str = host.lower()
@@ -45,20 +46,22 @@ class MaveoBox:
         self._authenticationRequired: bool = True
         self._initialSetupRequired: bool = False
         self._commandId: int = 0
-        
+
         # JSON-RPC socket for commands (port 2222)
         self._sock: socket.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        
+
         # WebSocket connection for notifications (port 4444)
         self._ws: Any = None
         self._ws_task: asyncio.Task[None] | None = None
-        
+
         self.maveoSticks: list[Any] = []
         self.things: list[Any] = []
         self.online: bool = True
-        
+
         # Notification system
-        self._notification_handlers: dict[str, list[Callable[[dict[str, Any]], None]]] = {}
+        self._notification_handlers: dict[
+            str, list[Callable[[dict[str, Any]], None]]
+        ] = {}
         self._stop_notification_listener: bool = False
 
     @property
@@ -88,7 +91,7 @@ class MaveoBox:
         """Inits the connection to the maveo box and returns a token used for authentication."""
         # Run blocking socket operations in executor
         loop = self._hass.loop
-        
+
         # Connect to socket in executor (blocking I/O)
         await loop.run_in_executor(None, self._sock.connect, (self._host, self._port))
 
@@ -96,16 +99,20 @@ class MaveoBox:
         try:
             # first try without ssl
             handshake_message = self.send_command("JSONRPC.Hello", {})
-        except:
+        except Exception:
             # on case of error try with ssl
             # Create SSL context in executor to avoid blocking
             context = await loop.run_in_executor(None, self._create_ssl_context)
-            
+
             self._sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-            await loop.run_in_executor(None, self._sock.connect, (self._host, self._port))
-            
+            await loop.run_in_executor(
+                None, self._sock.connect, (self._host, self._port)
+            )
+
             # Wrap socket with SSL in executor
-            self._sock = await loop.run_in_executor(None, context.wrap_socket, self._sock)
+            self._sock = await loop.run_in_executor(
+                None, context.wrap_socket, self._sock
+            )
             handshake_message = self.send_command("JSONRPC.Hello", {})
 
         handshake_data = handshake_message["params"]
@@ -134,13 +141,13 @@ class MaveoBox:
         # Authenticate if no token
         if self._authenticationRequired and self._token is None:
             self._token = self._pushbuttonAuthentication()
-        
+
         # Enable notifications for the Integrations namespace
         self._enable_notifications()
-        
+
         # Note: Notification listener will be started later from __init__.py
         # to avoid blocking during initialization
-        
+
         return self._token
 
     def _pushbuttonAuthentication(self) -> str | None:
@@ -205,7 +212,9 @@ class MaveoBox:
         # The notification listener will receive all notifications once started.
         _LOGGER.info("Notifications are enabled by default after authentication")
 
-    def send_command(self, method: str, params: dict[str, Any] | None = None) -> dict[str, Any] | None:
+    def send_command(
+        self, method: str, params: dict[str, Any] | None = None
+    ) -> dict[str, Any] | None:
         """Send a command via JSON-RPC socket and wait for response."""
         with mutex:
             command_obj: dict[str, Any] = {"id": self._commandId, "method": method}
@@ -237,8 +246,8 @@ class MaveoBox:
                 # Skip notifications (should rarely happen on command socket now).
                 if "notification" in response:
                     _LOGGER.warning(
-                        "Received notification on command socket: %s", 
-                        response['notification']
+                        "Received notification on command socket: %s",
+                        response["notification"],
                     )
                     continue
                 responseId = response["id"]
@@ -253,11 +262,11 @@ class MaveoBox:
     async def _websocket_listener(self) -> None:
         """WebSocket listener for push notifications from Nymea (port 4444)."""
         _LOGGER.info("Starting WebSocket notification listener")
-        
+
         # Determine if we need SSL.
         ws_url: str = f"ws://{self._host}:{self._ws_port}"
         ssl_context: ssl.SSLContext | None = None
-        
+
         try:
             # Try non-SSL first.
             async with websockets.connect(ws_url) as websocket:
@@ -268,7 +277,7 @@ class MaveoBox:
             loop = self._hass.loop
             ssl_context = await loop.run_in_executor(None, self._create_ssl_context)
             ws_url = f"wss://{self._host}:{self._ws_port}"
-            
+
             try:
                 async with websockets.connect(ws_url, ssl=ssl_context) as websocket:
                     await self._ws_listen_loop(websocket)
@@ -283,20 +292,19 @@ class MaveoBox:
             hello_message: dict[str, Any] = {
                 "id": 0,
                 "method": "JSONRPC.Hello",
-                "params": {}
+                "params": {},
             }
             await websocket.send(json.dumps(hello_message))
             hello_response: dict[str, Any] = json.loads(await websocket.recv())
-            
+
             if hello_response.get("status") != "success":
                 _LOGGER.error("WebSocket handshake failed: %s", hello_response)
                 return
-            
+
             _LOGGER.debug(
-                "WebSocket handshake successful: %s", 
-                hello_response.get('params', {})
+                "WebSocket handshake successful: %s", hello_response.get("params", {})
             )
-            
+
             # If authentication is required, send Hello again WITH the token.
             # This authenticates the WebSocket session.
             if self._authenticationRequired and self._token:
@@ -304,62 +312,63 @@ class MaveoBox:
                     "id": 1,
                     "method": "JSONRPC.Hello",
                     "params": {},
-                    "token": self._token
+                    "token": self._token,
                 }
                 await websocket.send(json.dumps(auth_hello))
                 auth_response = json.loads(await websocket.recv())
-                
+
                 if auth_response.get("status") != "success":
                     _LOGGER.error(
-                        "WebSocket token authentication failed: %s", 
-                        auth_response
+                        "WebSocket token authentication failed: %s", auth_response
                     )
                     return
-                
+
                 _LOGGER.info("WebSocket authenticated with token")
-            
+
             # Now enable notifications (after authentication).
             enable_notifications = {
                 "id": 2,
                 "method": "JSONRPC.SetNotificationStatus",
-                "params": {
-                    "enabled": True
-                }
+                "params": {"enabled": True},
             }
-            
+
             # Add token at top level if authentication is required.
             if self._authenticationRequired and self._token:
                 enable_notifications["token"] = self._token
-            
+
             await websocket.send(json.dumps(enable_notifications))
             notif_response = json.loads(await websocket.recv())
             if notif_response.get("status") == "success":
                 _LOGGER.info("WebSocket notifications enabled")
             else:
                 _LOGGER.warning("Failed to enable notifications: %s", notif_response)
-            
+
             # Listen for notifications.
             while not self._stop_notification_listener:
                 try:
                     message_str = await asyncio.wait_for(websocket.recv(), timeout=1.0)
                     message = json.loads(message_str)
-                    
+
                     # Only process notifications (not command responses).
                     if "notification" in message:
                         notification_name = message["notification"]
                         params = message.get("params", {})
                         _LOGGER.info(
-                            "WebSocket notification: %s with params: %s", 
-                            notification_name, 
-                            params
+                            "WebSocket notification: %s with params: %s",
+                            notification_name,
+                            params,
                         )
-                        
+
                         # Dispatch to registered handlers.
                         if notification_name in self._notification_handlers:
-                            for handler in self._notification_handlers[notification_name]:
+                            for handler in self._notification_handlers[
+                                notification_name
+                            ]:
                                 try:
                                     # Call handler in Home Assistant's event loop.
-                                    self._hass.loop.call_soon_threadsafe(handler, params)
+                                    self._hass.loop.call_soon_threadsafe(
+                                        handler, params
+                                    )
                                 except Exception as ex:
                                     _LOGGER.error(
                                         "Error calling notification handler: %s", ex
@@ -373,8 +382,8 @@ class MaveoBox:
                         _LOGGER.debug(
                             "Received command response on WebSocket: %s", message
                         )
-                        
-                except asyncio.TimeoutError:
+
+                except TimeoutError:
                     # Normal timeout, continue loop.
                     continue
                 except websockets.exceptions.ConnectionClosed:
@@ -383,7 +392,7 @@ class MaveoBox:
                 except Exception as ex:
                     _LOGGER.error("Error in WebSocket listener: %s", ex)
                     break
-                    
+
         except Exception as ex:
             _LOGGER.error("WebSocket listen loop error: %s", ex)
         finally:

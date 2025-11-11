@@ -3,14 +3,12 @@
 from collections.abc import Generator
 from unittest.mock import AsyncMock, MagicMock, patch
 
+from homeassistant.const import CONF_HOST, CONF_PORT, CONF_TOKEN
+from homeassistant.core import HomeAssistant
 import pytest
 from pytest_homeassistant_custom_component.common import MockConfigEntry
 
-from homeassistant.const import CONF_HOST, CONF_PORT, CONF_TOKEN
-from homeassistant.core import HomeAssistant
-
 from custom_components.nymea.const import CONF_WEBSOCKET_PORT, DOMAIN
-
 
 pytest_plugins = "pytest_homeassistant_custom_component"
 
