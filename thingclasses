@@ -1,0 +1,1499 @@
+THING CLASSES AVAILABLE:
+--------------------------------------------------------------------------------
+
+Thing Class: MFZ Garagedoor
+  - ID: 68d5ed34-c78e-4fe7-8472-b49bbb8ca663
+  - Vendor: maveo
+  - Vendor ID: e77e72ae-1228-42a3-85cd-34c6f3a8d494
+  - State Types (16):
+      * Connected (ID: 58d06b14-40e0-4997-8526-afc652cdf9cc, Type: Bool)
+      * Firmware update available (ID: fbdf89d1-5d81-4d93-9e79-f1cac0332ddd, Type: Bool)
+      * maveo-stick version (ID: 3a1d7495-1576-4f3a-9f94-a22098e76620, Type: String)
+      * Firmware upgrade status (ID: a80b6833-0f0c-4449-8798-a443069aa82b, Type: String)
+      * DFU progress (ID: bbf24f1f-d6bb-4966-a042-1b519e241151, Type: Int)
+      * Garage software version (ID: 4d6fe44c-c540-417d-bacf-8eb7208cd16c, Type: String)
+      * Garage manufacturer name (ID: 92924f63-539c-4b4d-8317-61f77ca5e3c8, Type: String)
+      * State (ID: db5e6ced-26d2-402b-9505-0c080d9234f4, Type: String)
+      * Intermediate position (ID: 644a80ce-09b4-4115-888d-4076578b536b, Type: Bool)
+      * Open count (ID: af8f7986-74e9-46d4-a71c-5020c4ca4585, Type: Int)
+      * Close count (ID: 1b5183bd-eb81-4d75-a1cc-b50a0651b17e, Type: Int)
+      * Open duration (ID: f47bf244-c6f9-4cc0-9b7a-0631852cdeda, Type: Int)
+      * Close duration (ID: ddc4a12b-f6ee-4741-805f-37da1f888476, Type: Int)
+      * Total movement time (ID: b5b10b09-cf42-46a1-8177-d46ab49941b9, Type: Int)
+      * Update status (ID: e560c2c6-e428-4bca-8b2e-a6b595f71815, Type: String)
+      * Available version (ID: 72b739b3-7733-462e-a620-91863ea481d7, Type: String)
+  - Action Types (6):
+      * Open (ID: d9e5e2f3-400b-4ecb-92e6-c0ad97b15176)
+      * Stop (ID: 0e380074-4bf2-48c3-9364-2e8e60eeb21a)
+      * Close (ID: d5599764-5f3e-4beb-99c6-4818dbc453dd)
+      * Check firmware version (ID: 7d1fccbd-5538-45ca-81d8-d0d4dab28448)
+      * Start firmware upgrade (ID: 72810251-b618-40f6-b968-5a87a55359c2)
+      * Reset open/close counters (ID: 82838549-57b8-4e1e-a8dd-866ae8f7152d)
+
+Thing Class: Hue Tap Dial
+  - ID: 58e579b4-f917-478c-9006-f1f8d4df2ded
+  - Vendor: Philips
+  - Vendor ID: 0ae1e001-2aa6-47ed-b8c0-334c3728a68f
+  - State Types (4):
+      * reachable (ID: 7c81af92-3643-4211-9d62-407cbc596619, Type: Bool)
+      * battery (ID: 9d0d190f-2898-4c9a-a423-ec7187bfcb5e, Type: Int)
+      * battery critical (ID: 79efe477-2757-4457-bdfb-a3fbeb198e7a, Type: Bool)
+      * Level (ID: 23528402-b98f-49b8-90cf-7b68f251ad59, Type: Uint)
+  - Event Types (6):
+      * Button pressed (ID: 9ff8853f-b1fe-44ac-bcfe-193303397012)
+      * Button longpress (ID: 4c1bac9f-291e-4bd2-aa2e-c8ecc182c300)
+      * Increase (ID: 11edf456-4484-45f3-8638-01162fb47609)
+      * Decrease (ID: 1b951b52-240d-437c-ae8d-c40298993acb)
+      * Large Increase (ID: 8d8aa384-e408-4365-8381-ac763168788b)
+      * Large Decrease (ID: d1415f84-c4cc-478d-89a4-bd7a5c9761e5)
+
+Thing Class: TVOC Air Quality Monitor
+  - ID: 1a9fb2ea-543e-46b2-a10d-9a977232367b
+  - Vendor: Lumi
+  - Vendor ID: f58dac98-0ba1-408f-946a-25d452080baa
+  - State Types (12):
+      * Available (ID: 92f74c82-5a3e-4bb7-b3f3-205a6a19620f, Type: Bool)
+      * Signal strength (ID: f948308d-ed05-47fb-a893-f1c855db10af, Type: Uint)
+      * Version (ID: 42e7712d-ff8b-4af5-be33-e4a55527a0b1, Type: String)
+      * Temperature (ID: 7ce4b747-dfc2-40db-ba55-fa430de97416, Type: Double)
+      * Humidity (ID: 85bd3b3f-11b7-409f-95bd-f5b5edc95158, Type: Double)
+      * VOC (ID: 028b0c34-db30-4a3a-bfad-f146b1a96b35, Type: Uint)
+      * Battery leve critical (ID: 0689e60d-8022-4537-9284-53d7cd91a78b, Type: Bool)
+      * Battery level (ID: 0e143e89-d021-40af-a349-de219ceb2084, Type: Int)
+      * Version (ID: 2c77e659-c1a0-4cfa-b9de-0a131e491ab6, Type: String)
+      * Update status (ID: 7affb09a-6df6-4fb7-88df-a3785b7aa0b5, Type: String)
+      * Available version (ID: 799bd935-be61-453f-8e24-a89546e4213d, Type: String)
+      * Update progress (ID: a6b7f2e2-3d7b-431f-91d8-72f0d47522dd, Type: Uint)
+  - Action Types (1):
+      * Start update (ID: 208a06cd-bbe5-4eb7-afb0-149d257b19b0)
+
+Thing Class: Zigbee Thermostat
+  - ID: ca9af6cf-2d15-4d54-ba07-3d2ce03445b8
+  - Vendor: nymea GmbH
+  - Vendor ID: 2062d64d-3232-433c-88bc-0d33c0ba2ba6
+  - State Types (9):
+      * Target temperature (ID: 88ad3957-2912-4de1-b53d-b360565dd361, Type: Double)
+      * Current temperature (ID: 497af03a-a893-438c-aba2-1bf3ecfc66c5, Type: Double)
+      * Heating on (ID: 88d5dda1-b8f6-49f1-a55a-20415f9157b3, Type: Bool)
+      * Cooling on (ID: c77a3d3f-46c7-4026-b9ab-02ab88077cc4, Type: Bool)
+      * Connected (ID: e9fb2b10-96da-4b70-afda-46e948399af8, Type: Bool)
+      * Signal strength (ID: 8f0512ab-ced2-4dcb-90fe-aaa532efd0dd, Type: Uint)
+      * Version (ID: c8bd12d2-b425-4422-9e0e-a65542a47b70, Type: String)
+      * Battery level (ID: 3a733e99-850b-4c56-b058-d39850ef2fee, Type: Int)
+      * Battery critical (ID: 5cec4399-ba7c-4c78-8c30-c91040ad99cf, Type: Bool)
+  - Action Types (1):
+      * Set target temperature (ID: 88ad3957-2912-4de1-b53d-b360565dd361)
+
+Thing Class: Color Light
+  - ID: d32953a5-ac30-479e-bd8d-e523c745902d
+  - Vendor: Philips
+  - Vendor ID: 0ae1e001-2aa6-47ed-b8c0-334c3728a68f
+  - State Types (10):
+      * Available (ID: e4954ad7-812b-491f-9187-ba6cd6cd1755, Type: Bool)
+      * Signal strength (ID: 3a65294c-a5b8-475e-ab1c-8a5df5c3ab51, Type: Uint)
+      * Power (ID: 3ab42d68-2394-40ff-8704-571e5b1b28e9, Type: Bool)
+      * Brightness (ID: 58f16042-b027-439b-96f6-39ae4b5772f8, Type: Int)
+      * Color temperature scaled (ID: 472d3582-cff9-42d1-914a-433ebdf8bf37, Type: Int)
+      * color (ID: 92338bb1-c3ef-46ee-8e87-3dcabad6d0d2, Type: Color)
+      * Update status (ID: 7d59df4c-7964-4c05-af04-a2672e30d919, Type: String)
+      * Version (ID: 985ef8bf-22c7-40b8-8de6-8ba5f54ab287, Type: String)
+      * Available firmware version (ID: 8ae98171-c2bc-4d87-a1e1-8d73f669fb4f, Type: String)
+      * Update progress (ID: b2fd7717-c6ce-425e-9b39-d9e953f5d687, Type: Uint)
+  - Action Types (6):
+      * Set power (ID: 3ab42d68-2394-40ff-8704-571e5b1b28e9)
+      * Set brightness (ID: 58f16042-b027-439b-96f6-39ae4b5772f8)
+      * Set color temperature scaled (ID: 472d3582-cff9-42d1-914a-433ebdf8bf37)
+      * Set color (ID: 92338bb1-c3ef-46ee-8e87-3dcabad6d0d2)
+      * Identify (ID: 2a0dc479-34e8-4f56-bd24-b004d4b762e9)
+      * Start update (ID: 392cd1ac-af9c-4035-ae6c-20c033ebf317)
+
+Thing Class: GWA1521 actuator
+  - ID: 6bce244f-b93c-474e-b8eb-65e44ad96329
+  - Vendor: Gewiss
+  - Vendor ID: 2fdc8d78-ea8e-47bd-9331-b06a9b56f938
+  - State Types (3):
+      * Available (ID: 5d23d473-f063-49dd-b675-d31741d6976b, Type: Bool)
+      * Signal strength (ID: 3e3dba24-37d5-4c4b-99b1-b33ad612a817, Type: Uint)
+      * Relay (ID: 3d4993c4-9142-409a-8389-3377eeae0ad6, Type: Bool)
+  - Action Types (1):
+      * Set relay (ID: 3d4993c4-9142-409a-8389-3377eeae0ad6)
+
+Thing Class: Magnet sensor
+  - ID: b3e30f37-7467-4c66-8694-9fe624aebd10
+  - Vendor: Lumi
+  - Vendor ID: f58dac98-0ba1-408f-946a-25d452080baa
+  - State Types (6):
+      * Available (ID: 76f6c739-73e0-4a36-97c9-043af5854af5, Type: Bool)
+      * Signal strength (ID: 7fef2f25-91ac-4818-bc7a-e427bdeff438, Type: Uint)
+      * Version (ID: ac0e4cd1-553b-4e43-b08a-6dd8d617e765, Type: String)
+      * Closed (ID: 6fad76ec-9d36-408d-bbf1-00e5d18bf6b0, Type: Bool)
+      * Battery level (ID: c2dbbf61-109d-4267-a9ad-904bc0f3e8ca, Type: Int)
+      * Battery level critical (ID: da0cb4d6-4d72-4163-93fe-a63cabf1adf0, Type: Bool)
+
+Thing Class: Friends of Hue Switch
+  - ID: 692bc4be-07b8-4b77-ab0b-a36185b17d76
+  - Vendor: Philips
+  - Vendor ID: 0ae1e001-2aa6-47ed-b8c0-334c3728a68f
+  - State Types (1):
+      * Reachable (ID: 840b220c-656b-4f56-bbaa-ce818cffad64, Type: Bool)
+  - Event Types (1):
+      * Button pressed (ID: 2cc68bd3-ad73-4bf3-9905-639870d071bd)
+
+Thing Class: On/Off Light
+  - ID: 7fbc3165-e618-4dc0-8255-8dac2cc08dfa
+  - Vendor: nymea GmbH
+  - Vendor ID: 2062d64d-3232-433c-88bc-0d33c0ba2ba6
+  - State Types (4):
+      * Connected (ID: 7548ac08-4ea1-4dcd-98b9-9d58bbc06ab7, Type: Bool)
+      * Signal strength (ID: 5857943e-ed90-4321-966e-b56eddaf2441, Type: Uint)
+      * Version (ID: f5b5e0b3-2c34-4ccc-baef-8e29b84e7a2b, Type: String)
+      * Power (ID: ae03155c-f17f-4d9f-bb40-157a8cb1f83c, Type: Bool)
+  - Action Types (2):
+      * Set power (ID: ae03155c-f17f-4d9f-bb40-157a8cb1f83c)
+      * Identify (ID: 9388290d-5db2-484a-a702-53a0d842d412)
+
+Thing Class: Motion sensor
+  - ID: 500a8b65-ad34-4bf0-a35d-c167510999f2
+  - Vendor: nymea GmbH
+  - Vendor ID: 2062d64d-3232-433c-88bc-0d33c0ba2ba6
+  - State Types (6):
+      * Presence detected (ID: 73523dee-93c1-4143-abff-7685b2d1bb1c, Type: Bool)
+      * Tampered (ID: c9c0343a-e396-4a21-ab7f-5f3d88cc55c5, Type: Bool)
+      * Battery level (ID: 4ed91f61-298f-411a-a1b8-403d77eecf34, Type: Int)
+      * Battery critical (ID: ca81d872-dcf0-430d-8b00-98e6e4e4ccf4, Type: Bool)
+      * Connected (ID: 5d12e9da-2f5c-4d40-a20a-b5d378fd0387, Type: Bool)
+      * Signal strength (ID: 5062aac1-aa2d-4a35-9435-482ff45a4d02, Type: Uint)
+
+Thing Class: Button sensor
+  - ID: ae3c8713-4660-427b-8916-a08723183ba8
+  - Vendor: Lumi
+  - Vendor ID: f58dac98-0ba1-408f-946a-25d452080baa
+  - State Types (3):
+      * Available (ID: a4285c0e-52c5-47a3-9129-1454421bdd01, Type: Bool)
+      * Signal strength (ID: d6f425ee-ff76-4e41-93c8-53efd828a169, Type: Uint)
+      * Version (ID: db532b4b-2d0f-4d77-bbb5-6f81e1981161, Type: String)
+  - Event Types (2):
+      * Pressed (ID: 8aa0a2e3-6338-4993-8b34-00839c2ed0c6)
+      * Long pressed (ID: d8f3b35c-0834-432a-9cfc-958545e3ead2)
+
+Thing Class: Hue Wall Switch Module
+  - ID: 1a81dffb-42e9-48f4-8fc5-b5917a7548b4
+  - Vendor: Philips
+  - Vendor ID: 0ae1e001-2aa6-47ed-b8c0-334c3728a68f
+  - State Types (8):
+      * Connected (ID: d36454c9-a90e-415a-870a-5488ba981006, Type: Bool)
+      * Signal strength (ID: ce55dd06-6d27-49f4-ad40-4a85bc126c2d, Type: Uint)
+      * Battery level (ID: 6a5f652c-5fa1-4477-a68c-ec1f2a3c1f91, Type: Int)
+      * Battery critical (ID: 2e4453a3-b8de-4494-b49e-f09ca855ff77, Type: Bool)
+      * Update status (ID: cd5f93c5-858c-41e2-b8af-1c23dc968636, Type: String)
+      * Version (ID: 9b00b4fd-700f-4bb4-aa45-c3801cd11557, Type: String)
+      * Available firmware version (ID: 6ab24ea7-2af6-4999-8033-9e84d95150c0, Type: String)
+      * Update progress (ID: 454e6350-d58d-4dd0-ae9a-cfae25f5a8b9, Type: Uint)
+  - Action Types (1):
+      * Start update (ID: a2706922-67da-4b83-8e5e-00627e607290)
+  - Event Types (2):
+      * Pressed (ID: 19acc530-0c21-4582-9c82-17ccf5901476)
+      * Long pressed (ID: 20a9a579-3560-4260-878d-153b8d59d8ec)
+
+Thing Class: Switch
+  - ID: f8aa2ba1-ce74-4691-b97d-85427f4cf8bd
+  - Vendor: Lumi
+  - Vendor ID: f58dac98-0ba1-408f-946a-25d452080baa
+  - State Types (3):
+      * Connected (ID: d1afa3ba-f3bd-47e5-90fa-9d80dcce91d8, Type: Bool)
+      * Signal strength (ID: a764dbfb-7b86-439b-94ea-aec742dcb13e, Type: Uint)
+      * Version (ID: 8164c1d0-657e-4347-99fb-f3fdc07af6de, Type: String)
+  - Event Types (2):
+      * Button pressed (ID: 9a0c5f37-e346-41d9-93a4-4877c012b805)
+      * Button longpressed (ID: 9a7a3d9e-faa3-471f-8c82-0bb98d9a788a)
+
+Thing Class: Hue Motion Sensor
+  - ID: 25b79fff-4b88-4af8-b06c-2fe246238790
+  - Vendor: Philips
+  - Vendor ID: 0ae1e001-2aa6-47ed-b8c0-334c3728a68f
+  - State Types (7):
+      * Reachable (ID: 19c28b69-a9c2-4908-8255-7681f72c2d92, Type: Bool)
+      * Battery (ID: ac463b30-24af-4352-84da-19a3ffc906bd, Type: Int)
+      * Battery critical (ID: d7c4e143-6f03-411e-a12e-dd22806270fd, Type: Bool)
+      * Temperature (ID: 63ee79f7-702b-48c1-86cf-8ddebb78bae6, Type: Double)
+      * Ambient light (ID: 064f48c1-f86d-4a0a-bdae-3420123dff3f, Type: Double)
+      * Person is present (ID: e38ee39c-c77f-40b5-b122-4efc411da0ed, Type: Bool)
+      * Last seen time (ID: ef2e564e-2443-448f-bcd9-f85a1126ee6a, Type: Int)
+
+Thing Class: Light sensor
+  - ID: 2c35236c-bc5c-4736-beb6-d8dfd0c6bc40
+  - Vendor: nymea GmbH
+  - Vendor ID: 2062d64d-3232-433c-88bc-0d33c0ba2ba6
+  - State Types (5):
+      * Light intensity (ID: 241629dd-15e4-4698-bb56-f4a16b82d6fa, Type: Double)
+      * Battery critical (ID: 235a87fd-524c-4177-a707-7ec004d94f54, Type: Bool)
+      * Connected (ID: 1415b7dc-8339-4022-99fa-e1b4c42ef591, Type: Bool)
+      * Signal strength (ID: 2ec0dc23-d665-469d-b7b1-2205a6056783, Type: Uint)
+      * Version (ID: c71e2426-69f3-45d2-acde-4870f010071e, Type: String)
+
+Thing Class: Photoelectric smoke sensor
+  - ID: 258dd38e-72ba-4295-b04b-ea9ef8e3312b
+  - Vendor: nymea GmbH
+  - Vendor ID: 2062d64d-3232-433c-88bc-0d33c0ba2ba6
+  - State Types (7):
+      * Connected (ID: f1a65b25-c0f9-4535-9f85-45b42d91cfa1, Type: Bool)
+      * Signal strength (ID: f0b38b1c-0f1d-4359-b732-06aae73b9edf, Type: Uint)
+      * Fire detected (ID: 58b073a2-62a0-4754-9e57-4dac80095ed1, Type: Bool)
+      * Smoke concentration (ID: aaef289e-d1fc-4e44-8c1d-bbb6ad28ea33, Type: Double)
+      * Tampered (ID: cca93a41-206c-41fa-809c-07f4f34b010f, Type: Bool)
+      * Battery level (ID: 9abc0e1b-242a-4f4b-a656-26563c761ed9, Type: Int)
+      * Battery level critical (ID: 37bae504-1471-4689-b8fa-cf494a5522a8, Type: Bool)
+
+Thing Class: Motion sensor
+  - ID: 43844f3d-c620-44ab-b1fa-741b79dfc289
+  - Vendor: nymea GmbH
+  - Vendor ID: 2062d64d-3232-433c-88bc-0d33c0ba2ba6
+  - State Types (6):
+      * Connected (ID: 8b16ee46-0132-409a-857e-863d20e68a77, Type: Bool)
+      * Signal strength (ID: 12334fb5-5ea4-44d3-8c60-f187097702db, Type: Uint)
+      * Presence (ID: b84574b4-43c9-49c4-a05a-92265bb044d7, Type: Bool)
+      * Light intensity (ID: 25568c64-b904-4099-8d5c-452c3130e130, Type: Double)
+      * Battery level (ID: 763dabb7-f1fb-4202-a31a-7af9f63f09e1, Type: Int)
+      * Battery level critical (ID: 323d801e-a563-4680-8e58-f96e148c2ad1, Type: Bool)
+
+Thing Class: System monitor
+  - ID: 181d852a-6290-434d-891a-35d2c3435f47
+  - Vendor: nymea GmbH
+  - Vendor ID: 2062d64d-3232-433c-88bc-0d33c0ba2ba6
+  - State Types (3):
+      * CPU usage (ID: 0744b84a-f9dc-4e53-a6f3-3533e909c533, Type: Double)
+      * Memory usage (ID: 672748c1-dbd0-4c65-8983-d0dd34892176, Type: Double)
+      * Storage usage (ID: 47d6e6fb-5dc9-4e3f-ad24-c9d7eab320bd, Type: Double)
+
+Thing Class: Remote control
+  - ID: b909dc16-61fa-4c5f-ad7d-195327f78f8d
+  - Vendor: nymea GmbH
+  - Vendor ID: 2062d64d-3232-433c-88bc-0d33c0ba2ba6
+  - State Types (5):
+      * Battery critical (ID: 445e279e-31e7-4a80-b382-62417ad61414, Type: Bool)
+      * Battery level (ID: 812daed6-1630-4d01-a039-3977edc965c0, Type: Int)
+      * Connected (ID: 5b563fa9-1140-4f1f-8b87-4c1a287ccad5, Type: Bool)
+      * Signal strength (ID: 599ca06d-a532-4633-8b79-30a50325e4a2, Type: Uint)
+      * Version (ID: 87ac4e00-bf34-4a15-9cc3-a98c5099c1eb, Type: String)
+  - Event Types (1):
+      * Pressed (ID: d49c9768-9726-4d86-a46e-cc34a0d7a2a1)
+
+Thing Class: Hue Smart Button
+  - ID: 1e34a056-9f37-4741-b249-a5eca7a4ab4e
+  - Vendor: Philips
+  - Vendor ID: 0ae1e001-2aa6-47ed-b8c0-334c3728a68f
+  - State Types (3):
+      * Reachable (ID: b449cca5-19a0-483f-b4bd-b9b43b4f8ed4, Type: Bool)
+      * Battery level (ID: a0a1b480-6822-49bc-b1b1-50c39764d255, Type: Int)
+      * Battery critical (ID: 7c1fd7c1-f322-4be7-9c22-7d14d0ec38ea, Type: Bool)
+  - Event Types (2):
+      * Button pressed (ID: c809179e-effa-4717-9172-11df7e80d109)
+      * Long pressed (ID: 25803922-37f1-47c8-ac00-2d3acb9eb634)
+
+Thing Class: Hue On/Off light
+  - ID: f720f31d-9523-4a74-9f10-19cbc9edeb58
+  - Vendor: Philips
+  - Vendor ID: 0ae1e001-2aa6-47ed-b8c0-334c3728a68f
+  - State Types (2):
+      * reachable (ID: 111a5a4a-63d4-4d1d-ac72-b5b5a29fd0aa, Type: Bool)
+      * power (ID: 5dc5e71b-789e-4c68-abb6-1534c8af019e, Type: Bool)
+  - Action Types (1):
+      * Set power (ID: 5dc5e71b-789e-4c68-abb6-1534c8af019e)
+
+Thing Class: Door lock
+  - ID: 34cb3d09-dd9f-4b95-95d0-30a1cd94adac
+  - Vendor: nymea GmbH
+  - Vendor ID: 2062d64d-3232-433c-88bc-0d33c0ba2ba6
+  - State Types (5):
+      * Connected (ID: 206b0508-b477-4aa2-b420-aba2259fb6e6, Type: Bool)
+      * Signal strength (ID: 6c8f8db5-464c-408a-9c65-4e8096663019, Type: Uint)
+      * Version (ID: 9e27850b-99d8-40df-9bc7-4b3c7c01faf8, Type: String)
+      * Battery level (ID: 568e5bdd-47f3-4ccb-a1d8-ff3a5ea87ad8, Type: Int)
+      * Battery critical (ID: 89abea26-b772-4258-9b56-e026b80c2028, Type: Bool)
+  - Action Types (2):
+      * Unlock door (ID: 6e112e3b-080f-47e4-8e2b-453029f0eacb)
+      * Lock door (ID: c26e1908-25d0-4475-8f82-5aaf034640f1)
+
+Thing Class: Hue Dimmer switch (Gen 2)
+  - ID: 60836676-c87b-499b-9802-a72b788ef00b
+  - Vendor: Philips
+  - Vendor ID: 0ae1e001-2aa6-47ed-b8c0-334c3728a68f
+  - State Types (8):
+      * Connected (ID: 0e35957c-bfdf-4b00-9cb2-ecc663f67d55, Type: Bool)
+      * Signal strength (ID: a20e79de-4710-4295-a582-3e63eedd19fa, Type: Uint)
+      * Battery level (ID: a182b72c-4fc5-4ae4-87c0-8b1eb3de00d4, Type: Int)
+      * Battery critical (ID: 3a446876-a960-43c5-b7bc-6e06a071391a, Type: Bool)
+      * Update status (ID: b47a5b4d-f10e-4d6f-965f-b2a1347fcab6, Type: String)
+      * Version (ID: f4442612-970e-4233-9242-b4f2873702ee, Type: String)
+      * Available firmware version (ID: 373848e9-cad7-4986-a9a5-0982f58efb71, Type: String)
+      * Update progress (ID: fd232036-9b2f-4c20-a6de-6227f3c8b947, Type: Uint)
+  - Action Types (1):
+      * Start update (ID: 2d8b7527-f8a3-41a7-aef2-706f8dd25fb1)
+  - Event Types (2):
+      * Pressed (ID: 4ca23a4d-f378-445f-892e-091694d7fcc1)
+      * Long pressed (ID: b1f1b4fe-bf0f-4bfe-99ae-f8967d28763d)
+
+Thing Class: TRÅDFRI Symfonisk
+  - ID: a18e398d-c14b-4bcd-8e6d-b64737436814
+  - Vendor: IKEA TRÅDFRI
+  - Vendor ID: 1a4fdeb3-2eab-47f2-9775-569552988a88
+  - State Types (9):
+      * Connected (ID: 41ca0f43-998e-4a5e-ad6b-ae7deab38461, Type: Bool)
+      * Signal strength (ID: 9485fea7-adfc-47aa-a7c4-76f38eff49ca, Type: Uint)
+      * Battery level (ID: 1a0e2e7b-1b2a-461c-a24f-1323c2aea4a1, Type: Int)
+      * Battery critical (ID: 59312570-9cab-4e64-ac2f-2eda1c5ac314, Type: Bool)
+      * Level (ID: 58657999-e062-4a12-81e7-f81d7842d18b, Type: Uint)
+      * Version (ID: 1958f3f7-509b-4222-9598-b6edd1bb9c1c, Type: String)
+      * Update status (ID: 73255d32-c21e-467a-86aa-3458660ac2ea, Type: String)
+      * Available version (ID: 0780be81-d4e3-4dc2-86dd-85bd8624737e, Type: String)
+      * Update progress (ID: 7f53f37a-fccc-4909-8cb0-223b75046c79, Type: Uint)
+  - Action Types (1):
+      * Perform update (ID: 5f8d2a0e-b80c-4479-8699-8ac46c98c34b)
+  - Event Types (3):
+      * Button pressed (ID: 46a8c0c7-2bc7-4eb7-a7fe-c0d7263c2e39)
+      * Increase (ID: 6ded6cbe-1157-4e72-a6d5-5f6f34fd206b)
+      * Decrease (ID: d8fdfcae-fd45-4158-be44-e3f8e9fc5acf)
+
+Thing Class: Water sensor
+  - ID: 20c843dc-b60e-4d06-8f96-be7950a98fc6
+  - Vendor: Develco
+  - Vendor ID: e4b36f3e-ccdc-4a88-8968-39025c3ec742
+  - State Types (10):
+      * Connected (ID: 6e26a196-6ecd-4971-a36c-0dcbd508e557, Type: Bool)
+      * Signal strength (ID: 9d92c9c7-901b-4a99-84d0-3d19c8be1635, Type: Uint)
+      * Version (ID: a59bb290-0c3e-48d8-933b-2f0783cc5615, Type: String)
+      * Water detected (ID: ff751a4f-ea4e-4706-ad4f-627c327a3d6a, Type: Bool)
+      * Temperature (ID: 98d4f3a5-539f-4f75-a86e-88d4ab4b026f, Type: Double)
+      * Battery critical (ID: b5eb9897-eabf-455b-9958-91db6b1c4868, Type: Bool)
+      * Update status (ID: 74a82258-5a7c-44f5-af98-3aa3afcbe08e, Type: String)
+      * Version (ID: 16ff5d40-77f0-46fa-bda0-1ef35eae12fc, Type: String)
+      * Available firmware version (ID: a4fdb89d-230f-454b-a4b4-12bc84a19e8c, Type: String)
+      * Update progress (ID: 9dcde658-9048-41da-b4ac-3cbe62a8609e, Type: Uint)
+  - Action Types (1):
+      * Start update (ID: 4d40f75d-fb8a-47af-9a03-98f828765887)
+
+Thing Class: Dimmable Light
+  - ID: b89762f6-056f-442d-8edc-6ab877ae9a57
+  - Vendor: IKEA TRÅDFRI
+  - Vendor ID: 1a4fdeb3-2eab-47f2-9775-569552988a88
+  - State Types (8):
+      * Available (ID: d6f7b579-08c2-4193-9eca-9b37a77e9a65, Type: Bool)
+      * Signal strength (ID: 9edb92b1-8a78-4628-9e2c-c0640860dbf8, Type: Uint)
+      * Power (ID: a0945256-b0ba-4767-b856-6c518eb9f6df, Type: Bool)
+      * Brightness (ID: 55a1b729-b865-4f05-a6b7-388a50e275f7, Type: Int)
+      * Update status (ID: 0173bd05-ce4e-46df-a0dd-e565dd56db4a, Type: String)
+      * Version (ID: 0c1388fb-fb1d-4b66-ac3c-4e0ba907b030, Type: String)
+      * Available firmware version (ID: 6c202e40-f7f8-4472-8d76-a3845dca3439, Type: String)
+      * Update progress (ID: 26d1277d-6868-4738-a2c2-f95b97da4117, Type: Uint)
+  - Action Types (4):
+      * Set power (ID: a0945256-b0ba-4767-b856-6c518eb9f6df)
+      * Set brightness (ID: 55a1b729-b865-4f05-a6b7-388a50e275f7)
+      * Identify (ID: c4ef7e85-b3cc-4c17-8347-e3e3c28771eb)
+      * Start update (ID: 7e644f8e-5f95-44db-9abc-a1d66986cee0)
+
+Thing Class: Temperature & humidity LCD sensor
+  - ID: 036d0b38-8d5b-497b-8534-9d1dd555c376
+  - Vendor: nymea GmbH
+  - Vendor ID: 2062d64d-3232-433c-88bc-0d33c0ba2ba6
+  - State Types (6):
+      * Connected (ID: 69bde74d-4ef5-49f0-958c-0609687883e8, Type: Bool)
+      * Signal strength (ID: dc4292ba-1d75-40dd-b55a-1e0d9aaf02ef, Type: Uint)
+      * Temperature (ID: c7eef19a-d5c8-4f2c-8161-9545eb123ed6, Type: Double)
+      * Humidity (ID: 3c256135-07ee-4e77-b3a5-91f05e977798, Type: Double)
+      * Battery level (ID: 45260385-cd14-4018-bf6e-d8df88a1b0b4, Type: Int)
+      * Battery level critical (ID: 72ce81f9-57c8-4b43-afa2-3ecee459c409, Type: Bool)
+
+
+Thing Class: Garagedoor
+  - ID: ca6baab8-3708-4478-8ca2-7d4d6d542937
+  - Vendor: maveo
+  - Vendor ID: e77e72ae-1228-42a3-85cd-34c6f3a8d494
+  - State Types (25):
+      * Connected (ID: 234bbb47-1641-4e8f-a7cd-09a65722596c, Type: Bool)
+      * Door movement (ID: ee5fb485-f95a-4daf-a414-14ade7a0a452, Type: String)
+      * State (ID: 6f113f20-11ed-4f69-bda5-449363ab71d0, Type: String)
+      * Controller mode (ID: 6a5f445f-a9e3-4e03-b5a3-26c3488515d4, Type: String)
+      * Garage type (ID: 42f2bc07-062c-4a51-a2c4-4ab104e25905, Type: String)
+      * Closed (ID: 02d6f21d-2c9d-4c22-a8b3-198994115a43, Type: Bool)
+      * Opened (ID: 4e61b1da-3d5f-4300-826a-62726680bc2b, Type: Bool)
+      * Intermediate open position (ID: e86f7dd2-cd02-49d6-b033-7075067480a1, Type: Bool)
+      * Intermediate close position (ID: 82d8ca8a-6f74-4d7f-8291-25c4b32f5311, Type: Bool)
+      * Intermediate open position configured (ID: 02778369-40c3-4868-8a9f-5bd915624455, Type: Bool)
+      * Intermediate close position configured (ID: 4b404143-9a4b-40dd-9d79-21a2f4a2a459, Type: Bool)
+      * Intermediate position (ID: 0e7a2d7e-8c55-442f-9a1e-c092ac7b876a, Type: Bool)
+      * Light (ID: bad168af-1925-42c2-8343-51bdb19895d3, Type: Bool)
+      * Maintenance required (ID: 394538db-4f28-4230-98bb-0bbe699ee2c3, Type: Bool)
+      * Intruder detected (ID: 90ef8e32-0bc2-49fd-9fe9-abb633debeae, Type: Bool)
+      * Firmware upgrade status (ID: 86012b09-6691-4e86-94fc-32611f11c9f5, Type: String)
+      * DFU progress (ID: 5aa09d90-e063-4a4b-80ae-49a9ea9b9680, Type: Int)
+      * Firmware update available (ID: 300a5eea-4961-4c9c-929a-32741ffa1a26, Type: Bool)
+      * maveo-stick version (ID: 8084459a-e104-4bd8-88ec-97cec435dd3d, Type: String)
+      * Garage manufacturer name (ID: a57bea5b-35ea-4538-b9b4-40dffc3b0d23, Type: String)
+      * Light barrier available (ID: 223c862e-217b-44d4-a7fa-63558457c40c, Type: Bool)
+      * Light barrier interrupted (ID: bbe2e5cb-4adc-43dc-a187-6bb8949ca649, Type: Bool)
+      * Current error code (ID: 6def2ab8-8d5a-4c55-a9e0-4dfa24cdd1ea, Type: Int)
+      * Update status (ID: 180ac69d-e645-4321-b1de-d272010c3e1e, Type: String)
+      * Available firmware version (ID: f93847ac-5f93-48d1-8668-a047d69b20d5, Type: String)
+  - Action Types (12):
+      * Switch light (ID: bad168af-1925-42c2-8343-51bdb19895d3)
+      * Open (ID: 5a1a68cb-a5ef-4bc9-8672-bc067b6c4d48)
+      * Stop (ID: fcb767de-e8d7-43da-ab21-17afea7eba24)
+      * Close (ID: 6a32c34f-763d-4065-acfc-2b88bfd9eb34)
+      * Intermediate position (ID: 76557b37-3f9a-409d-af7c-c56973b69503)
+      * Switch light (ID: 7a943679-4271-4a67-bb48-1fa606840d33)
+      * Connect (ID: c12cd2a4-696b-48de-802f-bf618352c190)
+      * Disconnect (ID: 8be6e04c-b9e6-4823-b71b-604cb094bb09)
+      * Check firmware version (ID: a3d0345c-f540-42fd-90b9-cb753f00f1e8)
+      * Start firmware upgrade (ID: 547df3a6-ce18-4dc3-b2f7-abf724189bb0)
+      * Start radio programming mode (ID: 2e112035-f959-4b1c-ad75-4b5c151ddf9c)
+      * Exit radio programming mode (ID: 6433c7a6-4bc7-4143-b903-0503433837c2)
+
+
+Thing Class: Garagedoor
+  - ID: b3395f33-1ce6-4212-a025-853779851248
+  - Vendor: maveo
+  - Vendor ID: e77e72ae-1228-42a3-85cd-34c6f3a8d494
+  - State Types (25):
+      * Connected (ID: 55615592-01bf-47be-8b18-9819314d9985, Type: Bool)
+      * Wall panel module initialized (ID: ee778627-67c0-41a8-8a88-d54657b40e2e, Type: Bool)
+      * Door movement (ID: cf78bccb-5642-48e0-a8d9-119c8ff25f99, Type: String)
+      * State (ID: 16147a91-11ca-488f-bbd1-bdf031376fca, Type: String)
+      * Controller mode (ID: a019a15f-35cf-4303-9d94-8d90aa6e0f4d, Type: String)
+      * Garage type (ID: 3b3be521-d41c-4816-b407-6949f332a08f, Type: String)
+      * Closed (ID: 9928b43d-3dd4-477a-ae68-e193e70932a0, Type: Bool)
+      * Opened (ID: 5330fa7f-aee9-4465-9e40-433cda9c93b4, Type: Bool)
+      * Intermediate open position (ID: 37bcda9b-971a-4f37-91d3-99de95fa0b17, Type: Bool)
+      * Intermediate close position (ID: 07d64717-22cb-4796-959b-c0791ee40d28, Type: Bool)
+      * Intermediate open position configured (ID: ffcf8831-afdc-4bff-b406-10bfc00bc64c, Type: Bool)
+      * Intermediate close position configured (ID: d55d5787-4ac9-4475-a4f3-6adebb3f4a72, Type: Bool)
+      * Intermediate position (ID: d43869f7-1142-4fc5-888d-936ee9778a1a, Type: Bool)
+      * Light (ID: 37623e2f-baa8-48cc-bb8c-b230d0278a30, Type: Bool)
+      * Maintenance required (ID: 6efd8d9b-4524-4d69-bb1f-d9e894f5eda4, Type: Bool)
+      * Intruder detected (ID: 709a90ee-fedc-46ed-8583-fa655c2e043e, Type: Bool)
+      * Garage software version (ID: 7e3b7f34-5a5d-47c2-a142-17b3a935623d, Type: String)
+      * Light barrier available (ID: f2da509f-2ae7-4826-8b62-fceca1159937, Type: Bool)
+      * Light barrier interrupted (ID: 167d28df-933c-4f47-8b1f-20b778030f3e, Type: Bool)
+      * Current error code (ID: 9bcbab86-e182-4563-867e-cb42f526b6ac, Type: Int)
+      * Firmware update available (ID: 6bdcbf0e-2f2c-4e31-8fbc-fbe5de715dc0, Type: Bool)
+      * maveo-stick version (ID: 3c153d50-b924-4ab4-8adb-3b7796c28392, Type: String)
+      * Update status (ID: 14c5fd22-1ac8-484a-962a-02448762aa28, Type: String)
+      * Update progress (ID: a6e5898d-1777-4960-a8c3-df3b39a9164c, Type: Uint)
+      * Available version (ID: c2fc6ea0-08e8-46ba-8cab-e92c191043f0, Type: String)
+  - Action Types (9):
+      * Switch light (ID: 37623e2f-baa8-48cc-bb8c-b230d0278a30)
+      * Open (ID: 629dceac-d20f-4a55-9154-28c717de68b8)
+      * Stop (ID: 7b27d916-49b3-4dd4-87f9-f1692f23974e)
+      * Close (ID: 4089cb65-4bad-49d6-88a5-69053e1c8eca)
+      * Intermediate position (ID: dea2f9ab-4633-452a-b237-9e001ca5cfa4)
+      * Start radio programming mode (ID: 5597c1d2-ca55-4e2f-a82d-97f651115d96)
+      * Exit radio programming mode (ID: 987f3816-92fc-4b70-87f2-34239a901325)
+      * Check firmware version (ID: 62abd511-571c-4d43-9de8-596b405ea3bd)
+      * Start firmware upgrade (ID: 3f513f67-f9e0-429b-a3f8-9f1ebc820e68)
+
+Thing Class: Process monitor
+  - ID: a3a15700-c251-4803-a608-0f3ddfcbd7a8
+  - Vendor: nymea GmbH
+  - Vendor ID: 2062d64d-3232-433c-88bc-0d33c0ba2ba6
+  - State Types (6):
+      * Running (ID: 8b8b6b38-79ed-4f0e-bdc7-445f073fa4b7, Type: Bool)
+      * CPU usage (ID: 56f8fac2-1021-4b96-bf15-23b21bb85b4c, Type: Double)
+      * Memory usage (ID: efe2d520-3b35-4668-b6f5-db3df0c8bf0d, Type: Double)
+      * RSS memory usage (ID: d9671ee3-51be-4cf8-8601-125c0684aec9, Type: Int)
+      * Virtual memory usage (ID: 6d71b001-c7fe-4f08-941d-47009b710d94, Type: Int)
+      * Shared memory usage (ID: fcdae649-dcc2-4f5b-a241-fe40fb07c071, Type: Int)
+
+Thing Class: Hue Dimmer switch
+  - ID: b2711164-a848-4715-8ddf-33ca86f9f4cf
+  - Vendor: Philips
+  - Vendor ID: 0ae1e001-2aa6-47ed-b8c0-334c3728a68f
+  - State Types (8):
+      * Connected (ID: 5ac101b2-4bb7-4b5c-8493-08b1ae7ca0c1, Type: Bool)
+      * Signal strength (ID: 5a6e325e-a6ee-4a36-b429-f5d8c8adb80b, Type: Uint)
+      * Battery level (ID: 3e28e0b3-fe23-4293-8876-8384def6c4fb, Type: Int)
+      * Battery critical (ID: 4223a3bc-9616-4ed2-ae50-704b9df62d0e, Type: Bool)
+      * Update status (ID: 92ecca97-4b27-47a3-a91b-948be70d36da, Type: String)
+      * Version (ID: d04a07c7-f1ef-4645-8de3-f2af2ee602f3, Type: String)
+      * Available firmware version (ID: 33f0fa54-2c33-4b9c-a2a5-5908ad1ac32c, Type: String)
+      * Update progress (ID: 9eb669bf-db22-4a58-843a-063457b0f586, Type: Uint)
+  - Action Types (1):
+      * Start update (ID: 22a24b4c-4c1a-490d-abe1-25b120ceef71)
+  - Event Types (2):
+      * Pressed (ID: 33bb5816-8479-4995-99e2-cb0443886003)
+      * Long pressed (ID: 1a0be168-c9cb-44be-bca3-14c389f18e9f)
+
+Thing Class: Water sensor
+  - ID: 22a389b6-1b2b-4b88-a47a-d9fd16c8ab2c
+  - Vendor: nymea GmbH
+  - Vendor ID: 2062d64d-3232-433c-88bc-0d33c0ba2ba6
+  - State Types (5):
+      * Water detected (ID: d5657846-3f19-4e94-841b-12681bbe4f8e, Type: Bool)
+      * Battery critical (ID: 75ce3761-24fa-48e1-9a86-94d67c80b7e8, Type: Bool)
+      * Connected (ID: c677bdd4-e319-4c7b-ba76-3851a69ad3df, Type: Bool)
+      * Signal strength (ID: 48d7361e-c99a-4eab-8143-dfccfd4a16da, Type: Uint)
+      * Version (ID: 326dc29b-355d-4d31-bf2f-8b570c342af1, Type: String)
+
+Thing Class: Rain gauge
+  - ID: 33a7230b-588f-471c-895d-4a1ddd417c2a
+  - Vendor: Netatmo
+  - Vendor ID: 4b46b4ed-5ec9-4aa4-afc3-92d3f80e6351
+  - State Types (7):
+      * Last update (ID: 3c87cbf7-73ad-4673-9abd-188e1f4facfb, Type: Int)
+      * Rainfall in the past hour (ID: 6c55bcd5-b1b3-4ea2-8b4c-2689941d43bb, Type: Uint)
+      * Rainfall in the last 24 hours (ID: 3f475b34-ad5f-4821-8452-2f6869ef46b4, Type: Uint)
+      * Signal strength (ID: d44a1e64-c5e5-4dae-944b-bce23192f610, Type: Uint)
+      * Connected (ID: d726cd1e-75c5-4d50-adbd-962301ea9b91, Type: Bool)
+      * Battery (ID: e06955c4-963b-4f8f-9c0c-975c1cd75edb, Type: Int)
+      * Battery critical (ID: dd8f8620-fcca-408b-835f-2c257e18aee2, Type: Bool)
+
+Thing Class: Weather
+  - ID: 985195aa-17ad-4530-88a4-cdd753d747d7
+  - Vendor: OpenWeatherMap
+  - Vendor ID: bf1e96f0-9650-4e7c-a56c-916d54d18e7a
+  - State Types (15):
+      * Weather condition (ID: f16891f3-1174-44f6-a940-cffc8b64bdc1, Type: String)
+      * Last update (ID: 36b2f09b-7d77-4fbc-a68f-23d735dda0b1, Type: Int)
+      * Temperature (ID: 6013402f-b5b1-46b3-8490-f0c20d62fe61, Type: Double)
+      * Minimum temperature (ID: 14ec2781-cb04-4bbf-b097-7d01ef982630, Type: Double)
+      * Maximum temperature (ID: fefe5563-452f-4833-b5cf-49c3cc67c772, Type: Double)
+      * Humidity (ID: 6f32ec73-3240-4630-ada9-1c10b8e98123, Type: Int)
+      * Pressure (ID: 4a42eea9-00eb-440b-915e-dbe42180f83b, Type: Double)
+      * Wind speed (ID: 2bf63430-e9e2-4fbf-88e6-6f1b4770f287, Type: Double)
+      * Wind direction (ID: 589e2ea5-65b2-4afd-9b72-e3708a589a12, Type: Int)
+      * Cloudiness (ID: 798553bc-45c7-42eb-9105-430bddb5d9b7, Type: Int)
+      * Visibility (ID: 1e10d129-cb88-48b0-9244-e3e7e7b175d9, Type: Int)
+      * Weather description (ID: f9539108-0e0e-4736-a306-6408f8e20a26, Type: String)
+      * Sunset time (ID: af155e94-9492-44e1-8608-7d0ee8b5d50d, Type: Int)
+      * Sunrise time (ID: a1dddc3d-549f-4f20-b78b-be850548f286, Type: Int)
+      * Daylight (ID: e0a14b66-c8e1-49fb-8eff-b48e5dce80de, Type: Bool)
+  - Action Types (1):
+      * Refresh (ID: cfbc6504-d86f-4856-8dfa-97b6fbb385e4)
+
+Thing Class: Color Temperature Light
+  - ID: be811592-6fe7-41be-b924-4a0a7e33295b
+  - Vendor: IKEA TRÅDFRI
+  - Vendor ID: 1a4fdeb3-2eab-47f2-9775-569552988a88
+  - State Types (9):
+      * Available (ID: 95c072ba-516a-43b5-8d68-a4712c5989b6, Type: Bool)
+      * Signal strength (ID: c6d12225-e5bb-4cc7-a69f-601b8ea07e70, Type: Uint)
+      * Power (ID: d815fd02-ebe2-456a-ba3f-6d649b90a094, Type: Bool)
+      * Brightness (ID: 7c4b6949-46ab-41f7-8a78-09e4eaf2a01f, Type: Int)
+      * Color temperature scaled (ID: 889f758f-f0b9-40ba-abe2-e2100188b86e, Type: Int)
+      * Update status (ID: 99aa4d81-cd35-478c-88b8-cfa9e26bf8ae, Type: String)
+      * Version (ID: 2bf3f759-4793-426b-ad05-bf4eb199e6de, Type: String)
+      * Available firmware version (ID: a5dc8a78-f818-461e-b0a7-97c6d2cdbd3c, Type: String)
+      * Update progress (ID: a2279a96-8c72-455e-a0c4-38db3fe76f17, Type: Uint)
+  - Action Types (5):
+      * Set power (ID: d815fd02-ebe2-456a-ba3f-6d649b90a094)
+      * Set brightness (ID: 7c4b6949-46ab-41f7-8a78-09e4eaf2a01f)
+      * Set color temperature scaled (ID: 889f758f-f0b9-40ba-abe2-e2100188b86e)
+      * Identify (ID: a1677c81-a68a-4268-a289-1d62b31605e3)
+      * Start update (ID: 7aaa9757-3b78-4dd2-86a6-07b72883e0fa)
+
+Thing Class: Door/window sensor
+  - ID: 82a859f0-41ed-4a53-93b0-260a1435ac75
+  - Vendor: nymea GmbH
+  - Vendor ID: 2062d64d-3232-433c-88bc-0d33c0ba2ba6
+  - State Types (6):
+      * Closed (ID: 6d4523c2-66f1-4fbf-b0d9-bd11a1920b50, Type: Bool)
+      * Tampered (ID: 948bc2da-23fb-44fd-a74c-c917bf657bf0, Type: Bool)
+      * Battery level (ID: 34a8f7f1-19f8-47be-a1b2-4d7ea52fee1e, Type: Int)
+      * Battery critical (ID: 455e1ebc-5534-4053-8db3-c0b6b79f8c41, Type: Bool)
+      * Connected (ID: 10d8aa94-943e-40f6-a10e-0ac77bcdecd3, Type: Bool)
+      * Signal strength (ID: 4ef57e47-2b83-4d41-8cfb-21bf2f5ee62d, Type: Uint)
+
+Thing Class: Button sensor
+  - ID: 42c1edba-cc5f-4eb9-84f8-1b0d47a6f95e
+  - Vendor: Lumi
+  - Vendor ID: f58dac98-0ba1-408f-946a-25d452080baa
+  - State Types (3):
+      * Available (ID: f0da4762-4778-4b3b-ba68-466ff504a3d3, Type: Bool)
+      * Signal strength (ID: 6e9de8ee-cb28-4f7d-a0f6-fe9e64df0463, Type: Uint)
+      * Version (ID: 11d03ab4-7450-4caf-81ec-0b2b73e56b08, Type: String)
+  - Event Types (1):
+      * Pressed (ID: 2515e40a-8146-4f11-8d79-2be9e20224e5)
+
+Thing Class: Push Notifications
+  - ID: f0dd4c03-0aca-42cc-8f34-9902457b05de
+  - Vendor: nymea GmbH
+  - Vendor ID: 2062d64d-3232-433c-88bc-0d33c0ba2ba6
+  - Action Types (1):
+      * Send notification (ID: ed9a0196-6c24-4e05-9cbc-c6834de38005)
+
+Thing Class: Power socket with energy metering
+  - ID: 760ecd1b-7365-4142-993b-9e4a3dc6f83f
+  - Vendor: nymea GmbH
+  - Vendor ID: 2062d64d-3232-433c-88bc-0d33c0ba2ba6
+  - State Types (5):
+      * Connected (ID: d4e2983a-f4a3-401f-853e-8b0e2f1d245e, Type: Bool)
+      * Signal strength (ID: 0d200118-f5fc-4c88-851f-6c9440830b21, Type: Uint)
+      * Power (ID: 799129a5-8f4f-4836-822f-d2f26465288b, Type: Bool)
+      * Current power consumption (ID: e98e7f15-31b1-44cd-ab9d-cce14a2d2df9, Type: Double)
+      * Total consumed energy (ID: dd36b0be-f34f-406b-be27-0fc374b333f9, Type: Double)
+  - Action Types (1):
+      * Set power (ID: 799129a5-8f4f-4836-822f-d2f26465288b)
+
+Thing Class: Hue Outdoor Sensor
+  - ID: 32dc6390-600f-4eb4-b349-cc2d6796a82a
+  - Vendor: Philips
+  - Vendor ID: 0ae1e001-2aa6-47ed-b8c0-334c3728a68f
+  - State Types (7):
+      * Reachable (ID: 9fe43e6b-3c29-43a9-bb96-3b80eacc10db, Type: Bool)
+      * Battery (ID: 19b18531-61e5-4998-89d1-765d740e24eb, Type: Int)
+      * Battery critical (ID: 617aa352-789c-46e7-bf55-7455b1e5018e, Type: Bool)
+      * Temperature (ID: 88f5b708-65bb-41a7-885f-01be46074713, Type: Double)
+      * Ambient light (ID: 4fb12c06-981c-4c42-b55c-46bdfe68681a, Type: Double)
+      * Person is present (ID: 680f79cf-c17c-4ffd-96fa-a5b286e2c117, Type: Bool)
+      * Last seen time (ID: 6fa16fb2-053c-4c3c-a39b-9548c1b15089, Type: Int)
+
+Thing Class: Water sensor
+  - ID: e8e18bbe-27bb-4fd7-98fc-f5cef3b5f213
+  - Vendor: Lumi
+  - Vendor ID: f58dac98-0ba1-408f-946a-25d452080baa
+  - State Types (5):
+      * Available (ID: 03fc0e4d-dcd9-41dc-8aac-dbe735f11ef7, Type: Bool)
+      * Signal strength (ID: b3bba018-b9d0-47a8-a2cf-d8d2d6fcecce, Type: Uint)
+      * Version (ID: bae1014f-67f5-4dcc-b36f-e15eb43afd6e, Type: String)
+      * Water detected (ID: e43532a7-cbee-446e-9e4a-aff88026ad1a, Type: Bool)
+      * Battery critical (ID: 72aa617c-88cc-4992-a1a2-400b5e19106e, Type: Bool)
+
+Thing Class: TRÅDFRI remote
+  - ID: 19ee3f56-f958-4b04-8ea3-747b72d7c7d6
+  - Vendor: IKEA TRÅDFRI
+  - Vendor ID: 1a4fdeb3-2eab-47f2-9775-569552988a88
+  - State Types (8):
+      * Connected (ID: 9d5d116c-f742-4766-baf9-e7662f5003a9, Type: Bool)
+      * Signal strength (ID: b87d310a-28ba-4546-9f47-822e5182836c, Type: Uint)
+      * Battery level (ID: 4a72d569-44be-4689-bda6-addc0c6351d4, Type: Int)
+      * Battery critical (ID: 87b60c83-d980-48f5-bc31-0daa241d727e, Type: Bool)
+      * Version (ID: 66c95514-6c23-4029-a3de-79f69f30cddb, Type: String)
+      * Update status (ID: 73f99785-7a4b-4cd3-96e7-fc2deef92227, Type: String)
+      * Available version (ID: f6979f9f-0f41-4520-899d-8dc52905cbaf, Type: String)
+      * Update progress (ID: a0fa549a-12c3-47fb-88b5-373c4f81794b, Type: Uint)
+  - Action Types (1):
+      * Perform update (ID: 28f2ae38-a592-4a7c-8f2a-58e1c3f43ac0)
+  - Event Types (2):
+      * Button pressed (ID: 4d671edd-d57c-4f72-a43a-d8e4eaa741cf)
+      * Button longpressed (ID: 1057a5ca-8201-4b51-b6bb-d050ca3b6ca3)
+
+Thing Class: Hue dimmable light
+  - ID: 4fa568ef-7a3a-422b-b0c0-206d37cb4eed
+  - Vendor: Philips
+  - Vendor ID: 0ae1e001-2aa6-47ed-b8c0-334c3728a68f
+  - State Types (3):
+      * reachable (ID: 57f80677-745e-4cb1-b894-87d8542a7e8c, Type: Bool)
+      * power (ID: 5995ecb7-b5e5-4f6a-b4d6-33c93497e5fb, Type: Bool)
+      * brightness (ID: 2f062912-1159-423b-8143-48a8e69b9348, Type: Int)
+  - Action Types (3):
+      * Set power (ID: 5995ecb7-b5e5-4f6a-b4d6-33c93497e5fb)
+      * Set brightness (ID: 2f062912-1159-423b-8143-48a8e69b9348)
+      * flash (ID: ab30a83a-539e-4b3a-860a-434e87ca165f)
+
+Thing Class: Indoor module
+  - ID: a6706b11-325b-4be3-b0d1-c09e027955b4
+  - Vendor: Netatmo
+  - Vendor ID: 4b46b4ed-5ec9-4aa4-afc3-92d3f80e6351
+  - State Types (11):
+      * Last update (ID: 024eb4d2-ed0b-428b-b5c4-ce9aba1fee1e, Type: Int)
+      * Temperature (ID: 33957a0c-75b7-45d0-8e07-731c7c20df0e, Type: Double)
+      * Temperature minimum (ID: 2f9e4042-b699-4036-be69-a84e561ac38c, Type: Double)
+      * Temperature maximum (ID: 304472e3-56fc-4ee6-96df-aeb4b570a1d1, Type: Double)
+      * Humidity (ID: e39c6ea6-8d53-42c7-bfce-e9e4aa3dfec9, Type: Double)
+      * CO2 (ID: a3fe53a3-0940-4fcb-915d-0297ae584917, Type: Double)
+      * Pressure (ID: 9d2c409e-0d4f-4e03-89ad-fe0cad776e66, Type: Double)
+      * WiFi signal strength (ID: 36fd51d9-7693-42ee-b0ae-b623e219d950, Type: Uint)
+      * Connected (ID: 5b819dbf-698d-49ae-aeb5-a15db9ef515a, Type: Bool)
+      * Battery (ID: d9fe5e52-8f42-41fd-aa5f-fd157ad6a6be, Type: Int)
+      * Battery critical (ID: 7cde2c79-2b90-4ced-97ac-2653d314cf73, Type: Bool)
+
+Thing Class: Hue Dimmer Switch V2
+  - ID: 2b40aea0-e0f3-4cde-b034-3ae8a69a5d9d
+  - Vendor: Philips
+  - Vendor ID: 0ae1e001-2aa6-47ed-b8c0-334c3728a68f
+  - State Types (3):
+      * reachable (ID: 45f75511-7d72-410e-aed0-5720cc497bf8, Type: Bool)
+      * battery (ID: cb6e045c-e305-4950-9cd4-fb3989912156, Type: Int)
+      * battery critical (ID: 88cc3794-3e83-47d4-8889-0b3246336bf7, Type: Bool)
+  - Event Types (2):
+      * Button pressed (ID: b7a5b3df-2c60-4b97-bf99-b97e6012a194)
+      * Button longpress (ID: d5052592-044d-42e8-b98a-d3fe9f2f53ae)
+
+Thing Class: Air qualiy sensor
+  - ID: 9f966405-4d63-4ae8-8472-a3ab7bbcadaa
+  - Vendor: Develco
+  - Vendor ID: e4b36f3e-ccdc-4a88-8968-39025c3ec742
+  - State Types (11):
+      * Connected (ID: c6f65bb8-1234-40f2-8855-84ca28f48150, Type: Bool)
+      * Signal strength (ID: 19cfb35b-6a2e-4efe-9366-287c2f13c027, Type: Uint)
+      * Version (ID: 5d1c46ca-9306-473a-a721-165831ff53cc, Type: String)
+      * Temperature (ID: 2d31d98e-dcd7-4700-a90e-a0d051ad6b40, Type: Double)
+      * Humidity (ID: 5bc2825c-666f-4013-9583-3a88ceebecc2, Type: Double)
+      * Battery critical (ID: 048ed452-785f-4361-b7a1-f955f4a622b2, Type: Bool)
+      * VOC (ID: 1ba14107-4241-46d0-b65f-eb6e8c6f8e08, Type: Uint)
+      * Update status (ID: 0ce38986-4700-47ef-a672-51853485e5f5, Type: String)
+      * Version (ID: b66948ad-59fd-420b-a7cd-4937b63050d5, Type: String)
+      * Available firmware version (ID: 80434d6d-2cde-4671-a050-8352f6aff2de, Type: String)
+      * Update progress (ID: 0b9488fa-458f-4c9b-9035-60f7d3d559e4, Type: Uint)
+  - Action Types (1):
+      * Start update (ID: 24b2a7ec-66c7-4e9e-8f92-1dee3373ff63)
+
+Thing Class: Dimmable Light
+  - ID: 3068324d-d5cd-4943-a3cd-95668b09cbc8
+  - Vendor: Philips
+  - Vendor ID: 0ae1e001-2aa6-47ed-b8c0-334c3728a68f
+  - State Types (8):
+      * Available (ID: 892dd19a-c47f-41a4-9b0b-40f43b58c7f9, Type: Bool)
+      * Signal strength (ID: c2ce2865-bab3-44ef-84f1-06b60d1bb514, Type: Uint)
+      * Power (ID: d40ac497-3716-4ec4-a7b3-21cecf751241, Type: Bool)
+      * Brightness (ID: 76ef975e-6713-497b-8e4b-a0ebae8b1f87, Type: Int)
+      * Update status (ID: 5fce38cd-07a7-4071-b020-fe405033fb98, Type: String)
+      * Version (ID: 8893cd94-f5e1-409f-baca-4d3eb173844e, Type: String)
+      * Available firmware version (ID: b4fe0394-0df0-475f-b24c-19470067070a, Type: String)
+      * Update progress (ID: ab7905f3-b202-4646-82f4-3db5d8fd1418, Type: Uint)
+  - Action Types (4):
+      * Set power (ID: d40ac497-3716-4ec4-a7b3-21cecf751241)
+      * Set brightness (ID: 76ef975e-6713-497b-8e4b-a0ebae8b1f87)
+      * Identify (ID: cc0cfcfa-97e2-4d7f-92f1-dbd0b8d479d2)
+      * Start update (ID: 6fe8bfd5-4f8d-428d-a67c-3d88ab910128)
+
+Thing Class: FLS/AIRLINK/4
+  - ID: 38693f57-004b-4d0b-aea3-df1ba7ca244e
+  - Vendor: Schneider Electric
+  - Vendor ID: 1bd48b2d-1e84-4f9a-aeb0-7f564655a548
+  - State Types (4):
+      * Available (ID: 07cf64a6-f0b4-4c7b-ac26-9388900e6cdc, Type: Bool)
+      * Signal strength (ID: 40313883-bb05-40a6-b98e-6d31f89352db, Type: Uint)
+      * Battery level (ID: 21b3af55-a149-4844-94f2-49f7f63336c4, Type: Int)
+      * Battery level critical (ID: 352e2b5b-e9d9-4df5-a482-c771966bb0f5, Type: Bool)
+  - Event Types (1):
+      * Button pressed (ID: e1d2fc49-def3-4a8f-b81e-6c4000e3124b)
+
+Thing Class: Power socket
+  - ID: 76afde12-e781-4723-94ca-5704e800e821
+  - Vendor: Lumi
+  - Vendor ID: f58dac98-0ba1-408f-946a-25d452080baa
+  - State Types (9):
+      * Connected (ID: 58e01e24-fa6e-4518-ad05-f3b118901f69, Type: Bool)
+      * Signal strength (ID: 81926f63-4dc8-4701-a62d-07b20a849b37, Type: Uint)
+      * Version (ID: e4a8e90c-4e38-4b3b-b5e6-fd336e3fa2a8, Type: String)
+      * Update status (ID: 21e03a17-7bb8-41f7-8cba-9194354892f9, Type: String)
+      * Available version (ID: 79ca6068-5532-4b3c-b8e2-d2533b03cc93, Type: String)
+      * Update progress (ID: 6655f819-b020-4573-843d-32d17a931db7, Type: Uint)
+      * Power (ID: 4c81aa6b-3a8a-4d2c-be87-29486ca242af, Type: Bool)
+      * Current energy consumption (ID: 2c05bb81-3be9-46a9-8bc6-94d72ee4a668, Type: Double)
+      * Total consumed energy (ID: 5616730e-6097-4bcb-8dfe-47667c5d197a, Type: Double)
+  - Action Types (3):
+      * Set power (ID: 4c81aa6b-3a8a-4d2c-be87-29486ca242af)
+      * Identify (ID: 67052e4d-350a-406f-91a9-3ce3f8eaaa7f)
+      * Start update (ID: 447936ea-96aa-4e37-a5ae-c62e3f7f3d05)
+
+Thing Class: Color Temperature Light
+  - ID: 8a91f8e7-8162-437e-a664-9ed999e44e62
+  - Vendor: Philips
+  - Vendor ID: 0ae1e001-2aa6-47ed-b8c0-334c3728a68f
+  - State Types (9):
+      * Available (ID: be8617fb-174f-4008-b60d-6a748b72c509, Type: Bool)
+      * Signal strength (ID: e666efcb-564e-41a1-8585-d0d99665c8c0, Type: Uint)
+      * Power (ID: 5f7c7a38-5dc0-44f2-ae25-576dd4b7740b, Type: Bool)
+      * Brightness (ID: 30643f4e-9f1a-4848-abb6-7ce4081f1878, Type: Int)
+      * Color temperature scaled (ID: 18f2b025-e638-4296-ade4-3dde89ffc5ab, Type: Int)
+      * Update status (ID: 91464b14-5989-48d0-98bf-31dd61429cd6, Type: String)
+      * Version (ID: 3fb91687-1cb1-4a86-817c-1c69be2bea1d, Type: String)
+      * Available firmware version (ID: c53a4c3d-0889-47c9-ac88-ca7ed92b28b8, Type: String)
+      * Update progress (ID: 45c7b068-e19a-4d44-81eb-6d116496f1c9, Type: Uint)
+  - Action Types (5):
+      * Set power (ID: 5f7c7a38-5dc0-44f2-ae25-576dd4b7740b)
+      * Set brightness (ID: 30643f4e-9f1a-4848-abb6-7ce4081f1878)
+      * Set color temperature scaled (ID: 18f2b025-e638-4296-ade4-3dde89ffc5ab)
+      * Identify (ID: b6c75191-fd7d-475c-9ed0-40fe7bdfbc28)
+      * Start update (ID: b805feb6-2920-4204-a4be-49f5890a7114)
+
+Thing Class: Hue color temperature light
+  - ID: 35f749f7-b60a-4922-bd25-1bdd2eddcbe3
+  - Vendor: Philips
+  - Vendor ID: 0ae1e001-2aa6-47ed-b8c0-334c3728a68f
+  - State Types (4):
+      * reachable (ID: 38f3ddea-ceb0-47ae-bbd8-e70b5a89b1bf, Type: Bool)
+      * power (ID: 4e579f6a-e4b3-4876-804a-9fcc066f90f9, Type: Bool)
+      * color temperature (ID: fee57738-45c7-48fe-a06b-1397376361f0, Type: Int)
+      * brightness (ID: bdf6f831-b448-4ff6-9f85-12e26b4e5534, Type: Int)
+  - Action Types (4):
+      * Set power (ID: 4e579f6a-e4b3-4876-804a-9fcc066f90f9)
+      * Set color temperature (ID: fee57738-45c7-48fe-a06b-1397376361f0)
+      * Set brigtness (ID: bdf6f831-b448-4ff6-9f85-12e26b4e5534)
+      * flash (ID: 8818e8b9-14ed-4344-96fb-c852abc85921)
+
+Thing Class: TRÅDFRI signal repeater
+  - ID: ac51f426-195e-472a-837f-4ba7e4666e6e
+  - Vendor: IKEA TRÅDFRI
+  - Vendor ID: 1a4fdeb3-2eab-47f2-9775-569552988a88
+  - State Types (6):
+      * Connected (ID: 7415ea93-9b72-4740-b3b1-a2ebb73d1db5, Type: Bool)
+      * Signal strength (ID: 05758f08-33a8-485b-8572-f87021e3af36, Type: Uint)
+      * Version (ID: 05d9a4f4-5d7e-474b-b57c-445f795a0d90, Type: String)
+      * Update status (ID: 7cf5dbb5-672f-4c17-ab52-bd62a4289f44, Type: String)
+      * Available version (ID: b092b5e3-496d-44a2-a15b-00cb6b7462f4, Type: String)
+      * Update progress (ID: 3ff0a3ab-f3fe-4dac-8b1a-d30676fde7f3, Type: Uint)
+  - Action Types (1):
+      * Perform update (ID: 4e6544cc-0f99-460f-92aa-f00c77f8131a)
+
+Thing Class: MFZ Garagedoor
+  - ID: 0e4596a6-7b0b-4cb3-bc94-fea3324f7874
+  - Vendor: maveo
+  - Vendor ID: e77e72ae-1228-42a3-85cd-34c6f3a8d494
+  - State Types (16):
+      * Connected (ID: 1322995b-4b6c-422a-ba80-6b80eee336b8, Type: Bool)
+      * State (ID: 858cc7cb-f4bb-4973-b604-965da794b81f, Type: String)
+      * Intermediate position (ID: 72d6109f-bf4e-4563-88af-b175ded40965, Type: Bool)
+      * Open count (ID: c4a09163-7f0b-473e-8ce4-57ff079aadb0, Type: Int)
+      * Close count (ID: 618b5b3d-4d69-4172-90a5-ba8413c20027, Type: Int)
+      * Open duration (ID: 75f8ebc2-2e58-4d18-a0c7-1d30c9a25a47, Type: Int)
+      * Close duration (ID: 8dce8c95-8724-4209-904b-bd04abd3e10b, Type: Int)
+      * Total movement time (ID: f83ae447-2c87-43d1-bb84-c3376598a35d, Type: Int)
+      * Firmware update available (ID: 182e8092-d0ea-45fc-9216-a98c62f869e7, Type: Bool)
+      * maveo-stick version (ID: 64e2f6ed-e26c-4917-9bd2-33b8cad99ab2, Type: String)
+      * Update status (ID: 9125c5d0-a3b9-4912-beac-dd7ea8d60b89, Type: String)
+      * Update progress (ID: c821c415-14bd-4218-8f29-94b791892496, Type: Uint)
+      * Available version (ID: 942b32ec-e5f2-4d99-bc32-ecfbd44ae850, Type: String)
+      * Garage door model (ID: 4728c7db-c92d-4bb3-bb14-e87ca51165ee, Type: String)
+      * Garage door error present (ID: c83e79d7-5b53-4987-8380-97c0d5d305c2, Type: Bool)
+      * Garage door error code (ID: 5df2c8f4-c471-4be9-bf9a-3071a82df9e1, Type: Int)
+  - Action Types (7):
+      * Open (ID: d9e5e2f3-400b-4ecb-92e6-c0ad97b15176)
+      * Stop (ID: 0e380074-4bf2-48c3-9364-2e8e60eeb21a)
+      * Close (ID: d5599764-5f3e-4beb-99c6-4818dbc453dd)
+      * Reset open/close counters (ID: 82838549-57b8-4e1e-a8dd-866ae8f7152d)
+      * Check firmware version (ID: 32785bae-4850-4087-b598-622626a30fe9)
+      * Start firmware upgrade (ID: 7c2575dd-45d7-488f-b784-61f0c52fed31)
+      * Request parameters (ID: b0d504da-36dc-48ec-ae7e-81f81d745b6d)
+
+Thing Class: Power socket with energy metering
+  - ID: 7cd9f139-013b-49da-ab71-794cd1e22f5d
+  - Vendor: nymea GmbH
+  - Vendor ID: 2062d64d-3232-433c-88bc-0d33c0ba2ba6
+  - State Types (6):
+      * Connected (ID: 3f0cb179-c74d-4e24-9b81-c0539de83cd2, Type: Bool)
+      * Signal strength (ID: 94ae4ee4-269b-4637-818a-25621fe40dc7, Type: Uint)
+      * Version (ID: 04ae808c-4720-4d06-b6d8-9772b4bd9e3c, Type: String)
+      * Power (ID: bfe70a26-f6a2-412c-94af-b31b9e91d5ea, Type: Bool)
+      * Current power consumption (ID: 33a572a4-fd5b-46e7-8618-eba3b7770309, Type: Double)
+      * Total consumed energy (ID: b653dea0-8028-49f8-be09-f0fd5521f43c, Type: Double)
+  - Action Types (2):
+      * Set power (ID: bfe70a26-f6a2-412c-94af-b31b9e91d5ea)
+      * Identify (ID: fac41f4f-dcba-48ef-adc5-d6478e67746d)
+
+Thing Class: SPIRIT ZigBee 
+  - ID: 57ce4f62-d5a3-4e79-8352-96942c6e4425
+  - Vendor: Eurotronic GmbH
+  - Vendor ID: 436cad23-136b-40d2-94d3-4d9af2789e60
+  - State Types (13):
+      * Target temperature (ID: 20e9006f-09ec-43ea-a249-46e4894698d2, Type: Double)
+      * Current temperature (ID: 68230bfe-ed04-49d6-b2ed-731fdfc35df2, Type: Double)
+      * Heating on (ID: e52ad2fd-ef3e-4e99-8854-4db07281e658, Type: Bool)
+      * Connected (ID: ebd54153-68ec-4e3c-a370-5b0dca35741b, Type: Bool)
+      * Signal strength (ID: 3bd33c04-37ca-4c26-b583-b6caf58b443d, Type: Uint)
+      * Battery level (ID: a6129509-e3dd-448f-8964-1817ca4c3888, Type: Int)
+      * Battery critical (ID: 78e2e1b5-0de6-49f7-9b90-63d6922234af, Type: Bool)
+      * Boost (ID: daeb8f1e-4637-406c-8b09-e441f2f53c9c, Type: Bool)
+      * Window open lock (ID: ddde7d49-19d4-4196-b09f-f614e04220b2, Type: Bool)
+      * Mirror display (ID: 89cdbb14-d4b1-444a-a193-e760d6b6bd87, Type: Bool)
+      * Child protection lock (ID: e31bb876-cc60-4127-bb6b-7d3a4b07fa11, Type: Bool)
+      * Update status (ID: 89c21b2c-0007-4da6-9bbf-4170b716858d, Type: String)
+      * Version (ID: 9a3987df-87d5-4b97-9f31-1e0b0a6468ad, Type: String)
+  - Action Types (6):
+      * Set target temperature (ID: 20e9006f-09ec-43ea-a249-46e4894698d2)
+      * Enable or disable boost (ID: daeb8f1e-4637-406c-8b09-e441f2f53c9c)
+      * Set window open lock (ID: ddde7d49-19d4-4196-b09f-f614e04220b2)
+      * Set mirror display (ID: 89cdbb14-d4b1-444a-a193-e760d6b6bd87)
+      * Set child protection lock (ID: e31bb876-cc60-4127-bb6b-7d3a4b07fa11)
+      * Start update (ID: 9dfcb8ce-298f-45c0-9abf-714c9ece9357)
+
+Thing Class: GWA1501 binary input
+  - ID: 5daf398f-2eba-47c1-8805-ca34f075c7ea
+  - Vendor: Gewiss
+  - Vendor ID: 2fdc8d78-ea8e-47bd-9331-b06a9b56f938
+  - State Types (6):
+      * Available (ID: c4a8d75d-fce0-4243-a25d-9a10a6c7e811, Type: Bool)
+      * Signal strength (ID: 17150f4b-6ef1-444a-b178-293a057275dc, Type: Uint)
+      * Battery (ID: 9dcf9715-267e-43c6-bcc7-9822e5361228, Type: Int)
+      * Battery critical (ID: 8b4b82e8-69e4-4160-90be-3040d455fd97, Type: Bool)
+      * Input 1 (ID: 9005783a-88ec-4f93-a486-992b2d6ae3ab, Type: Bool)
+      * Input 2 (ID: cd6362a6-2d94-41e4-ad0c-31a1cf910f33, Type: Bool)
+  - Event Types (1):
+      * Button pressed (ID: e2a05f86-7aef-4638-b637-b3b6af38e86b)
+
+Thing Class: Temperature humidity sensor
+  - ID: dfabab0e-d483-43f8-82c6-720899e70c86
+  - Vendor: Lumi
+  - Vendor ID: f58dac98-0ba1-408f-946a-25d452080baa
+  - State Types (7):
+      * Available (ID: eb09e3f4-44ea-4ca9-9eac-9a693595fe37, Type: Bool)
+      * Signal strength (ID: 0cb72e84-01c4-4041-9aee-1dabf26a062e, Type: Uint)
+      * Version (ID: 968ff8bb-b852-48d8-bde2-28cfa810b20e, Type: String)
+      * Temperature (ID: 152b475e-6bd8-4e6f-8765-0636c0bc8e9d, Type: Double)
+      * Humidity (ID: e6559d9e-2c64-485d-bb2b-8a9aec0ac656, Type: Double)
+      * Battery level (ID: 4091259a-f1db-435e-9296-9eeb17b6f835, Type: Int)
+      * Battery level critical (ID: 2c59a1f8-f33e-4dab-83fe-46b95d107fed, Type: Bool)
+
+Thing Class: Hue Motion sensor
+  - ID: 031c45d1-e782-4f91-9f05-259d6b81c7ef
+  - Vendor: Philips
+  - Vendor ID: 0ae1e001-2aa6-47ed-b8c0-334c3728a68f
+  - State Types (12):
+      * Connected (ID: 0d0a5ee1-41f2-4b5a-a3c0-7c8cca1c064d, Type: Bool)
+      * Signal strength (ID: d4f85c34-896a-4bab-af71-8b80d9889815, Type: Uint)
+      * Battery level (ID: 00a4450b-d2fe-4e2b-92c8-1ab3a98d1628, Type: Int)
+      * Battery critical (ID: 9341f65a-b0aa-4648-82eb-e8400779f817, Type: Bool)
+      * Presence (ID: 66e3b840-4f4c-4f4a-a71a-69fb751f2a3b, Type: Bool)
+      * Last seen time (ID: 128777a9-75e7-4cc6-b196-691d2ffddbc9, Type: Int)
+      * Light intensity (ID: 8077e335-1d18-4e3f-9b5e-6f71af4a33b1, Type: Double)
+      * Temperature (ID: 978f069c-57c0-4e73-a81b-c593bc2e7624, Type: Double)
+      * Update status (ID: 0bf7e6dd-4fa6-45da-a404-c35af88fe74c, Type: String)
+      * Version (ID: d79ca86e-124a-4d0b-b1fc-c032b6383b87, Type: String)
+      * Available firmware version (ID: 6d205b65-a53c-4cdd-9a7c-2e02fe8c0a16, Type: String)
+      * Update progress (ID: feeb0630-dcfb-4b41-a269-eedf2936c500, Type: Uint)
+  - Action Types (1):
+      * Start update (ID: 01b2e79f-ede7-49c1-8c38-3923513c1329)
+
+Thing Class: Power socket
+  - ID: 856bb6a7-65e8-44cb-b77a-ce46f742f33d
+  - Vendor: IKEA TRÅDFRI
+  - Vendor ID: 1a4fdeb3-2eab-47f2-9775-569552988a88
+  - State Types (7):
+      * Connected (ID: 99117bce-b9c3-4b43-b853-65585a99926e, Type: Bool)
+      * Signal strength (ID: 51a5f34e-880c-4b77-899c-763f2b9bef97, Type: Uint)
+      * Power (ID: 7d28e7b0-0c4a-4d69-a595-53b9e9b512c9, Type: Bool)
+      * Version (ID: 301b9aee-4a30-4873-bfd9-cfcacc40fbf1, Type: String)
+      * Update status (ID: 66b60151-5777-45e3-be51-9b490b650990, Type: String)
+      * Available version (ID: 844eecd8-2a4f-45a5-ac2d-5bb73eaf5a29, Type: String)
+      * Update progress (ID: 4977cd0d-8c73-43c1-a9a6-c0db8d54219d, Type: Uint)
+  - Action Types (2):
+      * Set power (ID: 7d28e7b0-0c4a-4d69-a595-53b9e9b512c9)
+      * Perform firmware update (ID: b5b4841d-0c50-4d21-8101-36a631c1aa00)
+
+Thing Class: Smart air housekeeper
+  - ID: bed2680c-ebce-49ab-86cc-7c3c69e34372
+  - Vendor: nymea GmbH
+  - Vendor ID: 2062d64d-3232-433c-88bc-0d33c0ba2ba6
+  - State Types (10):
+      * Connected (ID: 984b266b-e8b9-4566-a6ef-cc2aaf41333e, Type: Bool)
+      * Signal strength (ID: cf87d713-bdb6-4768-ad48-92b1ce5835ce, Type: Uint)
+      * Temperature (ID: 2cb06847-a98e-4440-ab5a-990a4073f7e6, Type: Double)
+      * Humidity (ID: 021ad175-3e09-4f9c-a457-231b71681699, Type: Double)
+      * VOC (ID: 0e5d6b08-d415-43e2-9314-e97e526e105d, Type: Uint)
+      * PM2.5 (ID: 1f9460ba-8495-4a00-a3ac-de4efcb40c1c, Type: Double)
+      * CO2 (ID: f0621e7f-46b0-40a6-8bce-54164e8518ae, Type: Double)
+      * Formaldehyd (ID: 2a8353ca-b1aa-4d7b-8951-e24febe87bbc, Type: Double)
+      * Battery level (ID: 24c68257-5e33-493f-acee-6c3cdce1bbf1, Type: Int)
+      * Battery level critical (ID: 1cadb85c-3c1b-4cd4-8878-d32c71234758, Type: Bool)
+
+Thing Class: NFC Detector
+  - ID: 5e80dcf7-0943-40dc-a0f0-4eebb9fc224b
+  - Vendor: maveo
+  - Vendor ID: e77e72ae-1228-42a3-85cd-34c6f3a8d494
+  - Event Types (3):
+      * Marantec equipment detected (ID: 7daf7c59-c6cf-4041-af6f-244d7a1c41a7)
+      * NFC tag detected (ID: 29cdd821-4435-48ac-89cc-2b83f47af2c9)
+      * Bluetooth pairing requested (ID: acd4ff82-6c59-4681-a1b3-1e0696920d93)
+
+Thing Class: Motion sensor
+  - ID: 73bfe746-4fc7-4a2a-a3c2-32dc44214170
+  - Vendor: Lumi
+  - Vendor ID: f58dac98-0ba1-408f-946a-25d452080baa
+  - State Types (5):
+      * Available (ID: d0239a0a-9320-45b6-8652-5e6af4f544d8, Type: Bool)
+      * Signal strength (ID: 84a2061d-da9c-4755-87b2-770dc92a2a53, Type: Uint)
+      * Version (ID: ad45268e-54f0-44fe-9a8f-25ccdca92452, Type: String)
+      * Presence (ID: 9a30ff91-64cb-432c-8db7-cf6a751e8601, Type: Bool)
+      * Last seen time (ID: 55229e22-e42b-4d38-af4b-fb668439d38a, Type: Int)
+
+Thing Class: Hue Tap
+  - ID: 2b8c1fb8-67ee-42e9-947b-16e0a09f0d4e
+  - Vendor: Philips
+  - Vendor ID: 0ae1e001-2aa6-47ed-b8c0-334c3728a68f
+  - State Types (1):
+      * Reachable (ID: 5e21b032-1230-4e93-8543-0c4773da17d3, Type: Bool)
+  - Event Types (1):
+      * Button pressed (ID: c45dd703-7cbd-48f7-88dc-31045cc3d39c)
+
+Thing Class: Hue Smart button
+  - ID: edfa223b-aade-4369-a4e2-77b99989f49d
+  - Vendor: Philips
+  - Vendor ID: 0ae1e001-2aa6-47ed-b8c0-334c3728a68f
+  - State Types (8):
+      * Battery level (ID: 2837540f-a97b-4a92-9e17-900db38577e4, Type: Int)
+      * Battery critical (ID: 3d79d36e-008e-41c8-9bb5-28db235b93ce, Type: Bool)
+      * Connected (ID: 4748fc45-5ffd-4472-97a2-9fef256937db, Type: Bool)
+      * Signal strength (ID: 0eb19a1e-04d1-44ce-9554-f70c47a4f48a, Type: Uint)
+      * Update status (ID: 2aa27a75-e336-4599-b95b-55175bad4acd, Type: String)
+      * Version (ID: 7c1c798d-334a-4132-8677-f8a49eab0804, Type: String)
+      * Available firmware version (ID: f475fbca-d17b-4751-81cd-74f9da657553, Type: String)
+      * Update progress (ID: 634434d6-9ccd-4e8b-992d-d8b062b47ed7, Type: Uint)
+  - Action Types (1):
+      * Start update (ID: 43a72851-7c66-49e4-841b-72ca05eae733)
+  - Event Types (2):
+      * Pressed (ID: b2c94c5a-0076-4231-b455-1ca1567d1b43)
+      * Long pressed (ID: c7e6b02a-2700-4dbb-b012-cb641655ce2b)
+
+Thing Class: Motion sensor
+  - ID: 6cbf86ea-0d31-4ce7-b0fd-02ff707d3553
+  - Vendor: Develco
+  - Vendor ID: e4b36f3e-ccdc-4a88-8968-39025c3ec742
+  - State Types (12):
+      * Connected (ID: 1c109b37-f002-4fb4-8667-2ee62bba2626, Type: Bool)
+      * Signal strength (ID: bbd0eef3-b2cd-4fcf-bd2a-e76295d0b232, Type: Uint)
+      * Version (ID: 1060399a-3e15-44ce-8bdc-4b7fd6f1e194, Type: String)
+      * Tampered (ID: 5ed06626-db36-4520-8c09-b0224df570f8, Type: Bool)
+      * Presence detected (ID: 80bb5618-2115-4909-a6ea-be0ccdaeffbd, Type: Bool)
+      * Temperature (ID: d7d096fe-8937-4fcf-a54c-8eb4a9aa830b, Type: Double)
+      * Light intensity (ID: 5368431e-a622-4d36-b1c0-61a456744ea8, Type: Double)
+      * Battery critical (ID: 0a9d580f-70e6-42f9-9d77-d7aeb245ee84, Type: Bool)
+      * Update status (ID: 5ccd02af-b646-4dcf-867c-867b0d5011f9, Type: String)
+      * Version (ID: 0e864bc8-45d0-4cf3-9ad9-cee15a4e2311, Type: String)
+      * Available firmware version (ID: 187dd962-4f44-4d1b-9b34-7e491c71d951, Type: String)
+      * Update progress (ID: 0736ac21-0f21-4d50-ade5-90cd18f64a1c, Type: Uint)
+  - Action Types (1):
+      * Start update (ID: 915dccbb-4220-45d0-b074-9446079b47e6)
+
+Thing Class: Relay
+  - ID: 8e381cb1-2caa-4261-be77-e76a538bf67a
+  - Vendor: Lumi
+  - Vendor ID: f58dac98-0ba1-408f-946a-25d452080baa
+  - State Types (5):
+      * Connected (ID: b12d1765-0b2e-4e95-b5ef-780d27fdda44, Type: Bool)
+      * Signal strength (ID: bc22b220-003f-4f19-9aef-21c4049c5a0e, Type: Uint)
+      * Version (ID: ca1a8d08-4423-4401-bca7-d52b11e54ed9, Type: String)
+      * Relay 1 (ID: 486e0df0-cbda-4b67-b844-6f70e5af6891, Type: Bool)
+      * Relay 2 (ID: 2caa4f0f-661e-4b59-83e5-8417058e48fd, Type: Bool)
+  - Action Types (2):
+      * Set relay 1 (ID: 486e0df0-cbda-4b67-b844-6f70e5af6891)
+      * Set relay 2 (ID: 2caa4f0f-661e-4b59-83e5-8417058e48fd)
+
+Thing Class: Wind module
+  - ID: 160096e8-5ad0-4ca5-b7f2-60d64865ca71
+  - Vendor: Netatmo
+  - Vendor ID: 4b46b4ed-5ec9-4aa4-afc3-92d3f80e6351
+  - State Types (7):
+      * Last update (ID: aa4be9dc-06e4-48a2-b83e-45c523da116b, Type: Int)
+      * Wind speed (ID: 9f6c1540-9933-4ef1-96d7-aecade2a8199, Type: Double)
+      * Wind direction (ID: 65ad8900-583a-4bf7-8bff-f738225ca017, Type: Int)
+      * Signal strength (ID: 7eafdb74-c99a-40c4-95ca-99f5ddf82355, Type: Uint)
+      * Connected (ID: 5d369774-78df-4259-bdff-cc82b946470b, Type: Bool)
+      * Battery (ID: 560e0bd7-3c75-430e-8ef3-65bbbe85a3af, Type: Int)
+      * Battery critical (ID: 5dcddcf9-da07-4bac-9988-018168a516ad, Type: Bool)
+
+Thing Class: Hue Wall Switch Module
+  - ID: e967027f-f8fc-410c-8b48-6ac4c42e2777
+  - Vendor: Philips
+  - Vendor ID: 0ae1e001-2aa6-47ed-b8c0-334c3728a68f
+  - State Types (3):
+      * Reachable (ID: b51071af-1290-41f1-b2eb-e84527342ade, Type: Bool)
+      * Battery level (ID: b025cab6-d128-43eb-ba63-b16861d6ab10, Type: Int)
+      * Battery critical (ID: 7fcf84e4-5638-46ce-9a7c-85b8bd466b38, Type: Bool)
+  - Event Types (1):
+      * Button pressed (ID: 4623b5ff-b999-4200-ba38-89435d78fcae)
+
+Thing Class: Motion sensor
+  - ID: b5530192-0891-4934-88a2-7338b069be24
+  - Vendor: Lumi
+  - Vendor ID: f58dac98-0ba1-408f-946a-25d452080baa
+  - State Types (6):
+      * Available (ID: 007e2fe5-80d5-4f98-941d-b458b555965a, Type: Bool)
+      * Signal strength (ID: c5913170-e377-484b-a330-c5d5b590fee2, Type: Uint)
+      * Version (ID: d1337b3b-0dfb-4505-90f1-e5b2b45be9bd, Type: String)
+      * Presence (ID: fed7582b-c057-42ab-b7c0-d562a2e7917c, Type: Bool)
+      * Last seen time (ID: 021ce190-a775-40e0-b19b-c6307c73e343, Type: Int)
+      * Light intensity (ID: eb3fb43e-a9bb-4498-880b-464cbb752ff6, Type: Double)
+
+Thing Class: Weather sensor
+  - ID: 0b582616-0b05-4ac9-8b59-51b66079b571
+  - Vendor: Lumi
+  - Vendor ID: f58dac98-0ba1-408f-946a-25d452080baa
+  - State Types (8):
+      * Available (ID: 003f7e37-326b-455d-828b-5a9493b56a69, Type: Bool)
+      * Signal strength (ID: 684f642e-08ed-4912-b7a9-597baef400c0, Type: Uint)
+      * Version (ID: cc644362-19ca-489d-8122-4d1bc55f100f, Type: String)
+      * Temperature (ID: b1641cec-3bf6-4654-b9c0-b81acb3b4481, Type: Double)
+      * Humidity (ID: 27a1e85a-f654-48d8-905d-05b3e2bc499e, Type: Double)
+      * Pressure (ID: 7c3861f3-a9db-407e-9459-90a511d7f797, Type: Double)
+      * Battery level (ID: 706eb697-4265-440d-a79a-11df3f6db335, Type: Int)
+      * Battery level critical (ID: dc419970-7bb4-404f-8146-232b46668778, Type: Bool)
+
+Thing Class: Door sensor
+  - ID: fd43b442-1764-4005-acaf-9075e6d11e3a
+  - Vendor: nymea GmbH
+  - Vendor ID: 2062d64d-3232-433c-88bc-0d33c0ba2ba6
+  - State Types (5):
+      * Closed (ID: 2fb8e0a0-52f2-4c1d-b1c9-c7a295a83b44, Type: Bool)
+      * Battery level (ID: 3c120c1c-0093-4c5e-8d7e-8892e4ce21b3, Type: Int)
+      * Battery critical (ID: 9628450e-5580-4f30-8af7-f1c3093dcfb7, Type: Bool)
+      * Connected (ID: 4fae59a7-fe89-4bc7-bc04-fc18e94b5c3e, Type: Bool)
+      * Signal strength (ID: a1bf9c90-6e12-4513-a82a-a1d15351f140, Type: Uint)
+
+Thing Class: TRÅDFRI motion sensor
+  - ID: 30a1090e-8058-4a5b-aee3-4ba112ba3ba7
+  - Vendor: IKEA TRÅDFRI
+  - Vendor ID: 1a4fdeb3-2eab-47f2-9775-569552988a88
+  - State Types (10):
+      * Connected (ID: 6bf470bb-4756-43fa-bddf-5e6ce002caa3, Type: Bool)
+      * Signal strength (ID: 0a54036e-ca25-40fd-8f24-3516c5141c0b, Type: Uint)
+      * Battery level (ID: e2e414c1-5f21-4244-942a-ee17cb25f1c0, Type: Int)
+      * Battery critical (ID: 21e7c58e-595e-4b7d-bd21-c0a424c876dc, Type: Bool)
+      * Presence (ID: 16ee7fe2-1a86-40e9-aae5-610f712ca155, Type: Bool)
+      * Last seen time (ID: 12041993-c731-4cc1-8010-904b5655d920, Type: Int)
+      * Version (ID: 09704fdb-f2da-4d1c-bddd-f85f85847e29, Type: String)
+      * Update status (ID: 8ff400f3-0b53-401e-b330-1a419f078734, Type: String)
+      * Available version (ID: d634f289-e6d6-4685-8636-64c41481adb2, Type: String)
+      * Update progress (ID: 15e02d98-badf-4961-a3db-b70d515d064c, Type: Uint)
+  - Action Types (1):
+      * Perform update (ID: aea08384-f841-4d46-97c6-d9803632a476)
+
+Thing Class: Vibration sensor
+  - ID: 775be45e-08d8-4ae8-bc95-5721a5317856
+  - Vendor: Lumi
+  - Vendor ID: f58dac98-0ba1-408f-946a-25d452080baa
+  - State Types (8):
+      * Available (ID: 12970c44-5c59-4c6b-a244-6bc413d32c66, Type: Bool)
+      * Signal strength (ID: eb8bbd63-1f1c-4499-8385-06fbe8e301db, Type: Uint)
+      * Version (ID: 8a4aceef-c8ee-487a-946c-20f26fc2d5ed, Type: String)
+      * Angle X (ID: 8ef735ef-332a-40f5-aa57-0408c5d05d46, Type: Double)
+      * Angle Y (ID: 0d398c75-9adf-4835-883b-e578e124af98, Type: Double)
+      * Angle Z (ID: 7ead841c-5a20-456b-85ed-983bda234718, Type: Double)
+      * Absolute angle X (ID: 10be3741-5bfc-4173-bf4f-e95af0e60d03, Type: Double)
+      * Absolute angle Y (ID: 97bf3f80-f70e-4bb1-b4e0-546f153dd3bc, Type: Double)
+  - Event Types (3):
+      * Vibration detected (ID: ce98b90b-f4fb-431d-a7c9-534fd2b76ba4)
+      * Tilt detected (ID: 66830e32-172b-488e-a0c8-56ec6ef802b5)
+      * Drop detected (ID: 6ee738a9-34ea-45dc-8399-be6bb52ff164)
+
+Thing Class: Color Light
+  - ID: 8d157281-73c0-4d2c-96a0-572d26e9dd4f
+  - Vendor: nymea GmbH
+  - Vendor ID: 2062d64d-3232-433c-88bc-0d33c0ba2ba6
+  - State Types (7):
+      * Available (ID: bc56076a-cfa3-4f93-bbf5-2fe9b067cdc3, Type: Bool)
+      * Signal strength (ID: 62789a2c-c6e6-47b4-b022-29a2d183f690, Type: Uint)
+      * Version (ID: 084b8268-4ae6-482d-b42b-67a57b5a7147, Type: String)
+      * Power (ID: 16cfb549-5347-4dc9-b5de-e4028cb4dddd, Type: Bool)
+      * Brightness (ID: 7329b2eb-fb7e-4098-a551-c3ff24fc2962, Type: Int)
+      * Color temperature scaled (ID: c2817667-afd0-434b-b0a3-e020d2c90082, Type: Int)
+      * color (ID: 51e8e6da-426c-4812-9c00-70f1356190dc, Type: Color)
+  - Action Types (5):
+      * Set power (ID: 16cfb549-5347-4dc9-b5de-e4028cb4dddd)
+      * Set brightness (ID: 7329b2eb-fb7e-4098-a551-c3ff24fc2962)
+      * Set color temperature scaled (ID: c2817667-afd0-434b-b0a3-e020d2c90082)
+      * Set color (ID: 51e8e6da-426c-4812-9c00-70f1356190dc)
+      * Identify (ID: 062fa97d-50b6-48ee-ab74-03701e4c7220)
+
+Thing Class: IO Module
+  - ID: 3fb419ef-795d-4f4d-b801-e7eaff16cdb0
+  - Vendor: Develco
+  - Vendor ID: e4b36f3e-ccdc-4a88-8968-39025c3ec742
+  - State Types (9):
+      * Connected (ID: 16d5ebb7-21d1-4294-98a6-ca06eea8e3a3, Type: Bool)
+      * Signal strength (ID: 0e09e6a6-8b3f-4b63-acb1-ac04ab31957a, Type: Uint)
+      * Version (ID: f28c9a61-b8ab-419c-bd85-58692df26ac7, Type: String)
+      * Output 1 (ID: aaeda2c6-439a-452a-b829-45d6249bdee6, Type: Bool)
+      * Output 2 (ID: 105cf314-35b5-4a8b-8e6d-d011009f97ff, Type: Bool)
+      * Input 1 (ID: bc23c7e8-f4ad-47c4-b938-f9af2dbd3393, Type: Bool)
+      * Input 2 (ID: 065b0dc0-6d31-40ec-b356-02fea57e2fe1, Type: Bool)
+      * Input 3 (ID: 8f2b052a-30b7-49aa-a8d4-503cb0b9b66b, Type: Bool)
+      * Input 4 (ID: caef986c-da13-4ef3-ab81-316244c7be1e, Type: Bool)
+  - Action Types (5):
+      * Set output 1 (ID: aaeda2c6-439a-452a-b829-45d6249bdee6)
+      * Set output 2 (ID: 105cf314-35b5-4a8b-8e6d-d011009f97ff)
+      * Identify (ID: 62c5562a-8bdf-49b4-8e1d-f27442b2b360)
+      * Impulse output 1 (ID: 45ec5c65-0719-4148-82ea-3e69b34be939)
+      * Impulse output 2 (ID: d780946c-4ddf-4b59-a669-dbf6ecfda5d6)
+
+Thing Class: Fire sensor
+  - ID: 6b49bd7e-4331-4e1b-bc1b-7860906fda15
+  - Vendor: nymea GmbH
+  - Vendor ID: 2062d64d-3232-433c-88bc-0d33c0ba2ba6
+  - State Types (5):
+      * Fire detected (ID: d139200e-a6b8-4dcd-a891-35a448461fcb, Type: Bool)
+      * Battery critical (ID: 6d0a6178-5e86-4bb5-b1a2-929a6d732195, Type: Bool)
+      * Connected (ID: 0b393a8a-3d4c-47fe-aeea-c9e201841901, Type: Bool)
+      * Signal strength (ID: 80dfad41-ecdf-4f4d-a63f-77611b107818, Type: Uint)
+      * Version (ID: 7cd6219c-a7af-4789-a174-ce1167d97164, Type: String)
+  - Action Types (1):
+      * Alarm (ID: f19e752b-03d9-4848-9dd1-e92c9c21b749)
+
+Thing Class: Vibration sensor
+  - ID: 6fb1f16f-ffb2-43e7-92ee-20b1f8137e17
+  - Vendor: nymea GmbH
+  - Vendor ID: 2062d64d-3232-433c-88bc-0d33c0ba2ba6
+  - State Types (4):
+      * Connected (ID: 9ecf841f-e542-4f24-b135-458683a43e92, Type: Bool)
+      * Signal strength (ID: b21adc6e-3c6e-4793-b49c-326e220b6059, Type: Uint)
+      * Battery level (ID: 1990fbc3-c122-424d-96f3-187867d75b82, Type: Int)
+      * Battery level critical (ID: ab8d043e-88d7-47e3-b157-a52543ae542a, Type: Bool)
+  - Event Types (1):
+      * Vibration detected (ID: 7559605a-37e7-4319-833d-eed4ff69ee11)
+
+Thing Class: Color Light
+  - ID: b11a3f24-8011-42ca-939c-ab110c5f350e
+  - Vendor: IKEA TRÅDFRI
+  - Vendor ID: 1a4fdeb3-2eab-47f2-9775-569552988a88
+  - State Types (10):
+      * Available (ID: e78b8264-d888-4cbd-bf90-2eaec0c83ee0, Type: Bool)
+      * Signal strength (ID: 84990224-7579-4d99-8a19-e98b62381881, Type: Uint)
+      * Power (ID: c3c02756-6cc7-455a-ae59-dd97b9e9a1e6, Type: Bool)
+      * Brightness (ID: e81e7c79-96a4-4e80-ae85-d33278c75de0, Type: Int)
+      * Color temperature scaled (ID: d78650c5-68d3-4d08-991c-cb054cdcf6fd, Type: Int)
+      * color (ID: 9e49f581-eed3-499f-8927-270dfde472e9, Type: Color)
+      * Update status (ID: 8e6ff7a1-d1d7-4aaf-a719-7bb35c3b0f89, Type: String)
+      * Version (ID: 54bfb270-59bf-434b-ac5c-539d05aaa4a6, Type: String)
+      * Available firmware version (ID: 5201e76b-2cc2-4de3-a0f2-43aee3d5fad7, Type: String)
+      * Update progress (ID: 01c7f30d-108b-4fe6-b9cc-6a0dca7e5c2f, Type: Uint)
+  - Action Types (6):
+      * Set power (ID: c3c02756-6cc7-455a-ae59-dd97b9e9a1e6)
+      * Set brightness (ID: e81e7c79-96a4-4e80-ae85-d33278c75de0)
+      * Set color temperature scaled (ID: d78650c5-68d3-4d08-991c-cb054cdcf6fd)
+      * Set color (ID: 9e49f581-eed3-499f-8927-270dfde472e9)
+      * Identify (ID: b0175457-b763-45d6-89fd-573f279c40b3)
+      * Start update (ID: c7c24bb7-9ad1-4584-bc4d-96ce848918da)
+
+Thing Class: TRÅDFRI Shortcut Button
+  - ID: 7a81dd57-0b79-4735-840d-69775d937095
+  - Vendor: IKEA TRÅDFRI
+  - Vendor ID: 1a4fdeb3-2eab-47f2-9775-569552988a88
+  - State Types (8):
+      * Connected (ID: 29cb833d-125f-45b0-add4-da69f22d8dcc, Type: Bool)
+      * Signal strength (ID: 24c227cd-aaeb-440e-b45d-0711074ef633, Type: Uint)
+      * Battery level (ID: 164e8d24-e4b7-4d88-a5d4-5649dfaf0180, Type: Int)
+      * Battery critical (ID: 13a68aa5-4118-4dc9-b55e-e715bc423e08, Type: Bool)
+      * Version (ID: 065f348a-54f2-4203-9a6c-b747e92d169a, Type: String)
+      * Update status (ID: a1254e8e-ac96-40b4-a2dd-dcdbbb3653a8, Type: String)
+      * Available version (ID: 352aa728-61e4-4d04-9bb9-9c438ccfb531, Type: String)
+      * Update progress (ID: af65f485-117f-4a26-911c-ece1d6e07ce9, Type: Uint)
+  - Action Types (1):
+      * Perform firmware update (ID: 83b33b50-a8fd-4234-be89-7b6e7da83b06)
+  - Event Types (2):
+      * Button pressed (ID: ea755d87-b3e3-4bed-8a85-44912e14b2fa)
+      * Button longpressed (ID: e0a0a2af-5d1a-461c-8fa5-726baa3fcc04)
+
+Thing Class: Netatmo account
+  - ID: 728d5a67-27a3-400e-b83c-2765f5196f69
+  - Vendor: Netatmo
+  - Vendor ID: 4b46b4ed-5ec9-4aa4-afc3-92d3f80e6351
+  - State Types (3):
+      * Available (ID: 2f79bc1d-27ed-480a-b583-728363c83ea6, Type: Bool)
+      * Logged in (ID: d1ca8579-5d5a-4372-9139-4b083efead2e, Type: Bool)
+      * Username (ID: b9c98ae6-3687-4279-8fda-bc02c7b7ea38, Type: String)
+
+Thing Class: Presence sensor
+  - ID: 17978e89-290f-4101-8a9e-85cb1cb5e12a
+  - Vendor: nymea GmbH
+  - Vendor ID: 2062d64d-3232-433c-88bc-0d33c0ba2ba6
+  - State Types (6):
+      * Connected (ID: af307ed4-6dd0-4e5e-9ea0-822f473613e7, Type: Bool)
+      * Signal strength (ID: dc265b4f-da86-43d0-9d55-aa83a9dff323, Type: Uint)
+      * Presence detected (ID: 98d3096b-4e42-4b6e-ae29-21b876fbfe3b, Type: Bool)
+      * Target distance (ID: 020e64e0-82a3-4bb6-8869-fc32368695f6, Type: Double)
+      * Light intensity (ID: 242c732d-47d3-496e-9004-1a36647b398a, Type: Double)
+      * Self test status (ID: 91e6ba5e-8dd1-4211-9a18-9d1511198614, Type: String)
+
+Thing Class: Color Temperature Light
+  - ID: 498815c1-a6a3-48e9-9c9b-bff974694b26
+  - Vendor: nymea GmbH
+  - Vendor ID: 2062d64d-3232-433c-88bc-0d33c0ba2ba6
+  - State Types (6):
+      * Connected (ID: dd4eb1fe-4ddd-42fa-97bf-df690728c866, Type: Bool)
+      * Signal strength (ID: 45e5b606-1e4d-42b8-9ee1-0442751247ef, Type: Uint)
+      * Version (ID: 477a1531-5f87-4f21-9b32-01161be93cd2, Type: String)
+      * Power (ID: a8c56366-5b2d-4f4b-b910-38a87851c484, Type: Bool)
+      * Brightness (ID: b72177f9-b673-49b5-864a-345936e5c821, Type: Int)
+      * Color temperature scaled (ID: 69e94f88-a664-4bb9-ba04-2c3ea6cd7569, Type: Int)
+  - Action Types (5):
+      * Set power (ID: a8c56366-5b2d-4f4b-b910-38a87851c484)
+      * Set brightness (ID: b72177f9-b673-49b5-864a-345936e5c821)
+      * Set color temperature scaled (ID: 69e94f88-a664-4bb9-ba04-2c3ea6cd7569)
+      * Identify (ID: 4f8a38f4-652f-40e1-86dd-028dcd64349c)
+      * Remove from network (ID: a3e8d1c7-81c7-4255-b410-3bc4d5c7b4e9)
+
+Thing Class: Temperature & humidity sensor
+  - ID: 3976d3fc-6bd3-4574-8c5b-90c9a07c6440
+  - Vendor: nymea GmbH
+  - Vendor ID: 2062d64d-3232-433c-88bc-0d33c0ba2ba6
+  - State Types (6):
+      * Temperature (ID: bb6ee147-2e36-4445-b3e9-449a5dfa9923, Type: Double)
+      * Relative humidity (ID: 5cc739a8-b84a-49e4-af01-08eea0815abb, Type: Double)
+      * Battery critical (ID: c12ee882-9e4e-4b62-b317-4a5a6162b00a, Type: Bool)
+      * Connected (ID: b15bc020-d6fd-4e0e-b3ce-6b7828416e02, Type: Bool)
+      * Signal strength (ID: 4b045aba-366c-49b5-a87e-389805319efe, Type: Uint)
+      * Version (ID: 67cc511f-ef3f-47e9-a60d-4cb8b881703d, Type: String)
+
+Thing Class: Philips Hue Bridge
+  - ID: 642aa4c7-19aa-45ed-ba06-aa1ae6c9edf7
+  - Vendor: Philips
+  - Vendor ID: 0ae1e001-2aa6-47ed-b8c0-334c3728a68f
+  - State Types (4):
+      * reachable (ID: 15794d26-fde8-4a61-8f83-d7830534975f, Type: Bool)
+      * api version (ID: 7a230e89-c4ce-4276-90e0-6a9ddb890603, Type: String)
+      * update status (ID: 16a126f3-0cef-4931-bb2b-9e1b49bec7fc, Type: String)
+      * Software version (ID: 4c707b18-6604-4e6d-b6bc-4e27769c2adc, Type: String)
+  - Action Types (3):
+      * search devices (ID: cca3f171-6318-44e7-a2ac-d841857c1c24)
+      * check updates (ID: 07a85e91-d064-4bce-b017-13fd0c320c0b)
+      * Upgrade bridge (ID: 6dfbc7c0-7372-42f6-82ba-e777cb32dc4c)
+
+Thing Class: TRÅDFRI STARKVIND Air purifier
+  - ID: 1580b37e-9f4f-474a-9a38-a40060f93861
+  - Vendor: IKEA TRÅDFRI
+  - Vendor ID: 1a4fdeb3-2eab-47f2-9775-569552988a88
+  - State Types (14):
+      * Connected (ID: 31565f01-0287-4f82-9dbf-894c20e06f69, Type: Bool)
+      * Signal strength (ID: ad88fa3d-eebf-42e2-98f4-e58281da03e0, Type: Uint)
+      * Power (ID: 7bcce1da-fc9c-4972-8df2-f17baee95023, Type: Bool)
+      * Auto mode (ID: 15ae0037-e85a-406f-878a-907bcf5bea63, Type: Bool)
+      * Flow rate (ID: 7ad8ce8c-36ab-41b8-8768-4f765a1fa291, Type: Int)
+      * Filter runtime (ID: 7b1a33b8-6f81-46c2-b1f1-a1a46fffd990, Type: Uint)
+      * Replace filter (ID: d01b170d-8985-4b33-b907-1c7e0a35bff6, Type: Bool)
+      * Light power (ID: c71f3fb0-7cd1-4868-846d-a261c24627c2, Type: Bool)
+      * PM 2.5 (ID: a71956ec-af44-4dab-86b1-dd7a2baece1c, Type: Double)
+      * Child lock (ID: d8e6ff6d-5b0e-4071-a749-1e2f19175e4d, Type: Bool)
+      * Version (ID: d7bea835-e91b-4a04-826a-aaacf7233faa, Type: String)
+      * Update status (ID: 5636514d-40a9-464e-bdfb-5877b22b3e69, Type: String)
+      * Available version (ID: 676491ec-2c20-4a05-a75d-c515f4f4bd18, Type: String)
+      * Update progress (ID: acbac78e-d65e-4698-bed7-9b15057cbf44, Type: Uint)
+  - Action Types (6):
+      * Turn on/off (ID: 7bcce1da-fc9c-4972-8df2-f17baee95023)
+      * Enable/disable auto mode (ID: 15ae0037-e85a-406f-878a-907bcf5bea63)
+      * Flow rate changed (ID: 7ad8ce8c-36ab-41b8-8768-4f765a1fa291)
+      * Turn on/off light (ID: c71f3fb0-7cd1-4868-846d-a261c24627c2)
+      * Enable/disable child lock (ID: d8e6ff6d-5b0e-4071-a749-1e2f19175e4d)
+      * Perform update (ID: 5f195fde-2b76-4789-9c7f-8f335a5b450a)
+
+Thing Class: Temperature sensor
+  - ID: ff9657f3-4076-41b9-ae7d-537866fd0ddc
+  - Vendor: nymea GmbH
+  - Vendor ID: 2062d64d-3232-433c-88bc-0d33c0ba2ba6
+  - State Types (4):
+      * Battery critical (ID: cf20355b-1640-4eda-b7e7-e3363c02bed6, Type: Bool)
+      * Connected (ID: 13d91dce-cba3-452c-9618-3c505a56fbc2, Type: Bool)
+      * Signal strength (ID: 8f77c980-a1e0-4f4b-a042-1272a8fe3459, Type: Uint)
+      * Temperature (ID: 1ca9594f-fa48-4ea3-be0e-d8aea3e5ad0a, Type: Double)
+
+Thing Class: Hue Remote
+  - ID: bb482d39-67ef-46dc-88e9-7b181d642b28
+  - Vendor: Philips
+  - Vendor ID: 0ae1e001-2aa6-47ed-b8c0-334c3728a68f
+  - State Types (3):
+      * reachable (ID: 9f9fac89-2dcd-4db6-b214-0065662af62a, Type: Bool)
+      * battery (ID: 683e493a-9796-4d5e-b0e3-61cb178d5819, Type: Int)
+      * battery critical (ID: f8516899-6312-4110-bb97-70ffa81dc530, Type: Bool)
+  - Event Types (2):
+      * Button pressed (ID: 8da28cf1-2457-451e-953e-2685f8daeda8)
+      * Button longpressed (ID: 2c64561b-2381-4769-8e21-0e206c84bbcc)
+
+--------------------------------------------------------------------------------
+THINGS (DEVICES) CONFIGURED:
+--------------------------------------------------------------------------------
+
+Device: Garage
+  - Thing ID: 580f520f-5a6c-4f4d-a7d7-45a40ab582c2
+  - Thing Class ID: ca6baab8-3708-4478-8ca2-7d4d6d542937
+  - Thing Class: Garagedoor
+  - Vendor: maveo
+  - Current States:
+      * Connected: True
+      * Door movement: -
+      * State: closed
+      * Controller mode: Normal mode
+      * Garage type: C250 STM32Lxxx
+      * Closed: True
+      * Opened: False
+      * Intermediate open position: False
+      * Intermediate close position: False
+      * Intermediate open position configured: True
+      * Intermediate close position configured: False
+      * Intermediate position: False
+      * Light: False
+      * Maintenance required: False
+      * Intruder detected: False
+      * Firmware upgrade status: -
+      * DFU progress: 0
+      * Firmware update available: False
+      * maveo-stick version: 52.1.26
+      * Garage manufacturer name: Marantec
+      * Light barrier available: True
+      * Light barrier interrupted: False
+      * Current error code: 0
+      * Update status: idle
+      * Available firmware version: 52.1.26
+
+Device: localhost
+  - Thing ID: c0db9b94-95dd-4567-afb7-64e16f079f31
+  - Thing Class ID: f0dd4c03-0aca-42cc-8f34-9902457b05de
+  - Thing Class: Push Notifications
+  - Vendor: nymea GmbH
+
+Device: localhost
+  - Thing ID: 2e132734-1fca-44fa-b122-4ecf1185b48c
+  - Thing Class ID: f0dd4c03-0aca-42cc-8f34-9902457b05de
+  - Thing Class: Push Notifications
+  - Vendor: nymea GmbH
+
+Device: NFC Detector
+  - Thing ID: b1a29bb8-733d-48a7-a2bd-8efae1f7d4b8
+  - Thing Class ID: 5e80dcf7-0943-40dc-a0f0-4eebb9fc224b
+  - Thing Class: NFC Detector
+  - Vendor: maveo
+
+Device: Weather sensor (LUMI - lumi.weather)
+  - Thing ID: 15add03d-e376-42d1-be14-08417c838d67
+  - Thing Class ID: 0b582616-0b05-4ac9-8b59-51b66079b571
+  - Thing Class: Weather sensor
+  - Vendor: Lumi
+  - Current States:
+      * Available: True
+      * Signal strength: 66
+      * Version: 3000-0001
+      * Temperature: 10.86
+      * Humidity: 83.81
+      * Pressure: 1000
+      * Battery level: 100
+      * Battery level critical: False
+
+Device: localhost
+  - Thing ID: 229305db-1e8c-448e-9a4f-cb9eb97050bf
+  - Thing Class ID: f0dd4c03-0aca-42cc-8f34-9902457b05de
+  - Thing Class: Push Notifications
+  - Vendor: nymea GmbH
+
+Device: Wetter (Ruhr)
+  - Thing ID: 284adf32-5fa6-4399-bc37-f2ef3c23204d
+  - Thing Class ID: 985195aa-17ad-4530-88a4-cdd753d747d7
+  - Thing Class: Weather
+  - Vendor: OpenWeatherMap
+  - Current States:
+      * Weather condition: overcast
+      * Last update: 1762888270
+      * Temperature: 10.22
+      * Minimum temperature: 9.86
+      * Maximum temperature: 10.38
+      * Humidity: 85
+      * Pressure: 1013
+      * Wind speed: 2.24
+      * Wind direction: 158
+      * Cloudiness: 99
+      * Visibility: 10000
+      * Weather description: overcast clouds
+      * Sunset time: 1762876066
+      * Sunrise time: 1762843273
+      * Daylight: False
+
+Device: localhost
+  - Thing ID: fb4adc4e-7e8c-4bc8-b7e2-46145a953ce8
+  - Thing Class ID: f0dd4c03-0aca-42cc-8f34-9902457b05de
+  - Thing Class: Push Notifications
+  - Vendor: nymea GmbH
+
+Device: localhost
+  - Thing ID: 48e67728-297e-4c14-bfbe-13f04614e5f5
+  - Thing Class ID: f0dd4c03-0aca-42cc-8f34-9902457b05de
+  - Thing Class: Push Notifications
+  - Vendor: nymea GmbH
+
+================================================================================
+NYMEA DISCOVERY COMPLETE
