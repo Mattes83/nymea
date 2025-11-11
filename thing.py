@@ -23,12 +23,14 @@ class Thing:
         manufacturer: str,
         name: str,
         maveoBox: MaveoBox,
+        model: str | None = None,
     ) -> None:
         """Init sensor."""
         self._id: str = thingid
         self.thingclass_id: str = thingclassId
         self.name: str = name
         self.manufacturer: str = manufacturer
+        self.model: str | None = model
         self.maveoBox: MaveoBox = maveoBox
         self._callbacks: set[Callable[[], None]] = set()
 
@@ -125,5 +127,6 @@ class Thing:
                     vendor["displayName"],
                     thing["name"],
                     maveoBox,
+                    thingClasses[0].get("displayName"),
                 )
             )

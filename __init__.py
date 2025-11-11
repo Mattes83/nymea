@@ -32,7 +32,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         entry.data["host"],
         entry.data["port"],
         entry.data["token"],
-        websocket_port=entry.data.get("websocket_port", 4444)
+        websocket_port=entry.data.get("websocket_port", 4444),
     )
 
     try:
@@ -41,6 +41,9 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         raise ConfigEntryNotReady(
             f"Error while connecting to {entry.data['host']}"
         ) from ex
+
+    # Discover and log all available thing classes and things
+    await nymea_hub.discover_and_log_all_things()
 
     # Store in runtime_data instead of hass.data.
     entry.runtime_data = nymea_hub

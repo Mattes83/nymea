@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import asyncio
 from collections.abc import Callable
+import contextlib
 import json
 import logging
 import socket
@@ -57,6 +58,10 @@ class MaveoBox:
         self.maveoSticks: list[Any] = []
         self.things: list[Any] = []
         self.online: bool = True
+
+        # Thing classes data for dynamic entity generation
+        self.thing_classes: list[dict[str, Any]] = []
+        self.vendors: dict[str, dict[str, Any]] = {}
 
         # Notification system
         self._notification_handlers: dict[
@@ -390,11 +395,11 @@ class MaveoBox:
                     _LOGGER.warning("WebSocket connection closed")
                     break
                 except Exception as ex:
-                    _LOGGER.error("Error in WebSocket listener: %s", ex)
+                    _LOGGER.exception("Error in WebSocket listener: %s", ex)
                     break
 
         except Exception as ex:
-            _LOGGER.error("WebSocket listen loop error: %s", ex)
+            _LOGGER.exception("WebSocket listen loop error: %s", ex)
         finally:
             _LOGGER.info("WebSocket notification listener stopped")
 
@@ -431,8 +436,169 @@ class MaveoBox:
         self._stop_notification_listener = True
         if self._ws_task and not self._ws_task.done():
             self._ws_task.cancel()
-            try:
+            with contextlib.suppress(asyncio.CancelledError):
                 await self._ws_task
-            except asyncio.CancelledError:
-                pass
             _LOGGER.info("Stopped WebSocket notification listener")
+            _LOGGER.info("Stopped WebSocket notification listener")
+
+    def get_thing_class_name(self, thingclass_id: str) -> str | None:
+        """Get the display name of a thing class by its ID."""
+        for thing_class in self.thing_classes:
+            if thing_class.get("id") == thingclass_id:
+                return thing_class.get("displayName")
+        return None
+
+    async def discover_and_log_all_things(self) -> None:
+        """Discover and log all available thing classes and things from the Nymea system."""
+        try:
+            # Get all vendors
+            loop = self._hass.loop
+            vendors_response = await loop.run_in_executor(
+                None, self.send_command, "Integrations.GetVendors", None
+            )
+            vendors = vendors_response.get("params", {}).get("vendors", [])
+
+            # Create vendor lookup and store
+            vendor_map = {v["id"]: v for v in vendors}
+            self.vendors = vendor_map
+
+            # Get all thing classes
+            thing_classes_response = await loop.run_in_executor(
+                None, self.send_command, "Integrations.GetThingClasses", None
+            )
+            thing_classes = thing_classes_response.get("params", {}).get(
+                "thingClasses", []
+            )
+
+            # Store thing classes for dynamic entity generation
+            self.thing_classes = thing_classes
+
+            # Get all things
+            things_response = await loop.run_in_executor(
+                None, self.send_command, "Integrations.GetThings", None
+            )
+            things = things_response.get("params", {}).get("things", [])
+
+            # Build output as strings to reduce number of log calls
+            output = []
+            output.append("=" * 80)
+            output.append("NYMEA DISCOVERY STARTING")
+            output.append("=" * 80)
+            output.append(
+                f"Found {len(vendors)} vendors, {len(thing_classes)} thing classes, {len(things)} things (devices)"
+            )
+            output.append("-" * 80)
+            output.append("THING CLASSES AVAILABLE:")
+            output.append("-" * 80)
+
+            # Log each thing class with detailed info
+            for tc in thing_classes:
+                vendor = vendor_map.get(tc.get("vendorId"), {})
+                vendor_name = vendor.get("displayName", "Unknown")
+
+                output.append("")
+                output.append(f"Thing Class: {tc.get('displayName', 'N/A')}")
+                output.append(f"  - ID: {tc.get('id', 'N/A')}")
+                output.append(f"  - Vendor: {vendor_name}")
+                output.append(f"  - Vendor ID: {tc.get('vendorId', 'N/A')}")
+
+                # Log available state types
+                state_types = tc.get("stateTypes", [])
+                if state_types:
+                    output.append(f"  - State Types ({len(state_types)}):")
+                    for st in state_types:
+                        output.append(
+                            f"      * {st.get('displayName', 'N/A')} (ID: {st.get('id', 'N/A')}, Type: {st.get('type', 'N/A')})"
+                        )
+
+                # Log available action types
+                action_types = tc.get("actionTypes", [])
+                if action_types:
+                    output.append(f"  - Action Types ({len(action_types)}):")
+                    for at in action_types:
+                        output.append(
+                            f"      * {at.get('displayName', 'N/A')} (ID: {at.get('id', 'N/A')})"
+                        )
+
+                # Log available event types
+                event_types = tc.get("eventTypes", [])
+                if event_types:
+                    output.append(f"  - Event Types ({len(event_types)}):")
+                    for et in event_types:
+                        output.append(
+                            f"      * {et.get('displayName', 'N/A')} (ID: {et.get('id', 'N/A')})"
+                        )
+
+            output.append("")
+            output.append("-" * 80)
+            output.append("THINGS (DEVICES) CONFIGURED:")
+            output.append("-" * 80)
+
+            # Log each thing instance
+            for thing in things:
+                thing_class = next(
+                    (
+                        tc
+                        for tc in thing_classes
+                        if tc["id"] == thing.get("thingClassId")
+                    ),
+                    None,
+                )
+
+                output.append("")
+                output.append(f"Device: {thing.get('name', 'N/A')}")
+                output.append(f"  - Thing ID: {thing.get('id', 'N/A')}")
+                output.append(f"  - Thing Class ID: {thing.get('thingClassId', 'N/A')}")
+
+                if thing_class:
+                    vendor = vendor_map.get(thing_class.get("vendorId"), {})
+                    output.append(
+                        f"  - Thing Class: {thing_class.get('displayName', 'N/A')}"
+                    )
+                    output.append(f"  - Vendor: {vendor.get('displayName', 'Unknown')}")
+
+                # Get current states for this thing
+                states_response = await loop.run_in_executor(
+                    None,
+                    self.send_command,
+                    "Integrations.GetStateValues",
+                    {"thingId": thing.get("id")},
+                )
+
+                if states_response:
+                    values = states_response.get("params", {}).get("values", [])
+                    if values:
+                        output.append("  - Current States:")
+                        for state_value in values:
+                            state_type_id = state_value.get("stateTypeId")
+                            value = state_value.get("value")
+
+                            # Try to find the state type name
+                            state_type_name = "Unknown"
+                            if thing_class:
+                                state_types = thing_class.get("stateTypes", [])
+                                state_type = next(
+                                    (
+                                        st
+                                        for st in state_types
+                                        if st["id"] == state_type_id
+                                    ),
+                                    None,
+                                )
+                                if state_type:
+                                    state_type_name = state_type.get(
+                                        "displayName", "Unknown"
+                                    )
+
+                            output.append(f"      * {state_type_name}: {value}")
+
+            output.append("")
+            output.append("=" * 80)
+            output.append("NYMEA DISCOVERY COMPLETE")
+            output.append("=" * 80)
+
+            # Log everything as a single multi-line message
+            _LOGGER.info("Nymea Discovery Results:\n%s", "\n".join(output))
+
+        except Exception:
+            _LOGGER.exception("Error during Nymea discovery")

@@ -2,114 +2,24 @@
 
 from __future__ import annotations
 
-from collections.abc import Callable
-from dataclasses import dataclass
 import logging
 from typing import Any
 
 from homeassistant.components.sensor import (
     SensorDeviceClass,
     SensorEntity,
-    SensorEntityDescription,
     SensorStateClass,
 )
 from homeassistant.config_entries import ConfigEntry
-from homeassistant.const import PERCENTAGE, UnitOfPressure, UnitOfTemperature
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.device_registry import DeviceInfo
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
 from .const import DOMAIN
+from .dynamic_mapper import generate_entities_for_thing_class
 from .thing import Thing
 
 _LOGGER = logging.getLogger(__name__)
-
-
-# https://docs.python.org/3/library/dataclasses.html
-@dataclass(frozen=True, kw_only=True)
-class NymeaEntityDescription(SensorEntityDescription):
-    """Describes Nymea sensor entity."""
-
-    value: Callable[[dict[str, Any]], float | int | None]
-    thingclass_id: str
-
-
-SENSOR_TYPES: list[NymeaEntityDescription] = [
-    # aqara h&t
-    NymeaEntityDescription(
-        thingclass_id="0b582616-0b05-4ac9-8b59-51b66079b571",
-        key="b1641cec-3bf6-4654-b9c0-b81acb3b4481",
-        name="Temperature",
-        device_class=SensorDeviceClass.TEMPERATURE,
-        native_unit_of_measurement=UnitOfTemperature.CELSIUS,
-        state_class=SensorStateClass.MEASUREMENT,
-        value=lambda data: data.get("temperature"),
-    ),
-    NymeaEntityDescription(
-        thingclass_id="0b582616-0b05-4ac9-8b59-51b66079b571",
-        key="27a1e85a-f654-48d8-905d-05b3e2bc499e",
-        name="Humidity",
-        device_class=SensorDeviceClass.HUMIDITY,
-        native_unit_of_measurement=PERCENTAGE,
-        state_class=SensorStateClass.MEASUREMENT,
-        value=lambda data: data.get("humidity"),
-    ),
-    NymeaEntityDescription(
-        thingclass_id="0b582616-0b05-4ac9-8b59-51b66079b571",
-        key="7c3861f3-a9db-407e-9459-90a511d7f797",
-        name="Pressure",
-        device_class=SensorDeviceClass.ATMOSPHERIC_PRESSURE,
-        native_unit_of_measurement=UnitOfPressure.HPA,
-        state_class=SensorStateClass.MEASUREMENT,
-        value=lambda data: data.get("pressure"),
-    ),
-    NymeaEntityDescription(
-        thingclass_id="0b582616-0b05-4ac9-8b59-51b66079b571",
-        key="684f642e-08ed-4912-b7a9-597baef400c0",
-        name="Signal strength",
-        device_class=SensorDeviceClass.SIGNAL_STRENGTH,
-        native_unit_of_measurement=PERCENTAGE,
-        state_class=SensorStateClass.MEASUREMENT,
-        value=lambda data: data.get("signalStrength"),
-    ),
-    NymeaEntityDescription(
-        thingclass_id="0b582616-0b05-4ac9-8b59-51b66079b571",
-        key="706eb697-4265-440d-a79a-11df3f6db335",
-        name="Battery level",
-        device_class=SensorDeviceClass.BATTERY,
-        native_unit_of_measurement=PERCENTAGE,
-        state_class=SensorStateClass.MEASUREMENT,
-        value=lambda data: data.get("batteryLevel"),
-    ),
-    # maveo sensor
-    NymeaEntityDescription(
-        thingclass_id="db7bd8f7-3d12-4ed4-a7c7-fa022bd3701c",
-        key="48612bb6-f209-44f8-ad21-eb4a4c5b9889",
-        name="Humidity",
-        device_class=SensorDeviceClass.HUMIDITY,
-        native_unit_of_measurement=PERCENTAGE,
-        state_class=SensorStateClass.MEASUREMENT,
-        value=lambda data: data.get("humidity"),
-    ),
-    NymeaEntityDescription(
-        thingclass_id="db7bd8f7-3d12-4ed4-a7c7-fa022bd3701c",
-        key="16bfc529-7822-40d8-a6c6-953aa9ceae27",
-        name="Temperature",
-        device_class=SensorDeviceClass.TEMPERATURE,
-        native_unit_of_measurement=UnitOfTemperature.CELSIUS,
-        state_class=SensorStateClass.MEASUREMENT,
-        value=lambda data: data.get("temperature"),
-    ),
-    # maveo stick
-    NymeaEntityDescription(
-        thingclass_id="ca6baab8-3708-4478-8ca2-7d4d6d542937",
-        key="6f113f20-11ed-4f69-bda5-449363ab71d0",
-        name="State",
-        device_class=SensorDeviceClass.ENUM,
-        state_class=SensorStateClass.MEASUREMENT,
-        value=lambda data: data.get("temperature"),
-    ),
-]
 
 
 async def async_setup_entry(
@@ -120,33 +30,46 @@ async def async_setup_entry(
     """Add sensors for passed config_entry in HA."""
     maveoBox = config_entry.runtime_data
 
-    new_devices = [
-        ThingSensor(thing, desc)
-        for thing in maveoBox.things
-        for desc in SENSOR_TYPES
-        if thing.thingclass_id == desc.thingclass_id
-    ]
+    # Generate dynamic sensor configurations from discovered thing classes
+    sensor_configs = []
+    for thing_class in maveoBox.thing_classes:
+        entities = generate_entities_for_thing_class(thing_class)
+        sensor_configs.extend(entities["sensors"])
+
+    _LOGGER.info("Generated %d dynamic sensor configurations", len(sensor_configs))
+
+    # Create sensors for all things that match the thing class IDs
+    new_devices = []
+    for thing in maveoBox.things:
+        for sensor_config in sensor_configs:
+            if thing.thingclass_id == sensor_config["thingclass_id"]:
+                new_devices.append(DynamicThingSensor(thing, sensor_config))
+
+    _LOGGER.info("Created %d sensor entities", len(new_devices))
 
     if new_devices:
         async_add_entities(new_devices)
 
 
-class ThingSensor(SensorEntity):
-    """Representation of a Sensor."""
+class DynamicThingSensor(SensorEntity):
+    """Representation of a dynamically discovered Sensor."""
 
     has_entity_name = True
 
     # Disable polling - using push notifications
     should_poll = False
 
-    def __init__(self, thing: Thing, desc: NymeaEntityDescription) -> None:
+    def __init__(self, thing: Thing, sensor_config: dict[str, Any]) -> None:
         """Initialize the sensor."""
         self._thing: Thing = thing
-        self._attr_unique_id: str = f"{self._thing.id}_{desc.key}"
-        self._attr_name: str = desc.name
-        self.device_class: SensorDeviceClass | None = desc.device_class
-        self._stateTypeId: str = desc.key
-        self.native_unit_of_measurement: str | None = desc.native_unit_of_measurement
+        self._stateTypeId: str = sensor_config["state_type_id"]
+        self._attr_unique_id: str = f"{self._thing.id}_{self._stateTypeId}"
+        self._attr_name: str = sensor_config["name"]
+        self.device_class: SensorDeviceClass | None = sensor_config.get("device_class")
+        self.native_unit_of_measurement: str | None = sensor_config.get("unit")
+        self._attr_state_class: SensorStateClass | None = sensor_config.get(
+            "state_class"
+        )
         self._available: bool = True
         self.value: float | int | str | None = None
 
@@ -178,7 +101,9 @@ class ThingSensor(SensorEntity):
         except Exception as ex:
             self._available = False
             # This is logging, so use % formatting.
-            _LOGGER.error("Error fetching initial sensor state for %s: %s", self._thing.id, ex)
+            _LOGGER.error(
+                "Error fetching initial sensor state for %s: %s", self._thing.id, ex
+            )
 
     @property
     def state(self) -> float | int | str | None:
@@ -201,4 +126,5 @@ class ThingSensor(SensorEntity):
             "identifiers": {(DOMAIN, self._thing.id)},
             "name": self._thing.name,
             "manufacturer": self._thing.manufacturer,
+            "model": self._thing.model,
         }

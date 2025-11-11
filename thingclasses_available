@@ -1,0 +1,60 @@
+THING CLASSES WITH CONNECTED DEVICES:
+--------------------------------------------------------------------------------
+
+Thing Class: Garagedoor
+  - ID: ca6baab8-3708-4478-8ca2-7d4d6d542937
+  - Vendor: maveo
+  - Vendor ID: e77e72ae-1228-42a3-85cd-34c6f3a8d494
+  - State Types (25):
+      * Connected (ID: 234bbb47-1641-4e8f-a7cd-09a65722596c, Type: Bool)
+      * Door movement (ID: ee5fb485-f95a-4daf-a414-14ade7a0a452, Type: String)
+      * State (ID: 6f113f20-11ed-4f69-bda5-449363ab71d0, Type: String)
+      * Controller mode (ID: 6a5f445f-a9e3-4e03-b5a3-26c3488515d4, Type: String)
+      * Garage type (ID: 42f2bc07-062c-4a51-a2c4-4ab104e25905, Type: String)
+      * Closed (ID: 02d6f21d-2c9d-4c22-a8b3-198994115a43, Type: Bool)
+      * Opened (ID: 4e61b1da-3d5f-4300-826a-62726680bc2b, Type: Bool)
+      * Intermediate open position (ID: e86f7dd2-cd02-49d6-b033-7075067480a1, Type: Bool)
+      * Intermediate close position (ID: 82d8ca8a-6f74-4d7f-8291-25c4b32f5311, Type: Bool)
+      * Intermediate open position configured (ID: 02778369-40c3-4868-8a9f-5bd915624455, Type: Bool)
+      * Intermediate close position configured (ID: 4b404143-9a4b-40dd-9d79-21a2f4a2a459, Type: Bool)
+      * Intermediate position (ID: 0e7a2d7e-8c55-442f-9a1e-c092ac7b876a, Type: Bool)
+      * Light (ID: bad168af-1925-42c2-8343-51bdb19895d3, Type: Bool)
+      * Maintenance required (ID: 394538db-4f28-4230-98bb-0bbe699ee2c3, Type: Bool)
+      * Intruder detected (ID: 90ef8e32-0bc2-49fd-9fe9-abb633debeae, Type: Bool)
+      * Firmware upgrade status (ID: 86012b09-6691-4e86-94fc-32611f11c9f5, Type: String)
+      * DFU progress (ID: 5aa09d90-e063-4a4b-80ae-49a9ea9b9680, Type: Int)
+      * Firmware update available (ID: 300a5eea-4961-4c9c-929a-32741ffa1a26, Type: Bool)
+      * maveo-stick version (ID: 8084459a-e104-4bd8-88ec-97cec435dd3d, Type: String)
+      * Garage manufacturer name (ID: a57bea5b-35ea-4538-b9b4-40dffc3b0d23, Type: String)
+      * Light barrier available (ID: 223c862e-217b-44d4-a7fa-63558457c40c, Type: Bool)
+      * Light barrier interrupted (ID: bbe2e5cb-4adc-43dc-a187-6bb8949ca649, Type: Bool)
+      * Current error code (ID: 6def2ab8-8d5a-4c55-a9e0-4dfa24cdd1ea, Type: Int)
+      * Update status (ID: 180ac69d-e645-4321-b1de-d272010c3e1e, Type: String)
+      * Available firmware version (ID: f93847ac-5f93-48d1-8668-a047d69b20d5, Type: String)
+  - Action Types (12):
+      * Switch light (ID: bad168af-1925-42c2-8343-51bdb19895d3)
+      * Open (ID: 5a1a68cb-a5ef-4bc9-8672-bc067b6c4d48)
+      * Stop (ID: fcb767de-e8d7-43da-ab21-17afea7eba24)
+      * Close (ID: 6a32c34f-763d-4065-acfc-2b88bfd9eb34)
+      * Intermediate position (ID: 76557b37-3f9a-409d-af7c-c56973b69503)
+      * Switch light (ID: 7a943679-4271-4a67-bb48-1fa606840d33)
+      * Connect (ID: c12cd2a4-696b-48de-802f-bf618352c190)
+      * Disconnect (ID: 8be6e04c-b9e6-4823-b71b-604cb094bb09)
+      * Check firmware version (ID: a3d0345c-f540-42fd-90b9-cb753f00f1e8)
+      * Start firmware upgrade (ID: 547df3a6-ce18-4dc3-b2f7-abf724189bb0)
+      * Start radio programming mode (ID: 2e112035-f959-4b1c-ad75-4b5c151ddf9c)
+      * Exit radio programming mode (ID: 6433c7a6-4bc7-4143-b903-0503433837c2)
+
+Thing Class: Weather sensor
+  - ID: 0b582616-0b05-4ac9-8b59-51b66079b571
+  - Vendor: Lumi
+  - Vendor ID: f58dac98-0ba1-408f-946a-25d452080baa
+  - State Types (8):
+      * Available (ID: 003f7e37-326b-455d-828b-5a9493b56a69, Type: Bool)
+      * Signal strength (ID: 684f642e-08ed-4912-b7a9-597baef400c0, Type: Uint)
+      * Version (ID: cc644362-19ca-489d-8122-4d1bc55f100f, Type: String)
+      * Temperature (ID: b1641cec-3bf6-4654-b9c0-b81acb3b4481, Type: Double)
+      * Humidity (ID: 27a1e85a-f654-48d8-905d-05b3e2bc499e, Type: Double)
+      * Pressure (ID: 7c3861f3-a9db-407e-9459-90a511d7f797, Type: Double)
+      * Battery level (ID: 706eb697-4265-440d-a79a-11df3f6db335, Type: Int)
+      * Battery level critical (ID: dc419970-7bb4-404f-8146-232b46668778, Type: Bool)
