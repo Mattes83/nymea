@@ -10,7 +10,7 @@
   "integration_type": "hub",
   "requirements": ["websockets>=15.0"],
   "ssdp": [],
-  "version": "0.2.1",
+  "version": "0.2.2",
   "zeroconf": [
     "_jsonrpc._tcp.local."
   ]
