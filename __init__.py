@@ -11,7 +11,7 @@ from .const import DOMAIN
 from .maveo_stick import MaveoStick
 from .thing import Thing
 
-PLATFORMS: list[str] = ["cover", "sensor", "binary_sensor"]
+PLATFORMS: list[str] = ["cover", "sensor", "binary_sensor", "switch", "button"]
 
 
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:

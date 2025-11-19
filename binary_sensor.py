@@ -69,6 +69,7 @@ class DynamicBinaryThingSensor(BinarySensorEntity):
         self._attr_device_class: BinarySensorDeviceClass | None = sensor_config.get(
             "device_class"
         )
+        self._inverted: bool = sensor_config.get("inverted", False)
         self._available: bool = True
         self._is_on: bool | None = None
 
@@ -93,9 +94,12 @@ class DynamicBinaryThingSensor(BinarySensorEntity):
             value: bool = self._thing.maveoBox.send_command(
                 "Integrations.GetStateValue", params
             )["params"]["value"]  # type: ignore[index]
-            self._is_on = value
-            # Also cache it in the Thing for future notifications.
+            # Cache the original value in the Thing for future notifications.
             self._thing._state_cache[self._stateTypeId] = value
+            # Invert value if configured (e.g., "Closed" state)
+            if self._inverted:
+                value = not value
+            self._is_on = value
             self._available = True
         except Exception as ex:
             self._available = False
@@ -112,7 +116,8 @@ class DynamicBinaryThingSensor(BinarySensorEntity):
         # Try to get the latest value from Thing's cache (updated by notifications).
         cached_value: Any = self._thing.get_state_value(self._stateTypeId)
         if cached_value is not None:
-            self._is_on = cached_value
+            # Invert value if configured (e.g., "Closed" state)
+            self._is_on = not cached_value if self._inverted else cached_value
         return self._is_on
 
     @property
