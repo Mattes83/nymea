@@ -265,30 +265,55 @@ class MaveoBox:
             return response
 
     async def _websocket_listener(self) -> None:
-        """WebSocket listener for push notifications from Nymea (port 4444)."""
+        """WebSocket listener with automatic reconnection on disconnect."""
         _LOGGER.info("Starting WebSocket notification listener")
 
-        # Determine if we need SSL.
-        ws_url: str = f"ws://{self._host}:{self._ws_port}"
+        # SSL preference is probed on first connect and reused for all reconnects.
+        use_ssl: bool | None = None
         ssl_context: ssl.SSLContext | None = None
+        retry_delay = 5  # seconds; doubles on each failure up to 60 s
 
-        try:
-            # Try non-SSL first.
-            async with websockets.connect(ws_url) as websocket:
-                await self._ws_listen_loop(websocket)
-        except (websockets.exceptions.WebSocketException, OSError) as ex:
-            _LOGGER.info("Non-SSL WebSocket failed, trying SSL: %s", ex)
-            # Try with SSL - create SSL context in executor to avoid blocking.
-            loop = self._hass.loop
-            ssl_context = await loop.run_in_executor(None, self._create_ssl_context)
-            ws_url = f"wss://{self._host}:{self._ws_port}"
-
+        while not self._stop_notification_listener:
             try:
-                async with websockets.connect(ws_url, ssl=ssl_context) as websocket:
-                    await self._ws_listen_loop(websocket)
+                if use_ssl is None:
+                    # First connect: probe non-SSL, fall back to SSL.
+                    try:
+                        ws_url = f"ws://{self._host}:{self._ws_port}"
+                        async with websockets.connect(ws_url) as websocket:
+                            use_ssl = False
+                            retry_delay = 5
+                            await self._ws_listen_loop(websocket)
+                    except (websockets.exceptions.WebSocketException, OSError) as ex:
+                        _LOGGER.info("Non-SSL WebSocket failed, trying SSL: %s", ex)
+                        ssl_context = await self._hass.loop.run_in_executor(
+                            None, self._create_ssl_context
+                        )
+                        ws_url = f"wss://{self._host}:{self._ws_port}"
+                        async with websockets.connect(ws_url, ssl=ssl_context) as websocket:
+                            use_ssl = True
+                            retry_delay = 5
+                            await self._ws_listen_loop(websocket)
+                else:
+                    ws_url = (
+                        f"wss://{self._host}:{self._ws_port}"
+                        if use_ssl
+                        else f"ws://{self._host}:{self._ws_port}"
+                    )
+                    connect_kwargs = {"ssl": ssl_context} if use_ssl else {}
+                    async with websockets.connect(ws_url, **connect_kwargs) as websocket:
+                        retry_delay = 5
+                        await self._ws_listen_loop(websocket)
+
+            except asyncio.CancelledError:
+                raise
             except Exception as ex:
-                _LOGGER.error("Failed to connect WebSocket: %s", ex)
-                self.online = False
+                if self._stop_notification_listener:
+                    break
+                _LOGGER.warning(
+                    "WebSocket disconnected, retrying in %ds: %s", retry_delay, ex
+                )
+                await asyncio.sleep(retry_delay)
+                retry_delay = min(retry_delay * 2, 60)
 
     async def _ws_listen_loop(self, websocket: Any) -> None:
         """Main WebSocket listening loop."""
@@ -358,7 +383,7 @@ class MaveoBox:
                     if "notification" in message:
                         notification_name = message["notification"]
                         params = message.get("params", {})
-                        _LOGGER.info(
+                        _LOGGER.debug(
                             "WebSocket notification: %s with params: %s",
                             notification_name,
                             params,
@@ -441,7 +466,6 @@ class MaveoBox:
             self._ws_task.cancel()
             with contextlib.suppress(asyncio.CancelledError):
                 await self._ws_task
-            _LOGGER.info("Stopped WebSocket notification listener")
             _LOGGER.info("Stopped WebSocket notification listener")
 
     def get_thing_class_name(self, thingclass_id: str) -> str | None:
