@@ -12,7 +12,6 @@ from homeassistant.helpers.device_registry import DeviceInfo
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
 from .const import DOMAIN
-from .dynamic_mapper import generate_entities_for_thing_class
 from .thing import Thing
 
 _LOGGER = logging.getLogger(__name__)
@@ -26,13 +25,8 @@ async def async_setup_entry(
     """Add switches for passed config_entry in HA."""
     maveoBox = config_entry.runtime_data
 
-    # Generate dynamic switch configurations from discovered thing classes
-    switch_configs = []
-    for thing_class in maveoBox.thing_classes:
-        entities = generate_entities_for_thing_class(thing_class)
-        switch_configs.extend(entities["switches"])
-
-    _LOGGER.info("Generated %d dynamic switch configurations", len(switch_configs))
+    switch_configs = maveoBox.entity_configs["switches"]
+    _LOGGER.debug("Using %d pre-computed switch configurations", len(switch_configs))
 
     # Create switches for all things that match the thing class IDs
     new_devices = []
@@ -131,14 +125,14 @@ class DynamicThingSwitch(SwitchEntity):
             )
 
             # Log what we discovered about this action
-            _LOGGER.warning(
+            _LOGGER.debug(
                 "Turn ON - Full action type definition for %s: %s",
                 self._thing.name, action_type
             )
-            _LOGGER.warning(
+            _LOGGER.debug(
                 "Turn ON - Action ID we're looking for: %s", self._actionTypeId_on
             )
-            _LOGGER.warning(
+            _LOGGER.debug(
                 "Turn ON - All available action types: %s",
                 [{"id": at.get("id"), "name": at.get("name", at.get("displayName")),
                   "paramTypes": at.get("paramTypes", [])} for at in action_types]
@@ -158,16 +152,16 @@ class DynamicThingSwitch(SwitchEntity):
                     param_id = param_type.get("id")
                     param_name = param_type.get("name")
                     param_type_type = param_type.get("type", "unknown")
-                    _LOGGER.warning(
+                    _LOGGER.debug(
                         "Turn ON - Param type found: id=%s, name=%s, type=%s",
                         param_id, param_name, param_type_type
                     )
                     # For Nymea API, use paramTypeId (the parameter ID) and value
                     param_list.append({"paramTypeId": param_id, "value": True})
                 exec_params["params"] = param_list
-                _LOGGER.warning("Turn ON - Built params: %s", exec_params["params"])
+                _LOGGER.debug("Turn ON - Built params: %s", exec_params["params"])
             else:
-                _LOGGER.warning("Turn ON - No parameters required for this action")
+                _LOGGER.debug("Turn ON - No parameters required for this action")
 
             # Execute the action and wait for response
             result = await self.hass.async_add_executor_job(
@@ -176,8 +170,8 @@ class DynamicThingSwitch(SwitchEntity):
                 exec_params,
             )
 
-            _LOGGER.warning("Turn ON - Execution params sent: %s", exec_params)
-            _LOGGER.warning("Turn ON - Result received: %s", result)
+            _LOGGER.debug("Turn ON - Execution params sent: %s", exec_params)
+            _LOGGER.debug("Turn ON - Result received: %s", result)
 
             if result is None:
                 _LOGGER.error("Failed to execute turn_on action for %s", self._thing.name)
@@ -219,11 +213,11 @@ class DynamicThingSwitch(SwitchEntity):
             )
 
             # Log what we discovered about this action
-            _LOGGER.warning(
+            _LOGGER.debug(
                 "Turn OFF - Full action type definition for %s: %s",
                 self._thing.name, action_type
             )
-            _LOGGER.warning(
+            _LOGGER.debug(
                 "Turn OFF - Action ID we're looking for: %s", self._actionTypeId_off
             )
 
@@ -241,16 +235,16 @@ class DynamicThingSwitch(SwitchEntity):
                     param_id = param_type.get("id")
                     param_name = param_type.get("name")
                     param_type_type = param_type.get("type", "unknown")
-                    _LOGGER.warning(
+                    _LOGGER.debug(
                         "Turn OFF - Param type found: id=%s, name=%s, type=%s",
                         param_id, param_name, param_type_type
                     )
                     # For Nymea API, use paramTypeId (the parameter ID) and value
                     param_list.append({"paramTypeId": param_id, "value": False})
                 exec_params["params"] = param_list
-                _LOGGER.warning("Turn OFF - Built params: %s", exec_params["params"])
+                _LOGGER.debug("Turn OFF - Built params: %s", exec_params["params"])
             else:
-                _LOGGER.warning("Turn OFF - No parameters required for this action")
+                _LOGGER.debug("Turn OFF - No parameters required for this action")
 
             # Execute the action and wait for response
             result = await self.hass.async_add_executor_job(
@@ -259,8 +253,8 @@ class DynamicThingSwitch(SwitchEntity):
                 exec_params,
             )
 
-            _LOGGER.warning("Turn OFF - Execution params sent: %s", exec_params)
-            _LOGGER.warning("Turn OFF - Result received: %s", result)
+            _LOGGER.debug("Turn OFF - Execution params sent: %s", exec_params)
+            _LOGGER.debug("Turn OFF - Result received: %s", result)
 
             if result is None:
                 _LOGGER.error("Failed to execute turn_off action for %s", self._thing.name)

@@ -15,7 +15,6 @@ from homeassistant.helpers.device_registry import DeviceInfo
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
 from .const import DOMAIN
-from .dynamic_mapper import generate_entities_for_thing_class
 from .thing import Thing
 
 _LOGGER = logging.getLogger(__name__)
@@ -29,14 +28,9 @@ async def async_setup_entry(
     """Add binary sensors for passed config_entry in HA."""
     maveoBox = config_entry.runtime_data
 
-    # Generate dynamic binary sensor configurations from discovered thing classes
-    binary_sensor_configs = []
-    for thing_class in maveoBox.thing_classes:
-        entities = generate_entities_for_thing_class(thing_class)
-        binary_sensor_configs.extend(entities["binary_sensors"])
-
-    _LOGGER.info(
-        "Generated %d dynamic binary sensor configurations", len(binary_sensor_configs)
+    binary_sensor_configs = maveoBox.entity_configs["binary_sensors"]
+    _LOGGER.debug(
+        "Using %d pre-computed binary sensor configurations", len(binary_sensor_configs)
     )
 
     # Create binary sensors for all things that match the thing class IDs

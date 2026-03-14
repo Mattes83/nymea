@@ -16,7 +16,6 @@ from homeassistant.helpers.device_registry import DeviceInfo
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
 from .const import DOMAIN
-from .dynamic_mapper import generate_entities_for_thing_class
 from .thing import Thing
 
 _LOGGER = logging.getLogger(__name__)
@@ -30,13 +29,8 @@ async def async_setup_entry(
     """Add sensors for passed config_entry in HA."""
     maveoBox = config_entry.runtime_data
 
-    # Generate dynamic sensor configurations from discovered thing classes
-    sensor_configs = []
-    for thing_class in maveoBox.thing_classes:
-        entities = generate_entities_for_thing_class(thing_class)
-        sensor_configs.extend(entities["sensors"])
-
-    _LOGGER.info("Generated %d dynamic sensor configurations", len(sensor_configs))
+    sensor_configs = maveoBox.entity_configs["sensors"]
+    _LOGGER.debug("Using %d pre-computed sensor configurations", len(sensor_configs))
 
     # Create sensors for all things that match the thing class IDs
     new_devices = []
