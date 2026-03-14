@@ -428,7 +428,10 @@ class MaveoBox:
         """Start the WebSocket notification listener."""
         if self._ws_task is None or self._ws_task.done():
             self._stop_notification_listener = False
-            self._ws_task = self._hass.async_create_task(self._websocket_listener())
+            self._ws_task = self._hass.async_create_background_task(
+              self._websocket_listener(),
+              name="nymea_websocket_listener",
+            )
             _LOGGER.info("Started WebSocket notification listener task")
 
     async def stop_notification_listener(self) -> None:
