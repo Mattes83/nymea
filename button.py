@@ -12,7 +12,6 @@ from homeassistant.helpers.device_registry import DeviceInfo
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
 from .const import DOMAIN
-from .dynamic_mapper import generate_entities_for_thing_class
 from .thing import Thing
 
 _LOGGER = logging.getLogger(__name__)
@@ -26,13 +25,8 @@ async def async_setup_entry(
     """Add buttons for passed config_entry in HA."""
     maveoBox = config_entry.runtime_data
 
-    # Generate dynamic button configurations from discovered thing classes
-    button_configs = []
-    for thing_class in maveoBox.thing_classes:
-        entities = generate_entities_for_thing_class(thing_class)
-        button_configs.extend(entities["buttons"])
-
-    _LOGGER.info("Generated %d dynamic button configurations", len(button_configs))
+    button_configs = maveoBox.entity_configs["buttons"]
+    _LOGGER.debug("Using %d pre-computed button configurations", len(button_configs))
 
     # Create buttons for all things that match the thing class IDs
     new_devices = []
