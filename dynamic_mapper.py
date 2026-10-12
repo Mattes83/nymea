@@ -11,8 +11,17 @@ from typing import Any
 from homeassistant.components.binary_sensor import BinarySensorDeviceClass
 from homeassistant.components.sensor import SensorDeviceClass, SensorStateClass
 from homeassistant.const import (
+    LIGHT_LUX,
     PERCENTAGE,
+    SIGNAL_STRENGTH_DECIBELS,
+    SIGNAL_STRENGTH_DECIBELS_MILLIWATT,
+    UnitOfDensity,
+    UnitOfElectricCurrent,
+    UnitOfElectricPotential,
+    UnitOfEnergy,
+    UnitOfPower,
     UnitOfPressure,
+    UnitOfRatio,
     UnitOfTemperature,
 )
 
@@ -38,14 +47,73 @@ STATE_NAME_TO_SENSOR_CLASS = {
     "current": SensorDeviceClass.CURRENT,
 }
 
-# Unit mappings
-UNIT_MAPPINGS = {
-    "celsius": UnitOfTemperature.CELSIUS,
-    "fahrenheit": UnitOfTemperature.FAHRENHEIT,
-    "hpa": UnitOfPressure.HPA,
-    "mbar": UnitOfPressure.MBAR,
-    "percentage": PERCENTAGE,
-    "%": PERCENTAGE,
+# Nymea Unit enum values -> HA unit strings (only units relevant for sensors)
+NYMEA_UNIT_TO_HA = {
+    "UnitDegreeCelsius": UnitOfTemperature.CELSIUS,
+    "UnitDegreeKelvin": UnitOfTemperature.KELVIN,
+    "UnitPercentage": PERCENTAGE,
+    "UnitPascal": UnitOfPressure.PA,
+    "UnitHectoPascal": UnitOfPressure.HPA,
+    "UnitMilliBar": UnitOfPressure.MBAR,
+    "UnitBar": UnitOfPressure.BAR,
+    "UnitLux": LIGHT_LUX,
+    "UnitWatt": UnitOfPower.WATT,
+    "UnitKiloWatt": UnitOfPower.KILO_WATT,
+    "UnitKiloWattHour": UnitOfEnergy.KILO_WATT_HOUR,
+    "UnitVolt": UnitOfElectricPotential.VOLT,
+    "UnitMilliVolt": UnitOfElectricPotential.MILLIVOLT,
+    "UnitAmpere": UnitOfElectricCurrent.AMPERE,
+    "UnitMilliAmpere": UnitOfElectricCurrent.MILLIAMPERE,
+    "UnitDezibel": SIGNAL_STRENGTH_DECIBELS,
+    "UnitPartsPerMillion": UnitOfRatio.PARTS_PER_MILLION,
+    "UnitPartsPerBillion": UnitOfRatio.PARTS_PER_BILLION,
+    "UnitMicroGrammPerCubicalMeter": UnitOfDensity.MICROGRAMS_PER_CUBIC_METER,
+}
+
+# Units HA accepts per device class; a class is dropped if its unit doesn't fit.
+DEVICE_CLASS_ALLOWED_UNITS: dict[SensorDeviceClass, set[str]] = {
+    SensorDeviceClass.TEMPERATURE: {
+        UnitOfTemperature.CELSIUS,
+        UnitOfTemperature.FAHRENHEIT,
+        UnitOfTemperature.KELVIN,
+    },
+    SensorDeviceClass.HUMIDITY: {PERCENTAGE},
+    SensorDeviceClass.ATMOSPHERIC_PRESSURE: {
+        UnitOfPressure.PA,
+        UnitOfPressure.HPA,
+        UnitOfPressure.MBAR,
+        UnitOfPressure.BAR,
+    },
+    SensorDeviceClass.BATTERY: {PERCENTAGE},
+    SensorDeviceClass.SIGNAL_STRENGTH: {
+        SIGNAL_STRENGTH_DECIBELS,
+        SIGNAL_STRENGTH_DECIBELS_MILLIWATT,
+    },
+    SensorDeviceClass.VOLATILE_ORGANIC_COMPOUNDS: {
+        UnitOfDensity.MICROGRAMS_PER_CUBIC_METER
+    },
+    SensorDeviceClass.CO2: {UnitOfRatio.PARTS_PER_MILLION},
+    SensorDeviceClass.PM25: {UnitOfDensity.MICROGRAMS_PER_CUBIC_METER},
+    SensorDeviceClass.PM10: {UnitOfDensity.MICROGRAMS_PER_CUBIC_METER},
+    SensorDeviceClass.ILLUMINANCE: {LIGHT_LUX},
+    SensorDeviceClass.ENERGY: {UnitOfEnergy.KILO_WATT_HOUR},
+    SensorDeviceClass.POWER: {UnitOfPower.WATT, UnitOfPower.KILO_WATT},
+    SensorDeviceClass.VOLTAGE: {
+        UnitOfElectricPotential.VOLT,
+        UnitOfElectricPotential.MILLIVOLT,
+    },
+    SensorDeviceClass.CURRENT: {
+        UnitOfElectricCurrent.AMPERE,
+        UnitOfElectricCurrent.MILLIAMPERE,
+    },
+}
+
+# Fallback units when the nymea state type carries no unit metadata.
+DEVICE_CLASS_DEFAULT_UNIT: dict[SensorDeviceClass, str] = {
+    SensorDeviceClass.TEMPERATURE: UnitOfTemperature.CELSIUS,
+    SensorDeviceClass.HUMIDITY: PERCENTAGE,
+    SensorDeviceClass.ATMOSPHERIC_PRESSURE: UnitOfPressure.HPA,
+    SensorDeviceClass.BATTERY: PERCENTAGE,
 }
 
 # Binary sensor mappings
@@ -103,8 +171,10 @@ def determine_sensor_type(
     # Check if it's a regular sensor
     if data_type in ["int", "uint", "double", "string"]:
         device_class = None
-        unit = None
         state_class = None
+
+        # Unit from nymea metadata is authoritative.
+        unit = NYMEA_UNIT_TO_HA.get(state_type.get("unit", ""))
 
         # Determine device class from name
         for keyword, sensor_class in STATE_NAME_TO_SENSOR_CLASS.items():
@@ -112,25 +182,26 @@ def determine_sensor_type(
                 device_class = sensor_class
                 break
 
-        # Determine unit and state class based on device class
-        if device_class == SensorDeviceClass.TEMPERATURE:
-            unit = UnitOfTemperature.CELSIUS
-            state_class = SensorStateClass.MEASUREMENT
-        elif device_class == SensorDeviceClass.HUMIDITY:
-            unit = PERCENTAGE
-            state_class = SensorStateClass.MEASUREMENT
-        elif device_class == SensorDeviceClass.ATMOSPHERIC_PRESSURE:
-            unit = UnitOfPressure.HPA
-            state_class = SensorStateClass.MEASUREMENT
-        elif (
-            device_class == SensorDeviceClass.BATTERY
-            or device_class == SensorDeviceClass.SIGNAL_STRENGTH
-        ):
-            unit = PERCENTAGE
-            state_class = SensorStateClass.MEASUREMENT
-        elif data_type in ["int", "uint", "double"]:
-            # Numeric sensor without specific class
-            state_class = SensorStateClass.MEASUREMENT
+        if device_class is not None:
+            if unit is None:
+                unit = DEVICE_CLASS_DEFAULT_UNIT.get(device_class)
+            # Drop the device class if the unit doesn't fit (e.g. "current
+            # error code" without Ampere, signal strength in %).
+            allowed = DEVICE_CLASS_ALLOWED_UNITS.get(device_class)
+            if allowed is not None and unit not in allowed:
+                _LOGGER.debug(
+                    "Dropping device class %s for '%s': unit %s not allowed",
+                    device_class,
+                    display_name,
+                    unit,
+                )
+                device_class = None
+
+        if data_type in ["int", "uint", "double"]:
+            if device_class == SensorDeviceClass.ENERGY:
+                state_class = SensorStateClass.TOTAL_INCREASING
+            else:
+                state_class = SensorStateClass.MEASUREMENT
 
         # For string types with known values, expose as an enum sensor.
         # ENUM requires an options list, so only use it when possibleValues exist.
@@ -140,6 +211,9 @@ def determine_sensor_type(
             and state_type.get("possibleValues")
         ):
             device_class = SensorDeviceClass.ENUM
+
+        if data_type == "string":
+            unit = None
 
         return ("sensor", device_class, unit, state_class, False)
 
