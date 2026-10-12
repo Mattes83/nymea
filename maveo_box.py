@@ -310,9 +310,9 @@ class MaveoBox:
         """WebSocket listener with automatic reconnection on disconnect."""
         _LOGGER.debug("Starting WebSocket notification listener")
 
-        # Start with the scheme negotiated on the JSON-RPC socket; flip until
-        # the first successful connect, then stick with what worked.
-        use_ssl = self._use_ssl
+        # Prefer secure wss first; flip to ws until the first successful
+        # connect, then stick with what worked.
+        use_ssl = True
         ssl_context: ssl.SSLContext | None = None
         connected_once = False
         retry_delay = 5  # seconds; doubles on each failure up to 60 s
@@ -336,11 +336,20 @@ class MaveoBox:
             except Exception as ex:
                 if self._stop_notification_listener:
                     break
+                if not connected_once:
+                    # Still probing the scheme; try the other one quickly.
+                    _LOGGER.debug(
+                        "WebSocket %s connect failed, trying %s next: %s",
+                        "wss" if use_ssl else "ws",
+                        "ws" if use_ssl else "wss",
+                        ex,
+                    )
+                    use_ssl = not use_ssl
+                    await asyncio.sleep(1)
+                    continue
                 _LOGGER.warning(
                     "WebSocket disconnected, retrying in %ds: %s", retry_delay, ex
                 )
-                if not connected_once:
-                    use_ssl = not use_ssl
                 await asyncio.sleep(retry_delay)
                 retry_delay = min(retry_delay * 2, 60)
 
