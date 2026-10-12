@@ -87,7 +87,6 @@ def determine_sensor_type(
         and inverted indicates if binary sensor state should be inverted
     """
     display_name = state_type.get("displayName", "").lower()
-    state_type_id = state_type.get("id", "")
     data_type = state_type.get("type", "").lower()
 
     # Check if it's a binary sensor (Bool type)
