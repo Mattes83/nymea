@@ -18,6 +18,7 @@ import websockets
 _LOGGER = logging.getLogger(__name__)
 
 COMMAND_TIMEOUT = 10  # seconds to wait for a JSON-RPC response
+CONNECT_TIMEOUT = 30  # seconds for TCP connect + TLS handshake (box can be slow)
 PAIRING_TIMEOUT = 60  # seconds to wait for the push button press
 
 
@@ -66,6 +67,7 @@ class MaveoBox:
 
         # WebSocket connection for notifications (port 4445)
         self._ws_task: asyncio.Task[None] | None = None
+        self._ws_ssl_hint: bool = True
 
         self.maveoSticks: list[Any] = []
         self.things: list[Any] = []
@@ -114,14 +116,14 @@ class MaveoBox:
     def _init_connection_blocking(self) -> str | None:
         """Blocking connect + handshake + authentication (runs in executor)."""
         with self._lock:
-            self._use_ssl = False
+            self._use_ssl = True
             self._connect_socket()
             try:
-                # First try without SSL, fall back to SSL.
+                # Prefer TLS, fall back to plain.
                 handshake = self._send_command_locked("JSONRPC.Hello", {})
             except (NymeaConnectionError, OSError, ValueError):
-                _LOGGER.debug("Plain connection failed, retrying with SSL")
-                self._use_ssl = True
+                _LOGGER.debug("TLS connection failed, retrying without SSL")
+                self._use_ssl = False
                 self._connect_socket()
                 handshake = self._send_command_locked("JSONRPC.Hello", {})
 
@@ -138,6 +140,7 @@ class MaveoBox:
                 _LOGGER.warning(
                     "Maveo box is configured to allow unauthenticated requests, skipping authentication"
                 )
+                self._discover_ws_config_locked()
                 return None
 
             if self._initialSetupRequired:
@@ -153,16 +156,61 @@ class MaveoBox:
             if self._token is None:
                 self._token = self._pushbutton_auth_locked()
 
+            self._discover_ws_config_locked()
             return self._token
+
+    def _discover_ws_config_locked(self) -> None:
+        """Read the WebSocket server port/SSL mode from the box configuration.
+
+        The configured websocket_port is only a fallback; the box is
+        authoritative. Must be called with the lock held.
+        """
+        try:
+            response = self._send_command_locked("Configuration.GetConfigurations")
+        except (NymeaConnectionError, OSError, TimeoutError) as ex:
+            _LOGGER.debug("Could not read server configurations: %s", ex)
+            return
+        if response is None:
+            return
+
+        ws_configs = response.get("params", {}).get(
+            "webSocketServerConfigurations", []
+        )
+        candidates = [
+            cfg
+            for cfg in ws_configs
+            if cfg.get("port") and cfg.get("address") not in ("127.0.0.1", "::1")
+        ]
+        if not candidates:
+            return
+
+        # Prefer an SSL-enabled configuration.
+        chosen = next(
+            (cfg for cfg in candidates if cfg.get("sslEnabled")), candidates[0]
+        )
+        self._ws_port = int(chosen["port"])
+        self._ws_ssl_hint = bool(chosen.get("sslEnabled", True))
+        _LOGGER.info(
+            "Discovered WebSocket server on port %d (ssl=%s)",
+            self._ws_port,
+            self._ws_ssl_hint,
+        )
 
     def _connect_socket(self) -> None:
         """(Re)create the JSON-RPC socket. Must be called with the lock held."""
         self._close_socket()
         sock = socket.create_connection(
-            (self._host, self._port), timeout=COMMAND_TIMEOUT
+            (self._host, self._port), timeout=CONNECT_TIMEOUT
         )
+        # Keepalive so the box doesn't silently drop the idle connection.
+        sock.setsockopt(socket.SOL_SOCKET, socket.SO_KEEPALIVE, 1)
+        with contextlib.suppress(OSError, AttributeError):
+            sock.setsockopt(socket.IPPROTO_TCP, socket.TCP_KEEPIDLE, 60)
+            sock.setsockopt(socket.IPPROTO_TCP, socket.TCP_KEEPINTVL, 15)
+            sock.setsockopt(socket.IPPROTO_TCP, socket.TCP_KEEPCNT, 4)
         if self._use_ssl:
             sock = self._create_ssl_context().wrap_socket(sock)
+        sock.settimeout(COMMAND_TIMEOUT)
         self._sock = sock
         self._recv_buffer = b""
 
@@ -257,10 +305,24 @@ class MaveoBox:
                 _LOGGER.warning(
                     "Connection to %s lost (%s), reconnecting", self._host, ex
                 )
-                self._connect_socket()
-                if self._send_command_locked("JSONRPC.Hello", {}) is None:
-                    raise NymeaConnectionError("Reconnect handshake failed") from ex
-                return self._send_command_locked(method, params)
+                last_ex: Exception = ex
+                for attempt in (1, 2):
+                    try:
+                        self._connect_socket()
+                        if self._send_command_locked("JSONRPC.Hello", {}) is None:
+                            raise NymeaConnectionError("Reconnect handshake failed")
+                        return self._send_command_locked(method, params)
+                    except (NymeaConnectionError, OSError, TimeoutError) as retry_ex:
+                        last_ex = retry_ex
+                        _LOGGER.warning(
+                            "Reconnect attempt %d to %s failed: %s",
+                            attempt,
+                            self._host,
+                            retry_ex,
+                        )
+                raise NymeaConnectionError(
+                    f"Reconnect to {self._host} failed"
+                ) from last_ex
 
     async def async_send_command(
         self, method: str, params: dict[str, Any] | None = None
@@ -310,9 +372,9 @@ class MaveoBox:
         """WebSocket listener with automatic reconnection on disconnect."""
         _LOGGER.debug("Starting WebSocket notification listener")
 
-        # Prefer secure wss first; flip to ws until the first successful
-        # connect, then stick with what worked.
-        use_ssl = True
+        # Scheme from the discovered server config (wss preferred); flip until
+        # the first successful connect, then stick with what worked.
+        use_ssl = self._ws_ssl_hint
         ssl_context: ssl.SSLContext | None = None
         connected_once = False
         retry_delay = 5  # seconds; doubles on each failure up to 60 s
@@ -326,6 +388,9 @@ class MaveoBox:
                 scheme = "wss" if use_ssl else "ws"
                 ws_url = f"{scheme}://{self._host}:{self._ws_port}"
                 connect_kwargs: dict[str, Any] = {"ssl": ssl_context} if use_ssl else {}
+                # Short timeout while probing; silent non-TLS servers would
+                # otherwise stall the wss attempt for the full default 10 s.
+                connect_kwargs["open_timeout"] = 5 if not connected_once else 15
                 async with websockets.connect(ws_url, **connect_kwargs) as websocket:
                     connected_once = True
                     retry_delay = 5
