@@ -7,25 +7,33 @@
             "unknown": "Unerwarteter Fehler"
         },
         "error": {
-            "cannot_connect": "[%key:common::config_flow::error::cannot_connect%]",
-            "invalid_auth": "[%key:common::config_flow::error::invalid_auth%]",
-            "unknown": "[%key:common::config_flow::error::unknown%]"
+            "cannot_connect": "Verbindung fehlgeschlagen",
+            "invalid_auth": "Authentifizierung fehlgeschlagen",
+            "unknown": "Unerwarteter Fehler"
         },
         "step": {
             "user": {
-                "title": "Connect to nymea",
-                "description": "Please enter the host name or IP address of a nymea device.",
+                "title": "Mit nymea verbinden",
+                "description": "Bitte den Hostnamen oder die IP-Adresse eines nymea-Geräts eingeben.",
                 "data": {
-                    "host": "[%key:common::config_flow::data::host%]"
+                    "host": "Host",
+                    "port": "Port",
+                    "websocket_port": "WebSocket-Port"
                 },
                 "data_description": {
-                    "host": "The hostname or IP address of your nymea device."
+                    "host": "Der Hostname oder die IP-Adresse des nymea-Geräts.",
+                    "port": "Der JSON-RPC-TCP-Port für Befehle und Kopplung (Standard: 2223).",
+                    "websocket_port": "Der WebSocket-Port für Benachrichtigungen (Standard: 4445)."
                 }
             },
             "link": {
-                "title": "Link Hub",
-                "description": "After confirming this dialog press the yellow button on the backside of the maveo box to create a token for use with Home Assistant."
-              }
+                "title": "Hub koppeln",
+                "description": "Diesen Dialog bestätigen und anschließend **innerhalb von 30 Sekunden** den **gelben Knopf** auf der Rückseite der Maveo Box drücken, um die Kopplung abzuschließen."
+            },
+            "zeroconf_confirm": {
+                "title": "nymea-Gerät gefunden",
+                "description": "Soll das nymea-Gerät unter {host} zu Home Assistant hinzugefügt werden?"
+            }
         }
    }
 }
