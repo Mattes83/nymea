@@ -394,6 +394,7 @@ class MaveoBox:
                 async with websockets.connect(ws_url, **connect_kwargs) as websocket:
                     connected_once = True
                     retry_delay = 5
+                    _LOGGER.info("WebSocket connected to %s", ws_url)
                     await self._ws_listen_loop(websocket)
 
             except asyncio.CancelledError:
@@ -472,7 +473,9 @@ class MaveoBox:
             await websocket.send(json.dumps(enable_notifications))
             notif_response = json.loads(await websocket.recv())
             if notif_response.get("status") == "success":
-                _LOGGER.debug("WebSocket notifications enabled")
+                _LOGGER.info(
+                    "WebSocket notifications enabled, listening for state updates"
+                )
             else:
                 _LOGGER.warning("Failed to enable notifications: %s", notif_response)
 
@@ -511,7 +514,9 @@ class MaveoBox:
                         )
 
         except websockets.exceptions.ConnectionClosed:
-            _LOGGER.warning("WebSocket connection closed")
+            _LOGGER.warning(
+                "WebSocket connection closed, state updates interrupted (reconnecting)"
+            )
         finally:
             _LOGGER.debug("WebSocket notification listener stopped")
 

@@ -66,8 +66,8 @@ class MaveoStick:
         old_state = self.state
         self.state = State[value]
         if old_state != self.state:
-            _LOGGER.debug(
-                "MaveoStick %s state changed from %s to %s (via notification)",
+            _LOGGER.info(
+                "Garage door '%s': state changed %s -> %s (via WebSocket)",
                 self.name,
                 old_state.name,
                 self.state.name,

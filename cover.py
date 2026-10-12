@@ -185,15 +185,37 @@ class GarageDoor(CoverEntity):
             return
 
         params = {"actionTypeId": action_type_id, "thingId": self._maveoStick.id}
+        _LOGGER.info(
+            "Garage door '%s': sending '%s' command",
+            self._maveoStick.name,
+            action_name,
+        )
         result = await self._maveoStick.maveoBox.async_send_command(
             "Integrations.ExecuteAction", params
         )
         if result is None:
             _LOGGER.error(
-                "Failed to execute '%s' for %s", action_name, self._maveoStick.id
+                "Garage door '%s': '%s' command failed (no/error response from box)",
+                self._maveoStick.name,
+                action_name,
             )
             return
 
+        thing_error = result.get("params", {}).get("thingError")
+        if thing_error and thing_error != "ThingErrorNoError":
+            _LOGGER.error(
+                "Garage door '%s': box rejected '%s' command: %s",
+                self._maveoStick.name,
+                action_name,
+                thing_error,
+            )
+            return
+
+        _LOGGER.info(
+            "Garage door '%s': '%s' command accepted by box",
+            self._maveoStick.name,
+            action_name,
+        )
         self._maveoStick.state = transition_state
         await self._maveoStick.publish_updates()
 
