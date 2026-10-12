@@ -162,6 +162,17 @@ class GarageDoor(CoverEntity):
         """Return the state of the sensor."""
         return self._available
 
+    @property
+    def current_cover_position(self) -> int | None:
+        """Return current position: 0 = closed, 100 = open, else in between."""
+        if self._maveoStick.state == State.closed:
+            return 0
+        if self._maveoStick.state == State.open:
+            return 100
+        if self._maveoStick.state == State.intermediate:
+            return 5  # barely open — keeps both arrows active without implying half-open
+        return None  # opening/closing/unknown — no reliable position
+
     async def _async_execute_action(
         self, action_name: str, transition_state: State
     ) -> None:
