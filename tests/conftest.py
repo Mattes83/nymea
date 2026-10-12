@@ -44,6 +44,7 @@ def mock_maveo_box():
         box_instance = mock_box.return_value
         box_instance.test_connection = AsyncMock(return_value=True)
         box_instance.init_connection = AsyncMock(return_value="test_token_12345")
+        box_instance.close = AsyncMock()
         box_instance.send_command = MagicMock(
             return_value={"params": {"value": "test"}}
         )
@@ -51,7 +52,7 @@ def mock_maveo_box():
         box_instance.stop_notification_listener = AsyncMock()
         box_instance.maveoSticks = []
         box_instance.things = []
-        box_instance.online = True
+        box_instance.server_uuid = "test-server-uuid"
         yield box_instance
 
 

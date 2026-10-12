@@ -14,13 +14,13 @@ from homeassistant.core import HomeAssistant
 import voluptuous as vol
 
 from .const import CONF_WEBSOCKET_PORT, DOMAIN  # pylint:disable=unused-import
-from .maveo_box import MaveoBox
+from .maveo_box import MaveoBox, NymeaPairingError
 
 _LOGGER = logging.getLogger(__name__)
 
 DATA_SCHEMA = vol.Schema(
     {
-        vol.Required(CONF_HOST, default="192.168.2.179"): str,
+        vol.Required(CONF_HOST): str,
         vol.Required(CONF_PORT, default=2223): int,  # JSON-RPC port for commands and pairing
         vol.Required(CONF_WEBSOCKET_PORT, default=4445): int,  # WebSocket port for notifications
     },
@@ -159,20 +159,48 @@ class NymeaConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             _LOGGER.debug("Showing link form")
             return self.async_show_form(step_id="link")
 
-        # User confirmed (submitted form, even if empty dict), proceed with pairing
-        _LOGGER.info("Starting pairing process for %s:%s", self.data.get(CONF_HOST), self.data.get(CONF_PORT))
-
         if not self.data or CONF_HOST not in self.data:
             _LOGGER.error("Configuration data missing in link step: %s", self.data)
             return self.async_abort(reason="unknown")
+
+        # User confirmed (submitted form, even if empty dict), proceed with pairing
+        _LOGGER.debug(
+            "Starting pairing process for %s:%s",
+            self.data.get(CONF_HOST),
+            self.data.get(CONF_PORT),
+        )
 
         box: MaveoBox = MaveoBox(
             self.hass,
             self.data[CONF_HOST],
             self.data[CONF_PORT],
-            websocket_port=self.data.get(CONF_WEBSOCKET_PORT, 4445)
+            websocket_port=self.data.get(CONF_WEBSOCKET_PORT, 4445),
         )
-        token: str | None = await box.init_connection()
+        errors: dict[str, str] = {}
+        token: str | None = None
+        try:
+            token = await box.init_connection()
+        except NymeaPairingError:
+            _LOGGER.warning("Push button pairing failed or timed out")
+            errors["base"] = "invalid_auth"
+        except NotImplementedError:
+            return self.async_abort(reason="not_supported")
+        except Exception:  # pylint: disable=broad-except
+            _LOGGER.exception("Error while pairing with %s", self.data[CONF_HOST])
+            errors["base"] = "cannot_connect"
+        finally:
+            await box.close()
+
+        if errors:
+            return self.async_show_form(step_id="link", errors=errors)
+
+        # Prefer the server UUID as unique ID (manual flow has none set yet).
+        if self.unique_id is None and box.server_uuid:
+            await self.async_set_unique_id(box.server_uuid)
+            self._abort_if_unique_id_configured(
+                updates={CONF_HOST: self.data[CONF_HOST]}
+            )
+
         self.data[CONF_TOKEN] = token
 
         return self.async_create_entry(

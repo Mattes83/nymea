@@ -37,7 +37,7 @@ class MaveoStick:
         self.firmware_version: str = version
         self.maveoBox: MaveoBox = maveoBox
         self._callbacks: set[Callable[[], None]] = set()
-        self.state: State = State.closed
+        self.state: State = State.unknown
 
         # Register for state change notifications.
         self._register_for_notifications()
@@ -50,7 +50,7 @@ class MaveoStick:
         )
 
     def _handle_state_changed(self, params: dict[str, Any]) -> None:
-        """Handle state change notification from Nymea."""
+        """Handle state change notification from Nymea (runs in the event loop)."""
         # Check if this notification is for this specific thing.
         thing_id = params.get("thingId")
         if thing_id != self._id:
@@ -59,27 +59,21 @@ class MaveoStick:
         # Get the value.
         value = params.get("value")
 
-        # We only care about the "State" state type (need to check if it's the right one)
-        # For now, update the state if we get any state change for this thing
-        try:
-            if value in State.__members__:
-                old_state = self.state
-                self.state = State[value]
-                if old_state != self.state:
-                    # This is logging, so use % formatting.
-                    _LOGGER.info(
-                        "MaveoStick %s state changed from %s to %s (via notification)",
-                        self.name,
-                        old_state.name,
-                        self.state.name,
-                    )
-                    # Publish updates to Home Assistant.
-                    self.maveoBox._hass.loop.call_soon_threadsafe(
-                        self.maveoBox._hass.async_create_task, self.publish_updates()
-                    )
-        except Exception as ex:
-            # This is logging, so use % formatting.
-            _LOGGER.error("Error handling state change notification: %s", ex)
+        # We only care about values matching the garage door State enum.
+        if value not in State.__members__:
+            return
+
+        old_state = self.state
+        self.state = State[value]
+        if old_state != self.state:
+            _LOGGER.debug(
+                "MaveoStick %s state changed from %s to %s (via notification)",
+                self.name,
+                old_state.name,
+                self.state.name,
+            )
+            for callback in list(self._callbacks):
+                callback()
 
     def unregister_notifications(self) -> None:
         """Unregister from state change notifications."""
@@ -106,36 +100,47 @@ class MaveoStick:
             callback()
 
     @staticmethod
-    async def add(maveoBox: MaveoBox):
-        # things = maveoBox.nymea.get_things(MaveoStick.thingclassid)
-        """Add all maveo sticks connected to the maveo box."""
-        params = {}
-        params["thingClassId"] = MaveoStick.thingclassid
-        stateTypes = maveoBox.send_command("Integrations.GetStateTypes", params)[
-            "params"
-        ]["stateTypes"]
+    async def add(maveoBox: MaveoBox) -> None:
+        """Add all maveo sticks connected to the maveo box from the cached inventory."""
+        thing_class = maveoBox.get_thing_class(MaveoStick.thingclassid)
+        if thing_class is None:
+            return
 
+        state_types = thing_class.get("stateTypes", [])
         statetype_version = next(
-            (obj for obj in stateTypes if obj["displayName"] == "maveo-stick version"),
+            (st for st in state_types if st["displayName"] == "maveo-stick version"),
+            None,
+        )
+        statetype_state = next(
+            (st for st in state_types if st["displayName"] == "State"),
             None,
         )
 
-        things = maveoBox.send_command("Integrations.GetThings")["params"]["things"]
-        for thing in things:
-            if thing["thingClassId"] == MaveoStick.thingclassid:
-                version = next(
-                    (
-                        obj
-                        for obj in thing["states"]
-                        if obj["stateTypeId"] == statetype_version["id"]
-                    ),
-                    None,
-                )["value"]
-                maveoBox.maveoSticks.append(
-                    MaveoStick(
-                        thing["id"],
-                        thing["name"],
-                        version,
-                        maveoBox,
-                    )
-                )
+        def _state_value(raw_thing: dict[str, Any], state_type: dict[str, Any] | None) -> Any:
+            if state_type is None:
+                return None
+            return next(
+                (
+                    s.get("value")
+                    for s in raw_thing.get("states", [])
+                    if s["stateTypeId"] == state_type["id"]
+                ),
+                None,
+            )
+
+        for raw_thing in maveoBox.raw_things:
+            if raw_thing["thingClassId"] != MaveoStick.thingclassid:
+                continue
+
+            version = _state_value(raw_thing, statetype_version) or "unknown"
+            stick = MaveoStick(
+                raw_thing["id"],
+                raw_thing["name"],
+                version,
+                maveoBox,
+            )
+            initial_state = _state_value(raw_thing, statetype_state)
+            if initial_state in State.__members__:
+                stick.state = State[initial_state]
+
+            maveoBox.maveoSticks.append(stick)

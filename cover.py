@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-from datetime import timedelta
 import logging
 from typing import TYPE_CHECKING, Any
 
@@ -24,8 +23,6 @@ if TYPE_CHECKING:
 from .maveo_stick import State
 
 _LOGGER = logging.getLogger(__name__)
-
-SCAN_INTERVAL = timedelta(seconds=5)
 
 
 # This function is called as part of the __init__.async_setup_entry (via the
@@ -69,17 +66,24 @@ class GarageDoor(CoverEntity):
         # is used as the device name for device screens in the UI. This name is used on
         # entity screens, and used to build the Entity ID that's used is automations etc.
         self._attr_name: str = self._maveoStick.name
-        params: dict[str, str] = {}
-        params["thingClassId"] = self._maveoStick.thingclassid
-        stateTypes: list[dict[str, Any]] = self._maveoStick.maveoBox.send_command(
-            "Integrations.GetStateTypes", params
-        )["params"]["stateTypes"]  # type: ignore[index]
 
+        # Look up state/action types from the cached inventory (no network I/O).
+        thing_class = maveoStick.maveoBox.get_thing_class(maveoStick.thingclassid)
+        state_types: list[dict[str, Any]] = (
+            thing_class.get("stateTypes", []) if thing_class else []
+        )
         statetype_state: dict[str, Any] | None = next(
-            (obj for obj in stateTypes if obj["displayName"] == "State"),
+            (obj for obj in state_types if obj["displayName"] == "State"),
             None,
         )
-        self.stateTypeIdState: str = statetype_state["id"]  # type: ignore[index]
+        self._state_type_id: str | None = (
+            statetype_state["id"] if statetype_state else None
+        )
+        self._action_type_ids: dict[str, str] = {
+            at["displayName"]: at["id"]
+            for at in (thing_class.get("actionTypes", []) if thing_class else [])
+            if "displayName" in at and "id" in at
+        }
         self._available: bool = True
 
     async def async_added_to_hass(self) -> None:
@@ -92,18 +96,30 @@ class GarageDoor(CoverEntity):
 
     async def async_update(self) -> None:
         """Fetch initial state (called once before notification listener starts)."""
-        params: dict[str, str] = {}
-        params["thingId"] = self._maveoStick.id
-        params["stateTypeId"] = self.stateTypeIdState
+        if self._state_type_id is None:
+            _LOGGER.error(
+                "No 'State' state type found for %s", self._maveoStick.id
+            )
+            self._available = False
+            return
+        params: dict[str, str] = {
+            "thingId": self._maveoStick.id,
+            "stateTypeId": self._state_type_id,
+        }
         try:
-            value: str = self._maveoStick.maveoBox.send_command(
+            response = await self._maveoStick.maveoBox.async_send_command(
                 "Integrations.GetStateValue", params
-            )["params"]["value"]  # type: ignore[index]
-            self._maveoStick.state = State[value]
+            )
+            if response is None:
+                self._available = False
+                return
+            value: str = response["params"]["value"]
+            self._maveoStick.state = (
+                State[value] if value in State.__members__ else State.unknown
+            )
             self._available = True
         except Exception as ex:
             self._available = False
-            # This is logging, so use % formatting.
             _LOGGER.error(
                 "Error fetching initial state for %s: %s", self._maveoStick.id, ex
             )
@@ -125,12 +141,11 @@ class GarageDoor(CoverEntity):
         }
 
     @property
-    def is_closed(self) -> bool:
-        """Return if the cover is closed."""
-        return (
-            self._maveoStick.state == State.closed
-            or self._maveoStick.state == State.intermediate
-        )
+    def is_closed(self) -> bool | None:
+        """Return if the cover is closed, or None if unknown."""
+        if self._maveoStick.state == State.unknown:
+            return None
+        return self._maveoStick.state == State.closed
 
     @property
     def is_closing(self) -> bool:
@@ -147,42 +162,34 @@ class GarageDoor(CoverEntity):
         """Return the state of the sensor."""
         return self._available
 
+    async def _async_execute_action(
+        self, action_name: str, transition_state: State
+    ) -> None:
+        """Execute a named action and set the optimistic transition state."""
+        action_type_id = self._action_type_ids.get(action_name)
+        if action_type_id is None:
+            _LOGGER.error(
+                "No '%s' action found for %s", action_name, self._maveoStick.id
+            )
+            return
+
+        params = {"actionTypeId": action_type_id, "thingId": self._maveoStick.id}
+        result = await self._maveoStick.maveoBox.async_send_command(
+            "Integrations.ExecuteAction", params
+        )
+        if result is None:
+            _LOGGER.error(
+                "Failed to execute '%s' for %s", action_name, self._maveoStick.id
+            )
+            return
+
+        self._maveoStick.state = transition_state
+        await self._maveoStick.publish_updates()
+
     async def async_open_cover(self, **kwargs: Any) -> None:
         """Open the cover."""
-        params: dict[str, str] = {}
-        params["thingClassId"] = self._maveoStick.thingclassid
-        response: list[dict[str, Any]] = self._maveoStick.maveoBox.send_command(
-            "Integrations.GetActionTypes", params
-        )["params"]["actionTypes"]  # type: ignore[index]
-
-        actionType_open: dict[str, Any] | None = next(
-            (obj for obj in response if obj["displayName"] == "Open"), None
-        )
-
-        params = {}
-        params["actionTypeId"] = actionType_open["id"]  # type: ignore[index]
-        params["thingId"] = self._maveoStick.id
-        self._maveoStick.maveoBox.send_command("Integrations.ExecuteAction", params)
-
-        self._maveoStick.state = State.opening
-        await self._maveoStick.publish_updates()
+        await self._async_execute_action("Open", State.opening)
 
     async def async_close_cover(self, **kwargs: Any) -> None:
         """Close the cover."""
-        params: dict[str, str] = {}
-        params["thingClassId"] = self._maveoStick.thingclassid
-        response: list[dict[str, Any]] = self._maveoStick.maveoBox.send_command(
-            "Integrations.GetActionTypes", params
-        )["params"]["actionTypes"]  # type: ignore[index]
-
-        actionType_open: dict[str, Any] | None = next(
-            (obj for obj in response if obj["displayName"] == "Close"), None
-        )
-
-        params = {}
-        params["actionTypeId"] = actionType_open["id"]  # type: ignore[index]
-        params["thingId"] = self._maveoStick.id
-        self._maveoStick.maveoBox.send_command("Integrations.ExecuteAction", params)
-
-        self._maveoStick.state = State.closing
-        await self._maveoStick.publish_updates()
+        await self._async_execute_action("Close", State.closing)

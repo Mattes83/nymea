@@ -64,10 +64,21 @@ class DynamicThingSwitch(SwitchEntity):
         self._available: bool = True
         self._is_on: bool | None = None
 
+        # Look up action type definitions from the cached inventory (no network I/O).
+        thing_class = thing.maveoBox.get_thing_class(thing.thingclass_id)
+        action_types = thing_class.get("actionTypes", []) if thing_class else []
+        self._action_type_on: dict[str, Any] | None = next(
+            (at for at in action_types if at.get("id") == self._actionTypeId_on), None
+        )
+        self._action_type_off: dict[str, Any] | None = next(
+            (at for at in action_types if at.get("id") == self._actionTypeId_off), None
+        )
+
     async def async_added_to_hass(self) -> None:
         """Run when this Entity has been added to HA."""
-        # Fetch initial state before notifications start
-        await self.async_update()
+        # Fetch initial state only if it wasn't prefilled from the inventory.
+        if self._thing.get_state_value(self._stateTypeId) is None:
+            await self._async_fetch_state()
 
         # Register callback for push notifications
         self._thing.register_callback(self.async_write_ha_state)
@@ -76,198 +87,78 @@ class DynamicThingSwitch(SwitchEntity):
         """Entity being removed from hass."""
         self._thing.remove_callback(self.async_write_ha_state)
 
-    async def async_update(self) -> None:
-        """Fetch initial state (called once before notification listener starts)."""
-        params: dict[str, str] = {}
-        params["thingId"] = self._thing.id
-        params["stateTypeId"] = self._stateTypeId
+    async def _async_fetch_state(self) -> None:
+        """Fetch the current state from the nymea box."""
+        params = {"thingId": self._thing.id, "stateTypeId": self._stateTypeId}
         try:
-            value: bool = self._thing.maveoBox.send_command(
+            response = await self._thing.maveoBox.async_send_command(
                 "Integrations.GetStateValue", params
-            )["params"]["value"]  # type: ignore[index]
-            # Cache the original value in the Thing for future notifications.
-            self._thing._state_cache[self._stateTypeId] = value
-            self._is_on = value
+            )
+            if response is None:
+                self._available = False
+                return
+            self._thing.set_state_value(self._stateTypeId, response["params"]["value"])
             self._available = True
         except Exception as ex:
             self._available = False
-            # This is logging, so use % formatting.
             _LOGGER.error(
                 "Error fetching initial switch state for %s: %s",
                 self._thing.id,
                 ex,
             )
 
-    async def async_turn_on(self, **kwargs: Any) -> None:
-        """Turn the switch on."""
-        # Query the action type to get parameter information
-        params_query: dict[str, Any] = {}
-        params_query["thingClassId"] = self._thing.thingclass_id
+    async def _async_execute(
+        self, action_type: dict[str, Any] | None, action_type_id: str, value: bool
+    ) -> None:
+        """Execute the on/off action, setting only bool-typed parameters."""
+        exec_params: dict[str, Any] = {
+            "thingId": self._thing.id,
+            "actionTypeId": action_type_id,
+        }
+
+        if action_type:
+            param_list = [
+                {"paramTypeId": pt["id"], "value": value}
+                for pt in action_type.get("paramTypes", [])
+                if pt.get("type", "").lower() == "bool" and "id" in pt
+            ]
+            if param_list:
+                exec_params["params"] = param_list
+
+        _LOGGER.debug(
+            "Executing action %s (value=%s) for %s with params: %s",
+            action_type_id,
+            value,
+            self._thing.name,
+            exec_params,
+        )
 
         try:
-            # Run synchronous send_command in executor
-            response = await self.hass.async_add_executor_job(
-                self._thing.maveoBox.send_command,
-                "Integrations.GetActionTypes",
-                params_query,
+            result = await self._thing.maveoBox.async_send_command(
+                "Integrations.ExecuteAction", exec_params
             )
-
-            if response is None:
-                _LOGGER.error("Failed to get action types for %s", self._thing.name)
-                return
-
-            action_types = response.get("params", {}).get("actionTypes", [])
-
-            # Find the action type we want to execute
-            action_type = next(
-                (at for at in action_types if at.get("id") == self._actionTypeId_on),
-                None,
-            )
-
-            # Log what we discovered about this action
-            _LOGGER.debug(
-                "Turn ON - Full action type definition for %s: %s",
-                self._thing.name, action_type
-            )
-            _LOGGER.debug(
-                "Turn ON - Action ID we're looking for: %s", self._actionTypeId_on
-            )
-            _LOGGER.debug(
-                "Turn ON - All available action types: %s",
-                [{"id": at.get("id"), "name": at.get("name", at.get("displayName")),
-                  "paramTypes": at.get("paramTypes", [])} for at in action_types]
-            )
-
-            # Build the execution params
-            exec_params: dict[str, Any] = {}
-            exec_params["thingId"] = self._thing.id
-            exec_params["actionTypeId"] = self._actionTypeId_on
-
-            # Check if this action has parameters
-            if action_type and action_type.get("paramTypes"):
-                # Build params based on paramTypes
-                param_list = []
-                for param_type in action_type["paramTypes"]:
-                    # Use the parameter ID (not name) as the key
-                    param_id = param_type.get("id")
-                    param_name = param_type.get("name")
-                    param_type_type = param_type.get("type", "unknown")
-                    _LOGGER.debug(
-                        "Turn ON - Param type found: id=%s, name=%s, type=%s",
-                        param_id, param_name, param_type_type
-                    )
-                    # For Nymea API, use paramTypeId (the parameter ID) and value
-                    param_list.append({"paramTypeId": param_id, "value": True})
-                exec_params["params"] = param_list
-                _LOGGER.debug("Turn ON - Built params: %s", exec_params["params"])
-            else:
-                _LOGGER.debug("Turn ON - No parameters required for this action")
-
-            # Execute the action and wait for response
-            result = await self.hass.async_add_executor_job(
-                self._thing.maveoBox.send_command,
-                "Integrations.ExecuteAction",
-                exec_params,
-            )
-
-            _LOGGER.debug("Turn ON - Execution params sent: %s", exec_params)
-            _LOGGER.debug("Turn ON - Result received: %s", result)
-
-            if result is None:
-                _LOGGER.error("Failed to execute turn_on action for %s", self._thing.name)
-                return
-
-            _LOGGER.info("Turn ON command successful for %s, result: %s", self._thing.name, result)
-            # Don't update state optimistically - wait for notification from device
         except Exception as ex:
             _LOGGER.error(
-                "Error turning on switch for %s: %s",
+                "Error switching %s for %s: %s",
+                "on" if value else "off",
                 self._thing.id,
                 ex,
             )
+            return
+
+        if result is None:
+            _LOGGER.error(
+                "Failed to execute switch action for %s", self._thing.name
+            )
+        # Don't update state optimistically - wait for notification from device.
+
+    async def async_turn_on(self, **kwargs: Any) -> None:
+        """Turn the switch on."""
+        await self._async_execute(self._action_type_on, self._actionTypeId_on, True)
 
     async def async_turn_off(self, **kwargs: Any) -> None:
         """Turn the switch off."""
-        # Query the action type to get parameter information
-        params_query: dict[str, Any] = {}
-        params_query["thingClassId"] = self._thing.thingclass_id
-
-        try:
-            # Run synchronous send_command in executor
-            response = await self.hass.async_add_executor_job(
-                self._thing.maveoBox.send_command,
-                "Integrations.GetActionTypes",
-                params_query,
-            )
-
-            if response is None:
-                _LOGGER.error("Failed to get action types for %s", self._thing.name)
-                return
-
-            action_types = response.get("params", {}).get("actionTypes", [])
-
-            # Find the action type we want to execute
-            action_type = next(
-                (at for at in action_types if at.get("id") == self._actionTypeId_off),
-                None,
-            )
-
-            # Log what we discovered about this action
-            _LOGGER.debug(
-                "Turn OFF - Full action type definition for %s: %s",
-                self._thing.name, action_type
-            )
-            _LOGGER.debug(
-                "Turn OFF - Action ID we're looking for: %s", self._actionTypeId_off
-            )
-
-            # Build the execution params
-            exec_params: dict[str, Any] = {}
-            exec_params["thingId"] = self._thing.id
-            exec_params["actionTypeId"] = self._actionTypeId_off
-
-            # Check if this action has parameters
-            if action_type and action_type.get("paramTypes"):
-                # Build params based on paramTypes
-                param_list = []
-                for param_type in action_type["paramTypes"]:
-                    # Use the parameter ID (not name) as the key
-                    param_id = param_type.get("id")
-                    param_name = param_type.get("name")
-                    param_type_type = param_type.get("type", "unknown")
-                    _LOGGER.debug(
-                        "Turn OFF - Param type found: id=%s, name=%s, type=%s",
-                        param_id, param_name, param_type_type
-                    )
-                    # For Nymea API, use paramTypeId (the parameter ID) and value
-                    param_list.append({"paramTypeId": param_id, "value": False})
-                exec_params["params"] = param_list
-                _LOGGER.debug("Turn OFF - Built params: %s", exec_params["params"])
-            else:
-                _LOGGER.debug("Turn OFF - No parameters required for this action")
-
-            # Execute the action and wait for response
-            result = await self.hass.async_add_executor_job(
-                self._thing.maveoBox.send_command,
-                "Integrations.ExecuteAction",
-                exec_params,
-            )
-
-            _LOGGER.debug("Turn OFF - Execution params sent: %s", exec_params)
-            _LOGGER.debug("Turn OFF - Result received: %s", result)
-
-            if result is None:
-                _LOGGER.error("Failed to execute turn_off action for %s", self._thing.name)
-                return
-
-            _LOGGER.info("Turn OFF command successful for %s, result: %s", self._thing.name, result)
-            # Don't update state optimistically - wait for notification from device
-        except Exception as ex:
-            _LOGGER.error(
-                "Error turning off switch for %s: %s",
-                self._thing.id,
-                ex,
-            )
+        await self._async_execute(self._action_type_off, self._actionTypeId_off, False)
 
     @property
     def is_on(self) -> bool | None:

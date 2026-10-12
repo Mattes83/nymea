@@ -31,7 +31,9 @@
     },
     "abort": {
       "already_configured": "[%key:common::config_flow::abort::already_configured_device%]",
-      "cannot_connect": "[%key:common::config_flow::abort::already_configured_device%]"
+      "cannot_connect": "[%key:common::config_flow::error::cannot_connect%]",
+      "not_supported": "This nymea device is not supported.",
+      "unknown": "[%key:common::config_flow::error::unknown%]"
     }
   }
 }

@@ -69,8 +69,9 @@ class DynamicBinaryThingSensor(BinarySensorEntity):
 
     async def async_added_to_hass(self) -> None:
         """Run when this Entity has been added to HA."""
-        # Fetch initial state before notifications start
-        await self.async_update()
+        # Fetch initial state only if it wasn't prefilled from the inventory.
+        if self._thing.get_state_value(self._stateTypeId) is None:
+            await self._async_fetch_state()
 
         # Register callback for push notifications
         self._thing.register_callback(self.async_write_ha_state)
@@ -79,25 +80,21 @@ class DynamicBinaryThingSensor(BinarySensorEntity):
         """Entity being removed from hass."""
         self._thing.remove_callback(self.async_write_ha_state)
 
-    async def async_update(self) -> None:
-        """Fetch initial state (called once before notification listener starts)."""
-        params: dict[str, str] = {}
-        params["thingId"] = self._thing.id
-        params["stateTypeId"] = self._stateTypeId
+    async def _async_fetch_state(self) -> None:
+        """Fetch the current state from the nymea box."""
+        params = {"thingId": self._thing.id, "stateTypeId": self._stateTypeId}
         try:
-            value: bool = self._thing.maveoBox.send_command(
+            response = await self._thing.maveoBox.async_send_command(
                 "Integrations.GetStateValue", params
-            )["params"]["value"]  # type: ignore[index]
-            # Cache the original value in the Thing for future notifications.
-            self._thing._state_cache[self._stateTypeId] = value
-            # Invert value if configured (e.g., "Closed" state)
-            if self._inverted:
-                value = not value
-            self._is_on = value
+            )
+            if response is None:
+                self._available = False
+                return
+            # Cache the original (non-inverted) value in the Thing.
+            self._thing.set_state_value(self._stateTypeId, response["params"]["value"])
             self._available = True
         except Exception as ex:
             self._available = False
-            # This is logging, so use % formatting.
             _LOGGER.error(
                 "Error fetching initial binary sensor state for %s: %s",
                 self._thing.id,

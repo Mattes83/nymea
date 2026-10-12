@@ -59,18 +59,23 @@ class DynamicThingSensor(SensorEntity):
         self._stateTypeId: str = sensor_config["state_type_id"]
         self._attr_unique_id: str = f"{self._thing.id}_{self._stateTypeId}"
         self._attr_name: str = sensor_config["name"]
-        self.device_class: SensorDeviceClass | None = sensor_config.get("device_class")
-        self.native_unit_of_measurement: str | None = sensor_config.get("unit")
+        self._attr_device_class: SensorDeviceClass | None = sensor_config.get(
+            "device_class"
+        )
+        self._attr_native_unit_of_measurement: str | None = sensor_config.get("unit")
         self._attr_state_class: SensorStateClass | None = sensor_config.get(
             "state_class"
         )
+        if self._attr_device_class == SensorDeviceClass.ENUM:
+            self._attr_options = sensor_config.get("options")
         self._available: bool = True
-        self.value: float | int | str | None = None
+        self._value: float | int | str | None = None
 
     async def async_added_to_hass(self) -> None:
         """Run when this Entity has been added to HA."""
-        # Fetch initial state before notifications start
-        await self.async_update()
+        # Fetch initial state only if it wasn't prefilled from the inventory.
+        if self._thing.get_state_value(self._stateTypeId) is None:
+            await self._async_fetch_state()
 
         # Register callback for push notifications
         self._thing.register_callback(self.async_write_ha_state)
@@ -79,34 +84,32 @@ class DynamicThingSensor(SensorEntity):
         """Entity being removed from hass."""
         self._thing.remove_callback(self.async_write_ha_state)
 
-    async def async_update(self) -> None:
-        """Fetch initial state (called once before notification listener starts)."""
-        params: dict[str, str] = {}
-        params["thingId"] = self._thing.id
-        params["stateTypeId"] = self._stateTypeId
+    async def _async_fetch_state(self) -> None:
+        """Fetch the current state from the nymea box."""
+        params = {"thingId": self._thing.id, "stateTypeId": self._stateTypeId}
         try:
-            value: float | int | str = self._thing.maveoBox.send_command(
+            response = await self._thing.maveoBox.async_send_command(
                 "Integrations.GetStateValue", params
-            )["params"]["value"]  # type: ignore[index]
-            self.value = value
-            # Also cache it in the Thing for future notifications.
-            self._thing._state_cache[self._stateTypeId] = value
+            )
+            if response is None:
+                self._available = False
+                return
+            self._thing.set_state_value(self._stateTypeId, response["params"]["value"])
             self._available = True
         except Exception as ex:
             self._available = False
-            # This is logging, so use % formatting.
             _LOGGER.error(
                 "Error fetching initial sensor state for %s: %s", self._thing.id, ex
             )
 
     @property
-    def state(self) -> float | int | str | None:
+    def native_value(self) -> float | int | str | None:
         """Return the state of the sensor."""
-        # Try to get the latest value from Thing's cache (updated by notifications).
+        # Get the latest value from Thing's cache (updated by notifications).
         cached_value: Any = self._thing.get_state_value(self._stateTypeId)
         if cached_value is not None:
-            self.value = cached_value
-        return self.value
+            self._value = cached_value
+        return self._value
 
     @property
     def available(self) -> bool:

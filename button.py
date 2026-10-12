@@ -56,43 +56,34 @@ class DynamicThingButton(ButtonEntity):
 
     async def async_press(self) -> None:
         """Handle the button press."""
+        exec_params: dict[str, Any] = {
+            "thingId": self._thing.id,
+            "actionTypeId": self._actionTypeId,
+        }
+
+        _LOGGER.debug(
+            "Button press - Executing action %s for %s",
+            self._actionTypeId,
+            self._thing.name,
+        )
+
         try:
-            # Execute the action
-            exec_params: dict[str, Any] = {}
-            exec_params["thingId"] = self._thing.id
-            exec_params["actionTypeId"] = self._actionTypeId
-
-            _LOGGER.info(
-                "Button press - Executing action %s for %s",
-                self._actionTypeId,
-                self._thing.name,
-            )
-
-            # Execute the action and wait for response
-            result = await self.hass.async_add_executor_job(
-                self._thing.maveoBox.send_command,
-                "Integrations.ExecuteAction",
-                exec_params,
-            )
-
-            if result is None:
-                _LOGGER.error(
-                    "Failed to execute button action %s for %s",
-                    self._actionTypeId,
-                    self._thing.name,
-                )
-                return
-
-            _LOGGER.info(
-                "Button action successful for %s, result: %s",
-                self._thing.name,
-                result,
+            result = await self._thing.maveoBox.async_send_command(
+                "Integrations.ExecuteAction", exec_params
             )
         except Exception as ex:
             _LOGGER.error(
                 "Error executing button action for %s: %s",
                 self._thing.id,
                 ex,
+            )
+            return
+
+        if result is None:
+            _LOGGER.error(
+                "Failed to execute button action %s for %s",
+                self._actionTypeId,
+                self._thing.name,
             )
 
     @property

@@ -133,8 +133,13 @@ def determine_sensor_type(
             # Numeric sensor without specific class
             state_class = SensorStateClass.MEASUREMENT
 
-        # For string types, check if it should be an enum
-        if data_type == "string" and "state" in display_name:
+        # For string types with known values, expose as an enum sensor.
+        # ENUM requires an options list, so only use it when possibleValues exist.
+        if (
+            data_type == "string"
+            and "state" in display_name
+            and state_type.get("possibleValues")
+        ):
             device_class = SensorDeviceClass.ENUM
 
         return ("sensor", device_class, unit, state_class, False)
@@ -267,17 +272,20 @@ def generate_entities_for_thing_class(
         )
 
         if entity_type == "sensor":
-            sensors.append(
-                {
-                    "thingclass_id": thing_class_id,
-                    "thingclass_name": thing_class_name,
-                    "state_type_id": state_type.get("id"),
-                    "name": state_type.get("displayName"),
-                    "device_class": device_class,
-                    "unit": unit,
-                    "state_class": state_class,
-                }
-            )
+            sensor_config = {
+                "thingclass_id": thing_class_id,
+                "thingclass_name": thing_class_name,
+                "state_type_id": state_type.get("id"),
+                "name": state_type.get("displayName"),
+                "device_class": device_class,
+                "unit": unit,
+                "state_class": state_class,
+            }
+            if device_class == SensorDeviceClass.ENUM:
+                sensor_config["options"] = [
+                    str(v) for v in state_type.get("possibleValues", [])
+                ]
+            sensors.append(sensor_config)
         elif entity_type == "binary_sensor":
             binary_sensors.append(
                 {
