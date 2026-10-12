@@ -38,7 +38,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         entry.data["host"],
         entry.data["port"],
         entry.data["token"],
-        websocket_port=entry.data.get("websocket_port", 4444),
+        websocket_port=entry.data.get("websocket_port", 4445),
     )
 
     try:

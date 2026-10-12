@@ -21,8 +21,8 @@ _LOGGER = logging.getLogger(__name__)
 DATA_SCHEMA = vol.Schema(
     {
         vol.Required(CONF_HOST, default="192.168.2.179"): str,
-        vol.Required(CONF_PORT, default=2222): int,  # JSON-RPC port for commands and pairing
-        vol.Required(CONF_WEBSOCKET_PORT, default=4444): int,  # WebSocket port for notifications
+        vol.Required(CONF_PORT, default=2223): int,  # JSON-RPC port for commands and pairing
+        vol.Required(CONF_WEBSOCKET_PORT, default=4445): int,  # WebSocket port for notifications
     },
 )
 
@@ -82,7 +82,7 @@ class NymeaConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
 
         host = discovery_info.host
         port = discovery_info.port or 2223  # Use JSON-RPC port by default.
-        websocket_port = 4444  # WebSocket port for notifications.
+        websocket_port = 4445  # WebSocket port for notifications.
 
         # Check if already configured.
         await self.async_set_unique_id(discovery_info.hostname.replace(".local.", ""))
@@ -170,7 +170,7 @@ class NymeaConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             self.hass,
             self.data[CONF_HOST],
             self.data[CONF_PORT],
-            websocket_port=self.data.get(CONF_WEBSOCKET_PORT, 4444)
+            websocket_port=self.data.get(CONF_WEBSOCKET_PORT, 4445)
         )
         token: str | None = await box.init_connection()
         self.data[CONF_TOKEN] = token

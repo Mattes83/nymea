@@ -71,8 +71,8 @@ If automatic discovery doesn't work:
 3. Search for "nymea"
 4. Enter your nymea device details:
    - **Host**: IP address or hostname of your nymea device (e.g., `192.168.2.179`)
-   - **Port**: JSON-RPC port (default: `2222`)
-   - **WebSocket Port**: WebSocket notification port (default: `4444`)
+   - **Port**: JSON-RPC port (default: `2223`)
+   - **WebSocket Port**: WebSocket notification port (default: `4445`)
 5. Click **Submit**
 6. Within 30 seconds, press the **yellow button** on the back of your Maveo Box
 7. The device will be added to Home Assistant
@@ -82,8 +82,8 @@ If automatic discovery doesn't work:
 | Parameter | Description | Default | Required |
 |-----------|-------------|---------|----------|
 | Host | IP address or hostname of nymea device | - | Yes |
-| Port | JSON-RPC TCP port for commands | 2222 | Yes |
-| WebSocket Port | WebSocket port for notifications | 4444 | Yes |
+| Port | JSON-RPC TCP port for commands | 2223 | Yes |
+| WebSocket Port | WebSocket port for notifications | 4445 | Yes |
 
 ## Entities
 
@@ -131,7 +131,7 @@ Once configured, the integration will create entities for all connected devices:
 
 - Verify the IP address and ports are correct
 - Check that the nymea:core service is running on your device
-- Ensure no firewall is blocking ports 2222 (JSON-RPC) and 4444 (WebSocket)
+- Ensure no firewall is blocking ports 2223 (JSON-RPC) and 4445 (WebSocket)
 - Try pinging the device from Home Assistant: `ping <device-ip>`
 
 ### Pairing Fails
@@ -143,7 +143,7 @@ Once configured, the integration will create entities for all connected devices:
 ### Entities Not Updating
 
 - Check the Home Assistant logs for connection errors
-- Verify the WebSocket connection (port 4444) is not being blocked
+- Verify the WebSocket connection (port 4445) is not being blocked
 - Restart the integration from **Settings** → **Devices & Services** → **nymea**
 
 ### Viewing Logs

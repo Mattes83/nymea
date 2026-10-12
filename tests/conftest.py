@@ -62,8 +62,8 @@ def mock_config_entry():
         domain=DOMAIN,
         data={
             CONF_HOST: "192.168.2.179",
-            CONF_PORT: 2222,
-            CONF_WEBSOCKET_PORT: 4444,
+            CONF_PORT: 2223,
+            CONF_WEBSOCKET_PORT: 4445,
             CONF_TOKEN: "test_token_12345",
         },
         unique_id="nymea-device",

@@ -35,8 +35,8 @@ async def test_form_user(hass: HomeAssistant, mock_maveo_box) -> None:
             result["flow_id"],
             {
                 CONF_HOST: "192.168.2.179",
-                CONF_PORT: 2222,
-                CONF_WEBSOCKET_PORT: 4444,
+                CONF_PORT: 2223,
+                CONF_WEBSOCKET_PORT: 4445,
             },
         )
         await hass.async_block_till_done()
@@ -62,8 +62,8 @@ async def test_form_user_cannot_connect(hass: HomeAssistant) -> None:
             result["flow_id"],
             {
                 CONF_HOST: "192.168.2.179",
-                CONF_PORT: 2222,
-                CONF_WEBSOCKET_PORT: 4444,
+                CONF_PORT: 2223,
+                CONF_WEBSOCKET_PORT: 4445,
             },
         )
 
@@ -87,8 +87,8 @@ async def test_form_user_invalid_host(hass: HomeAssistant) -> None:
             result["flow_id"],
             {
                 CONF_HOST: "-invalid-host-",  # Invalid hostname
-                CONF_PORT: 2222,
-                CONF_WEBSOCKET_PORT: 4444,
+                CONF_PORT: 2223,
+                CONF_WEBSOCKET_PORT: 4445,
             },
         )
 
@@ -112,8 +112,8 @@ async def test_form_link_step(hass: HomeAssistant, mock_maveo_box) -> None:
             result["flow_id"],
             {
                 CONF_HOST: "192.168.2.179",
-                CONF_PORT: 2222,
-                CONF_WEBSOCKET_PORT: 4444,
+                CONF_PORT: 2223,
+                CONF_WEBSOCKET_PORT: 4445,
             },
         )
 
@@ -132,8 +132,8 @@ async def test_form_link_step(hass: HomeAssistant, mock_maveo_box) -> None:
     assert result3["title"] == "nymea(192.168.2.179)"
     assert result3["data"] == {
         CONF_HOST: "192.168.2.179",
-        CONF_PORT: 2222,
-        CONF_WEBSOCKET_PORT: 4444,
+        CONF_PORT: 2223,
+        CONF_WEBSOCKET_PORT: 4445,
         CONF_TOKEN: "test_token_12345",
     }
 
@@ -145,7 +145,7 @@ async def test_zeroconf_discovery(hass: HomeAssistant, mock_maveo_box) -> None:
         ip_addresses=["192.168.2.179"],
         hostname="nymea-device.local.",
         name="nymea._jsonrpc._tcp.local.",
-        port=2222,
+        port=2223,
         type="_jsonrpc._tcp.local.",
         properties={},
     )
@@ -172,7 +172,7 @@ async def test_zeroconf_confirm_step(hass: HomeAssistant, mock_maveo_box) -> Non
         ip_addresses=["192.168.2.179"],
         hostname="nymea-device.local.",
         name="nymea._jsonrpc._tcp.local.",
-        port=2222,
+        port=2223,
         type="_jsonrpc._tcp.local.",
         properties={},
     )
@@ -205,7 +205,7 @@ async def test_zeroconf_websocket_ignored(hass: HomeAssistant) -> None:
         ip_addresses=["192.168.2.179"],
         hostname="nymea-device.local.",
         name="nymea._ws._tcp.local.",  # WebSocket, not JSON-RPC
-        port=4444,
+        port=4445,
         type="_ws._tcp.local.",
         properties={},
     )
@@ -227,7 +227,7 @@ async def test_zeroconf_cannot_connect(hass: HomeAssistant) -> None:
         ip_addresses=["192.168.2.179"],
         hostname="nymea-device.local.",
         name="nymea._jsonrpc._tcp.local.",
-        port=2222,
+        port=2223,
         type="_jsonrpc._tcp.local.",
         properties={},
     )

@@ -11,8 +11,8 @@
         },
         "data_description": {
           "host": "The hostname or IP address of your nymea device.",
-          "port": "The JSON-RPC TCP port for commands and pairing (default: 2222).",
-          "websocket_port": "The WebSocket port for notifications (default: 4444)."
+          "port": "The JSON-RPC TCP port for commands and pairing (default: 2223).",
+          "websocket_port": "The WebSocket port for notifications (default: 4445)."
         }
       },
       "link": {

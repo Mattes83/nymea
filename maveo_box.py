@@ -31,13 +31,13 @@ class MaveoBox:
         host: str,
         port: int,
         token: str | None = None,
-        websocket_port: int = 4444,
+        websocket_port: int = 4445,
     ) -> None:
         """Init maveo box."""
         self._host: str = host
-        self._port: int = port  # JSON-RPC port (typically 2222)
+        self._port: int = port  # JSON-RPC port (typically 2223)
         self._ws_port: int = (
-            websocket_port  # WebSocket port for notifications (typically 4444)
+            websocket_port  # WebSocket port for notifications (typically 4445)
         )
         self._hass: HomeAssistant = hass
         self._name: str = host
@@ -48,10 +48,10 @@ class MaveoBox:
         self._initialSetupRequired: bool = False
         self._commandId: int = 0
 
-        # JSON-RPC socket for commands (port 2222)
+        # JSON-RPC socket for commands (port 2223)
         self._sock: socket.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
-        # WebSocket connection for notifications (port 4444)
+        # WebSocket connection for notifications (port 4445)
         self._ws: Any = None
         self._ws_task: asyncio.Task[None] | None = None
 
