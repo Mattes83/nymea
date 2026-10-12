@@ -7,10 +7,10 @@ import re
 from typing import Any
 
 from homeassistant import config_entries, exceptions
-from homeassistant.components import zeroconf
 from homeassistant.config_entries import ConfigFlowResult
 from homeassistant.const import CONF_HOST, CONF_PORT, CONF_TOKEN
 from homeassistant.core import HomeAssistant
+from homeassistant.helpers.service_info.zeroconf import ZeroconfServiceInfo
 import voluptuous as vol
 
 from .const import CONF_WEBSOCKET_PORT, DOMAIN  # pylint:disable=unused-import
@@ -59,10 +59,10 @@ class NymeaConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
     def __init__(self) -> None:
         """Initialize the nymea config flow."""
         self.data: dict[str, Any] = {}
-        self.discovery_info: zeroconf.ZeroconfServiceInfo | None = None
+        self.discovery_info: ZeroconfServiceInfo | None = None
 
     async def async_step_zeroconf(
-        self, discovery_info: zeroconf.ZeroconfServiceInfo
+        self, discovery_info: ZeroconfServiceInfo
     ) -> ConfigFlowResult:
         """Handle zeroconf discovery.
 

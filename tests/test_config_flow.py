@@ -3,10 +3,10 @@
 from unittest.mock import AsyncMock, patch
 
 from homeassistant import config_entries
-from homeassistant.components import zeroconf
 from homeassistant.const import CONF_HOST, CONF_PORT, CONF_TOKEN
 from homeassistant.core import HomeAssistant
 from homeassistant.data_entry_flow import FlowResultType
+from homeassistant.helpers.service_info.zeroconf import ZeroconfServiceInfo
 import pytest
 
 from custom_components.nymea.config_flow import (
@@ -96,7 +96,9 @@ async def test_form_user_invalid_host(hass: HomeAssistant) -> None:
     assert result2["errors"] == {"host": "cannot_connect"}
 
 
-async def test_form_link_step(hass: HomeAssistant, mock_maveo_box) -> None:
+async def test_form_link_step(
+    hass: HomeAssistant, mock_maveo_box, mock_setup_entry
+) -> None:
     """Test the link step works."""
     # Start user flow
     result = await hass.config_entries.flow.async_init(
@@ -140,7 +142,7 @@ async def test_form_link_step(hass: HomeAssistant, mock_maveo_box) -> None:
 
 async def test_zeroconf_discovery(hass: HomeAssistant, mock_maveo_box) -> None:
     """Test zeroconf discovery."""
-    discovery_info = zeroconf.ZeroconfServiceInfo(
+    discovery_info = ZeroconfServiceInfo(
         ip_address="192.168.2.179",
         ip_addresses=["192.168.2.179"],
         hostname="nymea-device.local.",
@@ -167,7 +169,7 @@ async def test_zeroconf_discovery(hass: HomeAssistant, mock_maveo_box) -> None:
 
 async def test_zeroconf_confirm_step(hass: HomeAssistant, mock_maveo_box) -> None:
     """Test zeroconf confirmation step."""
-    discovery_info = zeroconf.ZeroconfServiceInfo(
+    discovery_info = ZeroconfServiceInfo(
         ip_address="192.168.2.179",
         ip_addresses=["192.168.2.179"],
         hostname="nymea-device.local.",
@@ -200,7 +202,7 @@ async def test_zeroconf_confirm_step(hass: HomeAssistant, mock_maveo_box) -> Non
 
 async def test_zeroconf_websocket_ignored(hass: HomeAssistant) -> None:
     """Test that WebSocket zeroconf discoveries are ignored."""
-    discovery_info = zeroconf.ZeroconfServiceInfo(
+    discovery_info = ZeroconfServiceInfo(
         ip_address="192.168.2.179",
         ip_addresses=["192.168.2.179"],
         hostname="nymea-device.local.",
@@ -222,7 +224,7 @@ async def test_zeroconf_websocket_ignored(hass: HomeAssistant) -> None:
 
 async def test_zeroconf_cannot_connect(hass: HomeAssistant) -> None:
     """Test zeroconf discovery with connection failure."""
-    discovery_info = zeroconf.ZeroconfServiceInfo(
+    discovery_info = ZeroconfServiceInfo(
         ip_address="192.168.2.179",
         ip_addresses=["192.168.2.179"],
         hostname="nymea-device.local.",
