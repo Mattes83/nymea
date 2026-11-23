@@ -9,7 +9,7 @@
   "integration_type": "hub",
   "loggers": ["custom_components.nymea"],
   "requirements": ["websockets>=15.0"],
-  "version": "0.2.2",
+  "version": "0.2.3",
   "zeroconf": [
     "_jsonrpc._tcp.local."
   ]

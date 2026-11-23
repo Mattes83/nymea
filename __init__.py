@@ -10,7 +10,7 @@ from homeassistant.core import HomeAssistant
 from homeassistant.exceptions import ConfigEntryError, ConfigEntryNotReady
 from homeassistant.helpers import device_registry as dr
 
-from .const import CONF_WEBSOCKET_PORT, DOMAIN
+from .const import CONF_WEBSOCKET_PORT, DOMAIN, normalize_uuid
 from .dynamic_mapper import generate_entities_for_thing_class
 from .maveo_box import MaveoBox
 from .maveo_stick import MaveoStick
@@ -56,6 +56,8 @@ async def async_setup_entry(hass: HomeAssistant, entry: NymeaConfigEntry) -> boo
             f"Error while connecting to {entry.data[CONF_HOST]}"
         ) from ex
 
+    _migrate_unique_id(hass, entry, nymea_hub)
+
     # Store in runtime_data instead of hass.data.
     entry.runtime_data = nymea_hub
 
@@ -85,6 +87,38 @@ async def async_setup_entry(hass: HomeAssistant, entry: NymeaConfigEntry) -> boo
     nymea_hub.start_notification_listener()
 
     return True
+
+
+def _migrate_unique_id(
+    hass: HomeAssistant, entry: NymeaConfigEntry, nymea_hub: MaveoBox
+) -> None:
+    """Switch the entry's unique ID to the server uuid reported by the box.
+
+    Older entries used the mDNS hostname, which changes when the box renames
+    itself on a name conflict (maveo-box-2 -> maveo-box-3) and then shows up
+    as a new discovery.
+    """
+    server_uuid = normalize_uuid(nymea_hub.server_uuid)
+    if not server_uuid or entry.unique_id == server_uuid:
+        return
+
+    for other in hass.config_entries.async_entries(DOMAIN):
+        if other.entry_id != entry.entry_id and other.unique_id == server_uuid:
+            _LOGGER.warning(
+                "Not migrating unique ID of '%s' to %s: already used by '%s'",
+                entry.title,
+                server_uuid,
+                other.title,
+            )
+            return
+
+    _LOGGER.info(
+        "Migrating unique ID of '%s' from %s to %s",
+        entry.title,
+        entry.unique_id,
+        server_uuid,
+    )
+    hass.config_entries.async_update_entry(entry, unique_id=server_uuid)
 
 
 def _cleanup_stale_devices(

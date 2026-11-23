@@ -13,7 +13,11 @@ from homeassistant.core import HomeAssistant
 from homeassistant.helpers.service_info.zeroconf import ZeroconfServiceInfo
 import voluptuous as vol
 
-from .const import CONF_WEBSOCKET_PORT, DOMAIN  # pylint:disable=unused-import
+from .const import (  # pylint:disable=unused-import
+    CONF_WEBSOCKET_PORT,
+    DOMAIN,
+    normalize_uuid,
+)
 from .maveo_box import MaveoBox, NymeaPairingError
 
 _LOGGER = logging.getLogger(__name__)
@@ -84,9 +88,32 @@ class NymeaConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         port = discovery_info.port or 2223  # Use JSON-RPC port by default.
         websocket_port = 4445  # WebSocket port for notifications.
 
-        # Check if already configured.
-        await self.async_set_unique_id(discovery_info.hostname.replace(".local.", ""))
+        # Use the server uuid from the TXT record as unique ID. The mDNS
+        # hostname is not stable: Avahi on the box renames itself on name
+        # conflicts (maveo-box -> maveo-box-2 -> maveo-box-3 ...).
+        server_uuid = normalize_uuid(discovery_info.properties.get("uuid"))
+        unique_id = server_uuid or discovery_info.hostname.removesuffix(".local.")
+
+        # Check if already configured (before connecting to the box, so a
+        # known box re-announcing itself costs no connection).
+        await self.async_set_unique_id(unique_id)
         self._abort_if_unique_id_configured(updates={CONF_HOST: host})
+
+        # Entries created before the uuid became the unique ID carry the old
+        # hostname-based ID. Match them by host and migrate them in place.
+        if server_uuid:
+            for entry in self._async_current_entries(include_ignore=False):
+                if entry.unique_id != server_uuid and entry.data.get(CONF_HOST) == host:
+                    _LOGGER.info(
+                        "Migrating unique ID of '%s' from %s to %s",
+                        entry.title,
+                        entry.unique_id,
+                        server_uuid,
+                    )
+                    self.hass.config_entries.async_update_entry(
+                        entry, unique_id=server_uuid
+                    )
+                    return self.async_abort(reason="already_configured")
 
         # Store discovery info for later use.
         self.discovery_info = discovery_info
@@ -195,8 +222,9 @@ class NymeaConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             return self.async_show_form(step_id="link", errors=errors)
 
         # Prefer the server UUID as unique ID (manual flow has none set yet).
-        if self.unique_id is None and box.server_uuid:
-            await self.async_set_unique_id(box.server_uuid)
+        server_uuid = normalize_uuid(box.server_uuid)
+        if self.unique_id is None and server_uuid:
+            await self.async_set_unique_id(server_uuid)
             self._abort_if_unique_id_configured(
                 updates={CONF_HOST: self.data[CONF_HOST]}
             )

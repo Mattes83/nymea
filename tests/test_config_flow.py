@@ -8,6 +8,7 @@ from homeassistant.core import HomeAssistant
 from homeassistant.data_entry_flow import FlowResultType
 from homeassistant.helpers.service_info.zeroconf import ZeroconfServiceInfo
 import pytest
+from pytest_homeassistant_custom_component.common import MockConfigEntry
 
 from custom_components.nymea.config_flow import (
     CannotConnect,
@@ -248,3 +249,124 @@ async def test_zeroconf_cannot_connect(hass: HomeAssistant) -> None:
 
     assert result["type"] == FlowResultType.ABORT
     assert result["reason"] == "cannot_connect"
+
+
+BOX_UUID_TXT = "{5DEC6CE8-59e8-49d1-9345-6715e1301195}"
+BOX_UUID = "5dec6ce8-59e8-49d1-9345-6715e1301195"
+
+
+def _discovery(hostname: str = "maveo-box-3.local.", uuid: str | None = BOX_UUID_TXT):
+    """Build a JSON-RPC zeroconf discovery like the maveo box sends it."""
+    return ZeroconfServiceInfo(
+        ip_address="192.168.2.179",
+        ip_addresses=["192.168.2.179"],
+        hostname=hostname,
+        name="nymea-tcp-external._jsonrpc._tcp.local.",
+        port=2223,
+        type="_jsonrpc._tcp.local.",
+        properties={"uuid": uuid} if uuid else {},
+    )
+
+
+async def test_zeroconf_uses_server_uuid(hass: HomeAssistant, mock_maveo_box) -> None:
+    """The unique ID comes from the TXT uuid, not the mDNS hostname."""
+    with patch(
+        "custom_components.nymea.config_flow.MaveoBox",
+        return_value=mock_maveo_box,
+    ):
+        result = await hass.config_entries.flow.async_init(
+            DOMAIN,
+            context={"source": config_entries.SOURCE_ZEROCONF},
+            data=_discovery(),
+        )
+
+    assert result["type"] == FlowResultType.FORM
+    flow = hass.config_entries.flow.async_get(result["flow_id"])
+    assert flow["context"]["unique_id"] == BOX_UUID
+
+
+async def test_zeroconf_falls_back_to_hostname(
+    hass: HomeAssistant, mock_maveo_box
+) -> None:
+    """Without a uuid in the TXT record the hostname is used."""
+    with patch(
+        "custom_components.nymea.config_flow.MaveoBox",
+        return_value=mock_maveo_box,
+    ):
+        result = await hass.config_entries.flow.async_init(
+            DOMAIN,
+            context={"source": config_entries.SOURCE_ZEROCONF},
+            data=_discovery(uuid=None),
+        )
+
+    flow = hass.config_entries.flow.async_get(result["flow_id"])
+    assert flow["context"]["unique_id"] == "maveo-box-3"
+
+
+async def test_zeroconf_known_uuid_renamed_host_aborts_without_connecting(
+    hass: HomeAssistant,
+) -> None:
+    """A configured box that renamed itself is recognised by its uuid."""
+    entry = MockConfigEntry(
+        domain=DOMAIN,
+        data={CONF_HOST: "192.168.2.50", CONF_PORT: 2223, CONF_TOKEN: "t"},
+        unique_id=BOX_UUID,
+    )
+    entry.add_to_hass(hass)
+
+    with patch("custom_components.nymea.config_flow.MaveoBox") as mock_box:
+        result = await hass.config_entries.flow.async_init(
+            DOMAIN,
+            context={"source": config_entries.SOURCE_ZEROCONF},
+            data=_discovery(hostname="maveo-box-7.local."),
+        )
+
+    assert result["type"] == FlowResultType.ABORT
+    assert result["reason"] == "already_configured"
+    mock_box.assert_not_called()
+    # Changed IP is taken over.
+    assert entry.data[CONF_HOST] == "192.168.2.179"
+
+
+async def test_zeroconf_migrates_legacy_hostname_entry(hass: HomeAssistant) -> None:
+    """An entry with the old hostname-based unique ID is migrated by host."""
+    entry = MockConfigEntry(
+        domain=DOMAIN,
+        data={CONF_HOST: "192.168.2.179", CONF_PORT: 2223, CONF_TOKEN: "t"},
+        unique_id="maveo-box-2",
+    )
+    entry.add_to_hass(hass)
+
+    with patch("custom_components.nymea.config_flow.MaveoBox") as mock_box:
+        result = await hass.config_entries.flow.async_init(
+            DOMAIN,
+            context={"source": config_entries.SOURCE_ZEROCONF},
+            data=_discovery(hostname="maveo-box-3.local."),
+        )
+
+    assert result["type"] == FlowResultType.ABORT
+    assert result["reason"] == "already_configured"
+    mock_box.assert_not_called()
+    assert entry.unique_id == BOX_UUID
+
+
+async def test_link_step_normalizes_server_uuid(
+    hass: HomeAssistant, mock_maveo_box, mock_setup_entry
+) -> None:
+    """Manual setup stores the same uuid format as zeroconf."""
+    mock_maveo_box.server_uuid = BOX_UUID_TXT
+    with patch(
+        "custom_components.nymea.config_flow.MaveoBox",
+        return_value=mock_maveo_box,
+    ):
+        result = await hass.config_entries.flow.async_init(
+            DOMAIN, context={"source": config_entries.SOURCE_USER}
+        )
+        result = await hass.config_entries.flow.async_configure(
+            result["flow_id"],
+            {CONF_HOST: "192.168.2.179", CONF_PORT: 2223, CONF_WEBSOCKET_PORT: 4445},
+        )
+        result = await hass.config_entries.flow.async_configure(result["flow_id"], {})
+
+    assert result["type"] == FlowResultType.CREATE_ENTRY
+    assert result["result"].unique_id == BOX_UUID
